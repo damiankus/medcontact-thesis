@@ -1,7 +1,9 @@
 package com.medcontact.data.repository;
 
-import com.medcontact.data.model.Administrator;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface AdministratorRepository extends AbstractUserRepository<Administrator, Long> {
+import com.medcontact.data.model.Admin;
+
+public interface AdministratorRepository extends PagingAndSortingRepository<Admin, Long> {
 
 }

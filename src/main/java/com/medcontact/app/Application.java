@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-import com.medcontact.data.model.Administrator;
+import com.medcontact.data.model.Admin;
 import com.medcontact.data.model.Sex;
 import com.medcontact.data.repository.AdministratorRepository;
 
@@ -27,7 +27,7 @@ public class Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		Administrator admin = new Administrator("admin@admin.com", "admin", "Damian", "Kus", Sex.MALE);
+		Admin admin = new Admin("admin@admin.com", "admin", "Damian", "Kus", Sex.MALE);
 		adminRepository.save(admin);
 	}
 }

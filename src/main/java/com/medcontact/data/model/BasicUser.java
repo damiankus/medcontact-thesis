@@ -96,4 +96,52 @@ public class BasicUser implements UserDetails {
 		this.sex = sex.toString();
 		this.email = email;
 	}
+	
+	public static BasicUserBuilder getBuilder() {
+		return new BasicUserBuilder();
+	}
+	
+	/* 
+	 * For the sake of convenience we provide a fluent API
+	 * for building BasicUser objects.
+	 *  */
+	
+	public static class BasicUserBuilder {
+		private BasicUser user;
+		
+		public BasicUserBuilder() {
+			this.user = new BasicUser("", "", ApplicationRole.PATIENT, "", "", Sex.OTHER);
+		}
+		
+		public BasicUser.BasicUserBuilder setUsername(String username) {
+			user.setUsername(username);
+			return this;
+		}
+		
+		public BasicUser.BasicUserBuilder setPassword(String password) {
+			user.setPassword(password);
+			return this;
+		}
+		
+		public BasicUser.BasicUserBuilder setRole(ApplicationRole role) {
+			user.setAuthorities(
+					Arrays.asList(
+							new SimpleGrantedAuthority(role.toString())));;
+			return this;
+		}
+		
+		public BasicUser.BasicUserBuilder setEmail(String email) {
+			user.setPassword(email);
+			return this;
+		}
+		
+		public BasicUser.BasicUserBuilder setSex(Sex sex) {
+			user.setSex(sex.toString());
+			return this;
+		}
+		
+		public BasicUser build() {
+			return this.user;
+		}
+	}
 }
