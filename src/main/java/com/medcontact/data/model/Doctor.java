@@ -1,5 +1,7 @@
 package com.medcontact.data.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -14,7 +16,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.apache.http.auth.BasicUserPrincipal;
 import org.hibernate.annotations.Check;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import com.medcontact.data.model.BasicUser.AbstractUserBuilder;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -37,7 +43,7 @@ public class Doctor extends BasicUser {
 			inverseJoinColumns= {
 					@JoinColumn(name="specialty_id", nullable=false)
 			})
-	private Set<Specialty> specialties;
+	private List<Specialty> specialties;
 	
 	@Column(nullable=false)
 	@NonNull
@@ -52,7 +58,63 @@ public class Doctor extends BasicUser {
 	@OneToMany(mappedBy="ratedDoctor", fetch=FetchType.LAZY)
 	private List<Opinion> opinions;
 	
+	/* Setting default values. */
+	
+	public Doctor() {
+		super();
+		this.specialties = new ArrayList<>();
+		this.title = "default";
+		this.university = "default";
+		this.biography = "default";
+		this.rating = 0;
+		this.opinions = new ArrayList<>();
+		
+		this.authorities = Arrays.asList(
+				new SimpleGrantedAuthority(
+						ApplicationRole.DOCTOR.toString()));
+	}
+	
 	public Doctor(String email, String password, String firstName, String lastName, Sex sex) {
 		super(email, password, ApplicationRole.DOCTOR, firstName, lastName, sex);
+	}
+	
+	public static DoctorBuilder getBuilder() {
+		return new DoctorBuilder();
+	}
+	
+	public static class DoctorBuilder extends BasicUser.BasicUserBuilder {
+		public DoctorBuilder() {
+			this.user = new Doctor();
+		}
+		
+		public DoctorBuilder setTitle(String title) {
+			((Doctor) user).setTitle(title);
+			return this;
+		}
+		
+		public DoctorBuilder setUniversity(String university) {
+			((Doctor) user).setUniversity(university);
+			return this;
+		}
+		
+		public DoctorBuilder setBiography(String biography) {
+			((Doctor) user).setBiography(biography);
+			return this;
+		}
+		
+		public DoctorBuilder setRating(float rating) {
+			((Doctor) user).setRating(rating);
+			return this;
+		}
+		
+		public DoctorBuilder setSpecialties(List<Specialty> specialties) {
+			((Doctor) user).setSpecialties(specialties);
+			return this;
+		}
+		
+		public DoctorBuilder setOpinions(List<Opinion> opinions) {
+			((Doctor) user).setOpinions(opinions);
+			return this;
+		}
 	}
 }
