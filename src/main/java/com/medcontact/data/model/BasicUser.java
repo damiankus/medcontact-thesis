@@ -6,6 +6,8 @@ import java.util.Collection;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -72,7 +74,8 @@ public class BasicUser implements UserDetails {
 	
 	@Column(nullable=false)
 	@NonNull
-	protected String sex;
+	@Enumerated(EnumType.STRING)
+	protected Sex sex;
 	
 	@Column(nullable=false)
 	@NonNull
@@ -94,7 +97,7 @@ public class BasicUser implements UserDetails {
 		
 		this.firstName = "default";
 		this.lastName = "default";
-		this.sex = Sex.OTHER.toString();
+		this.sex = Sex.OTHER;
 		this.email = "default@default.com";
 	}
 	
@@ -112,7 +115,7 @@ public class BasicUser implements UserDetails {
 		
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.sex = sex.toString();
+		this.sex = sex;
 		this.email = email;
 	}
 	
@@ -173,7 +176,7 @@ public class BasicUser implements UserDetails {
 		}
 		
 		public AbstractUserBuilder<T> setSex(Sex sex) {
-			user.setSex(sex.toString());
+			user.setSex(sex);
 			return this;
 		}
 		
@@ -182,7 +185,7 @@ public class BasicUser implements UserDetails {
 		}
 	}
 	
-	public static class BasicUserBuilder<T extends BasicUser> extends AbstractUserBuilder<BasicUser> {
+	public static class BasicUserBuilder extends AbstractUserBuilder<BasicUser> {
 		public BasicUserBuilder() {
 			this.user = new BasicUser("", "", ApplicationRole.PATIENT, "", "", Sex.OTHER);
 		}

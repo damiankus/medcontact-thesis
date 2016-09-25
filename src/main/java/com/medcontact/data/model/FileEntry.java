@@ -1,5 +1,6 @@
 package com.medcontact.data.model;
 
+import java.sql.Blob;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -29,7 +30,7 @@ public class FileEntry {
 	private LocalDateTime uploadTime;
 	
 	@Column(nullable=false)
-	private byte[] fileContent;
+	private Blob fileContent;
 	
 	@ManyToOne
 	@JoinColumn(name="file_owner_id")

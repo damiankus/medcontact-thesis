@@ -1,6 +1,8 @@
 package com.medcontact.data.model;
 
-import javax.persistence.Column;
+import java.sql.Date;
+import java.sql.Time;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,29 +11,27 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Check;
-
 import lombok.Data;
+import lombok.NonNull;
 
 @Entity
-@Table(name="opinions")
-@Check(constraints="rating > 0 AND rating <= 5")
+@Table(name="reservations")
 @Data
-public class Opinion {
+public class Reservation {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
-	
-	@Column(length=2048)
-	private String content;
-	private float rating;
-	
-	@ManyToOne
-	@JoinColumn(name="rated_doctor_id")
-	private Doctor ratedDoctor;
+	private Date date;
+	private Time startTime;
+	private Time endTime;
 	
 	@ManyToOne
-	@JoinColumn(name="rating_patient_id")
-	private Patient ratingPatient;
+	@JoinColumn(name="patient_id") 
+	private Patient patient;
+	
+	@ManyToOne
+	@JoinColumn(name="doctor_id")
+	private Doctor doctor;
+	
 }

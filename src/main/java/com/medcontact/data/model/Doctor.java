@@ -21,6 +21,7 @@ import org.hibernate.annotations.Check;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.medcontact.data.model.BasicUser.AbstractUserBuilder;
+import com.medcontact.data.model.Patient.PatientBuilder;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -28,7 +29,6 @@ import lombok.NonNull;
 @Entity
 @Table(name="doctors")
 @DiscriminatorValue("DOCTOR")
-@Check(constraints="rating > 0 AND rating <= 5")
 @Data
 public class Doctor extends BasicUser {
 	private static final long serialVersionUID = -5663126536666561117L;
@@ -49,14 +49,19 @@ public class Doctor extends BasicUser {
 	@NonNull
 	private String university;
 	private String biography;
-	private float rating;
 	
 	@Column(nullable=false)
 	@NonNull
 	private String title;
 	
-	@OneToMany(mappedBy="ratedDoctor", fetch=FetchType.LAZY)
+	@OneToMany(mappedBy="ratedDoctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<Opinion> opinions;
+	
+	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<Reservation> reservations;
+	
+	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<ScheduleTimeSlot> weeklySchedule;
 	
 	/* Setting default values. */
 	
@@ -66,8 +71,9 @@ public class Doctor extends BasicUser {
 		this.title = "default";
 		this.university = "default";
 		this.biography = "default";
-		this.rating = 0;
 		this.opinions = new ArrayList<>();
+		this.reservations = new ArrayList<>();
+		this.weeklySchedule = new ArrayList<>();
 		
 		this.authorities = Arrays.asList(
 				new SimpleGrantedAuthority(
@@ -102,11 +108,6 @@ public class Doctor extends BasicUser {
 			return this;
 		}
 		
-		public DoctorBuilder setRating(float rating) {
-			((Doctor) user).setRating(rating);
-			return this;
-		}
-		
 		public DoctorBuilder setSpecialties(List<Specialty> specialties) {
 			((Doctor) user).setSpecialties(specialties);
 			return this;
@@ -114,6 +115,16 @@ public class Doctor extends BasicUser {
 		
 		public DoctorBuilder setOpinions(List<Opinion> opinions) {
 			((Doctor) user).setOpinions(opinions);
+			return this;
+		}
+		
+		public DoctorBuilder setReservations(List<Reservation> reservations) {
+			((Doctor) user).setReservations(reservations);
+			return this;
+		}
+		
+		public DoctorBuilder setWeeklySchedule(List<ScheduleTimeSlot> schedule) {
+			((Doctor) user).setWeeklySchedule(schedule);
 			return this;
 		}
 	}

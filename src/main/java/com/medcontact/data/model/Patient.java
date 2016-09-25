@@ -24,11 +24,19 @@ public class Patient extends BasicUser {
 	@OneToMany(mappedBy="fileOwner", fetch=FetchType.LAZY)
 	private List<FileEntry> files;
 	
+	@OneToMany(mappedBy="patient", fetch=FetchType.LAZY)
+	private List<Reservation> reservations;
+	
+	@OneToMany(mappedBy="ratingPatient")
+	private List<Opinion> opinions;
+	
 	/* Setting default values for the members */
 	
 	public Patient() {
 		super();
 		this.files = new ArrayList<>();
+		this.opinions = new ArrayList<>();
+		this.reservations = new ArrayList<>();
 		this.authorities = Arrays.asList(
 				new SimpleGrantedAuthority(
 						ApplicationRole.PATIENT.toString()));
@@ -49,6 +57,16 @@ public class Patient extends BasicUser {
 		
 		public PatientBuilder setFiles(List<FileEntry> files) {
 			((Patient) user).setFiles(files);
+			return this;
+		}
+		
+		public PatientBuilder setOpinions(List<Opinion> opinions) {
+			((Patient) user).setOpinions(opinions);
+			return this;
+		}
+		
+		public PatientBuilder setReservations(List<Reservation> reservations) {
+			((Patient) user).setReservations(reservations);
 			return this;
 		}
 	}
