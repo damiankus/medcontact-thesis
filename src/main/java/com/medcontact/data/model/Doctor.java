@@ -3,7 +3,7 @@ package com.medcontact.data.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,12 +16,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.apache.http.auth.BasicUserPrincipal;
-import org.hibernate.annotations.Check;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import com.medcontact.data.model.BasicUser.AbstractUserBuilder;
-import com.medcontact.data.model.Patient.PatientBuilder;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -54,6 +49,10 @@ public class Doctor extends BasicUser {
 	@NonNull
 	private String title;
 	
+	@Column(nullable=false)
+	@NonNull
+	private String roomId;
+	
 	@OneToMany(mappedBy="ratedDoctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<Opinion> opinions;
 	
@@ -74,14 +73,11 @@ public class Doctor extends BasicUser {
 		this.opinions = new ArrayList<>();
 		this.reservations = new ArrayList<>();
 		this.weeklySchedule = new ArrayList<>();
+		this.roomId = UUID.randomUUID().toString();
 		
 		this.authorities = Arrays.asList(
 				new SimpleGrantedAuthority(
 						ApplicationRole.DOCTOR.toString()));
-	}
-	
-	public Doctor(String email, String password, String firstName, String lastName, Sex sex) {
-		super(email, password, ApplicationRole.DOCTOR, firstName, lastName, sex);
 	}
 	
 	public static DoctorBuilder getBuilder() {
@@ -125,6 +121,11 @@ public class Doctor extends BasicUser {
 		
 		public DoctorBuilder setWeeklySchedule(List<ScheduleTimeSlot> schedule) {
 			((Doctor) user).setWeeklySchedule(schedule);
+			return this;
+		}
+		
+		public DoctorBuilder setRoomId(String roomId) {
+			((Doctor) user).setRoomId(roomId);
 			return this;
 		}
 	}

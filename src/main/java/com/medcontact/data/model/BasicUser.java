@@ -20,6 +20,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Data;
 import lombok.NonNull;
 
@@ -29,6 +31,7 @@ import lombok.NonNull;
 @Inheritance(strategy=InheritanceType.JOINED)
 @DiscriminatorColumn(name="role")
 @Data
+@JsonIgnoreProperties({"password"})
 public class BasicUser implements UserDetails {
 	private static final long serialVersionUID = 2679949213300447361L;
 	

@@ -10,7 +10,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
+import com.medcontact.data.model.Admin;
 import com.medcontact.data.model.Doctor;
+import com.medcontact.data.model.Patient;
 import com.medcontact.data.model.ScheduleTimeSlot;
 import com.medcontact.data.model.Sex;
 import com.medcontact.data.model.Specialty;
@@ -52,15 +54,48 @@ public class Application implements CommandLineRunner {
 				.setBiography("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
 				.setWeeklySchedule(schedule)
 				.setUniversity("Uniwersytet Jagielloński")
-				.setUsername("toughMothFucka")
-				.setPassword("weakAssBitch")
+				.setUsername("doctor")
+				.setPassword("doctor")
 				.setFirstName("Jan")
-				.setLastName("Bęcwał")
+				.setLastName("Kowalski")
 				.setEmail("jan.becwal@gmail.com")
 				.setSex(Sex.MALE)
 				.build();
 		schedule.forEach(ts -> ts.setDoctor(doctor));
 		
 		doctorRepository.save(doctor);
+		
+		Admin admin = (Admin) Admin.getBuilder()
+				.setFirstName("Jan")
+				.setLastName("Kowalski")
+				.setEmail("jan.kowalski@gmail.com")
+				.setSex(Sex.MALE)
+				.setUsername("admin")
+				.setPassword("admin")
+				.build();
+		
+		adminRepository.save(admin);
+		
+		Patient patient1 = (Patient) Patient.getBuilder()
+				.setFirstName("Jan")
+				.setLastName("Kowalski")
+				.setEmail("jan.kowalski@gmail.com")
+				.setSex(Sex.MALE)
+				.setUsername("jank")
+				.setPassword("haslo")
+				.build();
+		
+		Patient patient2 = (Patient) Patient.getBuilder()
+				.setFirstName("Janina")
+				.setLastName("Malinowska")
+				.setEmail("janina.malinowska@gmail.com")
+				.setSex(Sex.MALE)
+				.setUsername("janinamal")
+				.setPassword("haslo")
+				.build();
+		
+		patientRepository.save(patient1);
+		patientRepository.save(patient2);
+				
 	}
 }

@@ -1,7 +1,7 @@
 package com.medcontact.data.model;
 
 import java.sql.Blob;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,10 +24,10 @@ public class FileEntry {
 	private long id;
 	
 	@Column(nullable=false)
-	private String description;
+	private String name;
 	
 	@Column(nullable=false)
-	private LocalDateTime uploadTime;
+	private Timestamp uploadTime;
 	
 	@Column(nullable=false)
 	private Blob fileContent;
