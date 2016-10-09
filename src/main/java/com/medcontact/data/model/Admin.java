@@ -6,7 +6,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.hornetq.core.deployers.impl.BasicUserCredentialsDeployer;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import lombok.Data;

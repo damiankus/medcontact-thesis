@@ -40,11 +40,11 @@ public class BasicUser implements UserDetails {
 	protected long id;
 	
 	/* Authentication details required by the UserDetails interface. */
-	
-	@Column(nullable=false, updatable=false, unique=true)
-	@NonNull
-	protected String username;
 
+	@Column(nullable=false)
+	@NonNull
+	protected String username;	
+	
 	@Column(nullable=false)
 	@NonNull
 	protected String password;
@@ -67,6 +67,10 @@ public class BasicUser implements UserDetails {
 	
 	/* Custom user data */
 	
+	@Column(nullable=false, unique=true)
+	@NonNull
+	protected String email;
+	
 	@Column(nullable=false)
 	@NonNull
 	protected String firstName;
@@ -80,28 +84,23 @@ public class BasicUser implements UserDetails {
 	@Enumerated(EnumType.STRING)
 	protected Sex sex;
 	
-	@Column(nullable=false)
-	@NonNull
-	protected String email;
 	
 	/* Default constructor. We're setting default values for 
 	 * the class members. */
 	
 	public BasicUser() {
-
-		this.username = "default";
-		this.password = "default";
+		this.username = "";
+		this.password = "";
 		this.enabled = true;
 		this.accountNonExpired = true;
 		this.credentialsNonExpired = true;
 		this.accountNonLocked = true;
 		this.authorities = Arrays.asList(
 				new SimpleGrantedAuthority(ApplicationRole.PATIENT.toString()));
-		
-		this.firstName = "default";
-		this.lastName = "default";
+		this.firstName = "";
+		this.lastName = "";
 		this.sex = Sex.OTHER;
-		this.email = "default@default.com";
+		this.email = "";
 	}
 	
 	public BasicUser(String email, String password, ApplicationRole role, 
@@ -127,7 +126,6 @@ public class BasicUser implements UserDetails {
 	}
 	
 	public <T extends BasicUser> void copyBasicData(T other) {
-		this.username = other.getUsername();
 		this.password = other.getPassword();
 		this.enabled = other.isEnabled();
 		this.accountNonExpired = other.isAccountNonExpired();
@@ -139,6 +137,14 @@ public class BasicUser implements UserDetails {
 		this.lastName = other.getLastName();
 		this.sex = other.getSex();
 		this.email = other.getEmail();
+	}
+	
+	/* We use the email as the user name and thus we must 
+	 * after changing the email address we need to modify the username too. */
+	
+	public void setEmail(String email) {
+		this.email = email;
+		this.username = email;
 	}
 	
 	public static BasicUserBuilder getBuilder() {
@@ -153,11 +159,6 @@ public class BasicUser implements UserDetails {
 	public abstract static class AbstractUserBuilder<T extends BasicUser> {
 		protected T user;
 				
-		public AbstractUserBuilder<T> setUsername(String username) {
-			user.setUsername(username);
-			return this;
-		}
-		
 		public AbstractUserBuilder<T> setPassword(String password) {
 			user.setPassword(password);
 			return this;
@@ -174,12 +175,22 @@ public class BasicUser implements UserDetails {
 		}
 		
 		public AbstractUserBuilder<T> setEmail(String email) {
-			user.setPassword(email);
+			user.setEmail(email);
 			return this;
 		}
 		
 		public AbstractUserBuilder<T> setSex(Sex sex) {
 			user.setSex(sex);
+			return this;
+		}
+		
+		public AbstractUserBuilder<T> valueOf(BasicUserDetails details) {
+			user.setPassword(details.getPassword());
+			user.setEmail(details.getEmail());
+			user.setFirstName(details.getFirstName());
+			user.setLastName(details.getLastName());
+			user.setSex(details.getSex());
+			
 			return this;
 		}
 		
@@ -190,7 +201,7 @@ public class BasicUser implements UserDetails {
 	
 	public static class BasicUserBuilder extends AbstractUserBuilder<BasicUser> {
 		public BasicUserBuilder() {
-			this.user = new BasicUser("", "", ApplicationRole.PATIENT, "", "", Sex.OTHER);
+			this.user = new BasicUser();
 		}
 	}
 }

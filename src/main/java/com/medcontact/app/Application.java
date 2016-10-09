@@ -54,7 +54,6 @@ public class Application implements CommandLineRunner {
 				.setBiography("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
 				.setWeeklySchedule(schedule)
 				.setUniversity("Uniwersytet Jagielloński")
-				.setUsername("doctor")
 				.setPassword("doctor")
 				.setFirstName("Jan")
 				.setLastName("Kowalski")
@@ -68,9 +67,8 @@ public class Application implements CommandLineRunner {
 		Admin admin = (Admin) Admin.getBuilder()
 				.setFirstName("Jan")
 				.setLastName("Kowalski")
-				.setEmail("jan.kowalski@gmail.com")
+				.setEmail("jan.kowalskij@gmail.com")
 				.setSex(Sex.MALE)
-				.setUsername("admin")
 				.setPassword("admin")
 				.build();
 		
@@ -81,7 +79,6 @@ public class Application implements CommandLineRunner {
 				.setLastName("Kowalski")
 				.setEmail("jan.kowalski@gmail.com")
 				.setSex(Sex.MALE)
-				.setUsername("jank")
 				.setPassword("haslo")
 				.build();
 		
@@ -90,7 +87,6 @@ public class Application implements CommandLineRunner {
 				.setLastName("Malinowska")
 				.setEmail("janina.malinowska@gmail.com")
 				.setSex(Sex.MALE)
-				.setUsername("janinamal")
 				.setPassword("haslo")
 				.build();
 		

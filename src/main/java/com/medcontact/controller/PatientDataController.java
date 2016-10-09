@@ -37,7 +37,7 @@ public class PatientDataController {
 	@Autowired
 	FileRepository fileRepository;
 	
-	@GetMapping(value="patientsList")
+	@GetMapping(value="patients")
 	@ResponseBody
 	public List<Patient> getPatientsList() {
 		ArrayList<Patient> patients = new ArrayList<>();

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	
+	<title>Rejestracja użytkownika</title>
+	
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"  
+		integrity="sha382-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg2Va+PmSTsz/K68vbdEjh2u" 
+		crossorigin="anonymous"/>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+		integrity="sha382-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
+		crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="css/signup/signup.css"/>
+	
+</head>
+<body>
+	<div class="container">
+		<div class="jumbotron">
+			<form class="form-horizontal" action="signup/save" method="post">
+				<input type="hidden" 
+					th:name="${_csrf.parameterName}" 
+					th:value="${_csrf.token}" />
+				<h3 class="">Rejestracja pacjenta</h3>				
+				<div class="form-group">
+					<label class="col-md-3 control-label">Imię: </label>
+					<div class="col-md-8">
+						<input name="firstName" type="text" class="form-control" autofocus="autofocus" required="required"/>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-3 control-label">Nazwisko:</label>
+					<div class="col-md-8">
+						<input name="lastName" type="text" class="form-control" required="required"/>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-3 control-label">Adres e-mail: </label>
+					<div class="col-md-8">
+						<input name="email" type="text" class="form-control" required="required"/>
+					</div>
+				</div>
+								
+				<div class="form-group">
+					<label class="col-md-3 control-label">Hasło: </label>
+					<div class="col-md-8">
+						<input name="password" type="password" class="form-control" required="required"/>
+					</div>
+				</div>
+								
+				<div class="form-group">
+					<label class="col-md-3 control-label">Płeć: </label>
+					<div class="col-md-9">
+						<div class="btn-group" data-toggle="buttons">
+							<label class="btn btn-primary active">
+								<input type="radio" name="sex" id="sex-female" value="FEMALE" checked="checked"/> kobieta
+							</label>
+							<label class="btn btn-primary">
+								<input type="radio" name="sex" id="sex-male" value="MALE"/> mężczyzna
+							</label>
+							<label class="btn btn-primary">
+								<input type="radio" name="sex" id="sex-other" value="OTHER"/> inna
+							</label>
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-md-4 pull-right">
+					<input name="submit-btn" class="btn btn-lg btn-success" type="submit" value="Utwórz konto" />
+				</div>
+			</form>
+		</div>
+	</div>
+
+</body>
+</html>

@@ -16,8 +16,8 @@ public class ApplicationUserDetailsService implements UserDetailsService {
 	private BasicUserRepository userRepository;
 	
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Optional<BasicUser> user = userRepository.findByUsername(username);
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		Optional<BasicUser> user = userRepository.findByEmail(email);
 		
 		if (!user.isPresent()) {
 			throw new UsernameNotFoundException("Authentication failed");

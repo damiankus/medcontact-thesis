@@ -62,6 +62,9 @@ public class Doctor extends BasicUser {
 	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<ScheduleTimeSlot> weeklySchedule;
 	
+	@OneToMany(mappedBy="owner", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<Note> notes;
+	
 	/* Setting default values. */
 	
 	public Doctor() {
@@ -74,6 +77,7 @@ public class Doctor extends BasicUser {
 		this.reservations = new ArrayList<>();
 		this.weeklySchedule = new ArrayList<>();
 		this.roomId = UUID.randomUUID().toString();
+		this.notes = new ArrayList<>();
 		
 		this.authorities = Arrays.asList(
 				new SimpleGrantedAuthority(
@@ -126,6 +130,11 @@ public class Doctor extends BasicUser {
 		
 		public DoctorBuilder setRoomId(String roomId) {
 			((Doctor) user).setRoomId(roomId);
+			return this;
+		}
+		
+		public DoctorBuilder setNotes(List<Note> notes) {
+			((Doctor) user).setNotes(notes);
 			return this;
 		}
 	}
