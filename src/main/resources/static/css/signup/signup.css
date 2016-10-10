@@ -1,2 +1,10 @@
 @CHARSET "UTF-8";
 
+.form-horizontal {
+	padding-bottom: 2%;
+}
+
+.jumbotron {
+	margin: 5%;
+	width: 80%;
+}
