@@ -78,10 +78,7 @@ public class Doctor extends BasicUser {
 		this.weeklySchedule = new ArrayList<>();
 		this.roomId = UUID.randomUUID().toString();
 		this.notes = new ArrayList<>();
-		
-		this.authorities = Arrays.asList(
-				new SimpleGrantedAuthority(
-						ApplicationRole.DOCTOR.toString()));
+		this.role = ApplicationRole.DOCTOR;
 	}
 	
 	public static DoctorBuilder getBuilder() {

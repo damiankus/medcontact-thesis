@@ -29,7 +29,7 @@ import lombok.NonNull;
 @Entity
 @Table(name="users")
 @Inheritance(strategy=InheritanceType.JOINED)
-@DiscriminatorColumn(name="role")
+@DiscriminatorColumn(name="user_type")
 @Data
 @JsonIgnoreProperties({"password"})
 public class BasicUser implements UserDetails {
@@ -61,9 +61,17 @@ public class BasicUser implements UserDetails {
 	@Column(nullable=false)
 	protected boolean accountNonLocked;
 	
-	@Transient
-	@NonNull
-	protected Collection<? extends GrantedAuthority> authorities;
+	@Column
+//	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+//	@JoinTable(name="user_authority", 
+//			joinColumns={
+//					@JoinColumn(name="user_id", nullable=false)
+//			},
+//			inverseJoinColumns= {
+//					@JoinColumn(name="authority_id", nullable=false)
+//			})
+	@Enumerated(EnumType.STRING)
+	protected ApplicationRole role;
 	
 	/* Custom user data */
 	
@@ -79,9 +87,10 @@ public class BasicUser implements UserDetails {
 	@NonNull
 	protected String lastName;
 	
-	@Column(nullable=false)
-	@NonNull
-	@Enumerated(EnumType.STRING)
+//	@Column(nullable=false)
+//	@NonNull
+//	@Enumerated(EnumType.STRING)
+	@Transient
 	protected Sex sex;
 	
 	
@@ -95,34 +104,15 @@ public class BasicUser implements UserDetails {
 		this.accountNonExpired = true;
 		this.credentialsNonExpired = true;
 		this.accountNonLocked = true;
-		this.authorities = Arrays.asList(
-				new SimpleGrantedAuthority(ApplicationRole.PATIENT.toString()));
+		this.role = ApplicationRole.PATIENT;
 		this.firstName = "";
 		this.lastName = "";
 		this.sex = Sex.OTHER;
 		this.email = "";
 	}
 	
-	public BasicUser(String email, String password, ApplicationRole role, 
-			 String firstName, String lastName, Sex sex) {
-
-		this.username = email;
-		this.password = password;
-		this.enabled = true;
-		this.accountNonExpired = true;
-		this.credentialsNonExpired = true;
-		this.accountNonLocked = true;
-		this.authorities = Arrays.asList(
-				new SimpleGrantedAuthority(role.toString()));
-		
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.sex = sex;
-		this.email = email;
-	}
-	
 	public static BasicUser createDefaultUser() {
-		return new BasicUser("", "", ApplicationRole.PATIENT, "", "", Sex.OTHER);
+		return new BasicUser();
 	}
 	
 	public <T extends BasicUser> void copyBasicData(T other) {
@@ -131,7 +121,7 @@ public class BasicUser implements UserDetails {
 		this.accountNonExpired = other.isAccountNonExpired();
 		this.credentialsNonExpired = other.isCredentialsNonExpired();
 		this.accountNonLocked = other.isAccountNonLocked();
-		this.authorities = other.getAuthorities();
+		this.role = other.getRole();
 		
 		this.firstName = other.getFirstName();
 		this.lastName = other.getLastName();
@@ -203,5 +193,12 @@ public class BasicUser implements UserDetails {
 		public BasicUserBuilder() {
 			this.user = new BasicUser();
 		}
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return Arrays.asList(
+				new SimpleGrantedAuthority(
+						this.role.toString()));
 	}
 }

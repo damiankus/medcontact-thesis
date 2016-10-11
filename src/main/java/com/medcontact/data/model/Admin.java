@@ -22,13 +22,7 @@ public class Admin extends BasicUser {
 		/* This call sets the default values of the
 		 * user data. */
 		super();
-		this.authorities = Arrays.asList(
-				new SimpleGrantedAuthority(
-						ApplicationRole.ADMIN.toString()));
-	}
-	
-	public Admin(String email, String password, String firstName, String lastName, Sex sex) {
-		super(email, password, ApplicationRole.ADMIN, firstName, lastName, sex);
+		this.role = ApplicationRole.ADMIN;
 	}
 	
 	public static AdminBuilder getBuilder() {

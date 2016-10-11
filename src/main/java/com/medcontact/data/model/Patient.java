@@ -10,8 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import lombok.Data;
 
 @Entity
@@ -37,13 +35,7 @@ public class Patient extends BasicUser {
 		this.files = new ArrayList<>();
 		this.opinions = new ArrayList<>();
 		this.reservations = new ArrayList<>();
-		this.authorities = Arrays.asList(
-				new SimpleGrantedAuthority(
-						ApplicationRole.PATIENT.toString()));
-	}
-	
-	public Patient(String email, String password, String firstName, String lastName, Sex sex) {
-		super(email, password, ApplicationRole.PATIENT, firstName, lastName, sex);
+		this.role = ApplicationRole.PATIENT;
 	}
 	
 	public static PatientBuilder getBuilder() {

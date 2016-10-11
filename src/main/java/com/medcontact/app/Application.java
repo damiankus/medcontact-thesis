@@ -9,12 +9,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.medcontact.data.model.Admin;
 import com.medcontact.data.model.Doctor;
 import com.medcontact.data.model.Patient;
 import com.medcontact.data.model.ScheduleTimeSlot;
-import com.medcontact.data.model.Sex;
 import com.medcontact.data.model.Specialty;
 import com.medcontact.data.repository.AdministratorRepository;
 import com.medcontact.data.repository.DoctorRepository;
@@ -37,6 +37,9 @@ public class Application implements CommandLineRunner {
 	@Autowired
 	DoctorRepository doctorRepository;
 	
+	@Autowired
+	PasswordEncoder passwordEncoder;
+	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
@@ -54,44 +57,38 @@ public class Application implements CommandLineRunner {
 				.setBiography("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
 				.setWeeklySchedule(schedule)
 				.setUniversity("Uniwersytet Jagielloński")
-				.setPassword("doctor")
+				.setPassword(passwordEncoder.encode("haslo"))
 				.setFirstName("Jan")
 				.setLastName("Kowalski")
 				.setEmail("jan.becwal@gmail.com")
-				.setSex(Sex.MALE)
 				.build();
-		schedule.forEach(ts -> ts.setDoctor(doctor));
 		
+		schedule.forEach(ts -> ts.setDoctor(doctor));
 		doctorRepository.save(doctor);
 		
 		Admin admin = (Admin) Admin.getBuilder()
-				.setFirstName("Jan")
-				.setLastName("Kowalski")
-				.setEmail("jan.kowalskij@gmail.com")
-				.setSex(Sex.MALE)
-				.setPassword("admin")
+				.setFirstName("Admin")
+				.setLastName("Adminowski")
+				.setEmail("admin@gmail.com")
+				.setPassword(passwordEncoder.encode("haslo"))
 				.build();
 		
 		adminRepository.save(admin);
 		
-		Patient patient1 = (Patient) Patient.getBuilder()
-				.setFirstName("Jan")
-				.setLastName("Kowalski")
-				.setEmail("jan.kowalski@gmail.com")
-				.setSex(Sex.MALE)
-				.setPassword("haslo")
+		Patient patient = (Patient) Patient.getBuilder()
+				.setFirstName("Gregory")
+				.setLastName("House")
+				.setEmail("house@gmail.com")
+				.setPassword(passwordEncoder.encode("haslo"))
 				.build();
-		
 		Patient patient2 = (Patient) Patient.getBuilder()
-				.setFirstName("Janina")
-				.setLastName("Malinowska")
-				.setEmail("janina.malinowska@gmail.com")
-				.setSex(Sex.MALE)
-				.setPassword("haslo")
+				.setFirstName("Damian")
+				.setLastName("Kuś")
+				.setEmail("dkus@gmail.com")
+				.setPassword(passwordEncoder.encode("haslo"))
 				.build();
 		
-		patientRepository.save(patient1);
+		patientRepository.save(patient);
 		patientRepository.save(patient2);
-				
 	}
 }

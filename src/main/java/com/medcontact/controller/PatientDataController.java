@@ -37,9 +37,9 @@ public class PatientDataController {
 	@Autowired
 	FileRepository fileRepository;
 	
-	@GetMapping(value="patients")
+	@GetMapping(value="all")
 	@ResponseBody
-	public List<Patient> getPatientsList() {
+	public List<Patient> getAllPatients() {
 		ArrayList<Patient> patients = new ArrayList<>();
 		patientRepository.findAll()
 			.forEach(patients::add);
@@ -47,7 +47,7 @@ public class PatientDataController {
 		return patients;
 	}
 	
-	@GetMapping(value="basicData")
+	@GetMapping(value="basic")
 	@ResponseBody
 	public Patient getBasicData() {
 		return getCurrentUser();
@@ -68,9 +68,7 @@ public class PatientDataController {
 	@GetMapping(value="files")
 	@ResponseBody
 	public List<FileEntry> getFiles() {
-		Patient patient = getCurrentUser();
-		
-		return patient.getFiles();
+		return getCurrentUser().getFiles();
 	}
 	
 	@PostMapping(value="file/upload")
@@ -92,13 +90,20 @@ public class PatientDataController {
 	/* A utility method fetching the current logged in user's data. */
 	
 	private Patient getCurrentUser() {
-		Patient patient = (Patient) SecurityContextHolder.getContext().
-				getAuthentication()
+		Patient patient = (Patient) SecurityContextHolder.getContext()
+				.getAuthentication()
 				.getPrincipal();
 		
 		/* We don't return the actual password. */
 		
 		patient.setPassword("");
+		SecurityContextHolder.getContext()
+			.getAuthentication()
+			.getAuthorities()
+			.forEach(a -> System.out.println(a));
+		System.out.println("PATIENT: " + patient.toString() + "]");
+		patient.getAuthorities().forEach(a -> System.out.println("\t" + a));
+		System.out.println("]");
 		
 		return patient;
 	}

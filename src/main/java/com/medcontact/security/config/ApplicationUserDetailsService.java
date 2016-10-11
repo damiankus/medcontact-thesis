@@ -23,10 +23,6 @@ public class ApplicationUserDetailsService implements UserDetailsService {
 			throw new UsernameNotFoundException("Authentication failed");
 		}
 		
-		System.out.println("User with role: " + user.get().getClass().getName() + " has logged in.");
-		System.out.println("Authorities: ");
-		user.get().getAuthorities().forEach(a -> System.out.println(a.getAuthority()));
 		return user.get();
 	}
-
 }

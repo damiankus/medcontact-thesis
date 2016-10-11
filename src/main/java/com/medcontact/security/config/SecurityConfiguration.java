@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
@@ -18,9 +20,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/patient/**").hasRole("PATIENT")
 				.antMatchers("/doctor/**").hasRole("DOCTOR")
 				.antMatchers("/admin/**").hasRole("ADMIN")
+				.antMatchers("/docinfo/**").permitAll()
 				.antMatchers("/signup/**").permitAll()
+				.antMatchers("/home/**").permitAll()
 				.and()
 			.formLogin()
+				.loginPage("/login")
+				.failureUrl("/login?error")
+				.permitAll()
+				.and()
+			.logout()
+				.logoutUrl("/logout")
+				.logoutSuccessUrl("/home")
 				.and()
 			.httpBasic();
 	}
@@ -28,11 +39,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(getApplicationUserDetailsService());
+		auth.userDetailsService(getApplicationUserDetailsService())
+			.passwordEncoder(getPasswordEncoder());
 	}
 	
 	@Bean
 	public ApplicationUserDetailsService getApplicationUserDetailsService() {
 		return new ApplicationUserDetailsService();
+	}
+	
+	@Bean
+	public PasswordEncoder getPasswordEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 }

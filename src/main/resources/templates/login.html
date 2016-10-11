@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-	<meta charset="UTF-8"/>
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -20,7 +19,13 @@
 <body>
 	<div class="container">
 		<div class="jumbotron">
-			<form class="form-horizontal" action="login" method="post">
+			
+			<div id="error-message-box" class="alert alert-danger" th:if="${param.error != null}" >
+				<div class="row">Logowanie zakończyło się niepowodzeniem.</div>
+				<div class="row">Proszę upewnić się, że podane dane są poprawne.</div>
+			</div>
+		
+			<form name="f" th:action="@{/login}" class="form-horizontal" action="/login" method="post">
 				<input type="hidden" 
 					th:name="${_csrf.parameterName}" 
 					th:value="${_csrf.token}" />
@@ -45,10 +50,11 @@
 				</div>		
 								
 				<div class="pull-right">
-					<input name="submit-btn" class="btn btn-lg btn-success" type="submit" value="Utwórz konto"/>
+					<input name="submit-btn" class="btn btn-lg btn-success" type="submit" value="Zaloguj się" />
 				</div>
 			</form>
 		</div>
 	</div>
+
 </body>
 </html>
