@@ -6,8 +6,8 @@ var app = {
 $(document).ready(function () {
     var peerConnectionConfig;
     var roomId = $("meta[name=roomId]").attr("content");
+    
     console.log(roomId);
-    roomId = (roomId !== "undefined" && roomId !== "") ? roomId : "default";
     
     if (roomId === null) {
         console.log("Connection cancelled");
@@ -85,6 +85,48 @@ $(document).ready(function () {
     		$("#disconnect-btn").prop("disabled", true);
     		$("#hang-btn").prop("disabled", true);
     		disconnect(webrtc, roomId);
+    });
+    
+    $("#mute-btn").click(function () {
+    	var video = document.getElementById("localVideo");
+    	
+    	if (video.volume === 0) {
+    		video.volume = 0.5;
+    		webrtc.unmute();
+    		$(this).removeClass("glyphicon-volume-off");
+    		$(this).addClass("glyphicon-volume-up");
+    		$("#volume-level-range").val(video.volume * 100);
+  
+    	} else {
+    		video.volume = 0;
+    		webrtc.mute();
+      		$(this).removeClass("glyphicon-volume-up");
+    		$(this).addClass("glyphicon-volume-off");
+    		$("#volume-level-range").val(0);
+    	}
+    });
+    
+    /* Note that the input of the slider is an integer
+     * between 0 and 100. */
+    
+    $("#volume-level-range").change(function () {
+    	var video = document.getElementById("localVideo");
+    	video.volume = $(this).val() / 100.0;
+    	console.log("Volume changed to: " + video.volume);
+    	var muteBtn = $("#mute-btn");
+    	
+    	if (video.volume > 0 
+    			&& muteBtn.hasClass("glyphicon-volume-off")) {
+    		webrtc.unmute();
+    		muteBtn.removeClass("glyphicon-volume-off");
+    		muteBtn.addClass("glyphicon-volume-up");
+    		
+    	} else if (video.volume == 0 
+    			&& muteBtn.hasClass("glyphicon-volume-up")) {
+    		webrtc.mute();
+    		muteBtn.removeClass("glyphicon-volume-up");
+    		muteBtn.addClass("glyphicon-volume-off");
+    	}
     });
     
     $("#screenshot-btn").click(function () {
