@@ -29,7 +29,7 @@ import com.medcontact.data.repository.PatientRepository;
 
 @RestController
 @RequestMapping(value="patient")
-public class PatientDataController {
+public class PatientAccountController {
 	
 	@Autowired
 	PatientRepository patientRepository;
@@ -71,11 +71,12 @@ public class PatientDataController {
 		return getCurrentUser().getFiles();
 	}
 	
-	@PostMapping(value="file/upload")
+	@PostMapping(value="file/add")
 	public void handleFileUpload(
 			@RequestParam("file") MultipartFile file) 
 			throws SerialException, SQLException, IOException {
 		
+		Patient patient = getCurrentUser();
 		FileEntry fileEntry = new FileEntry();
 		fileEntry.setName(file.getName());
 		fileEntry.setUploadTime(
@@ -83,7 +84,8 @@ public class PatientDataController {
 						LocalDateTime.now()));
 		fileEntry.setFileContent(
 				new SerialBlob(file.getBytes()));
-		fileEntry.setFileOwner(getCurrentUser());
+		fileEntry.setFileOwner(patient);
+		patient.getFiles().add(fileEntry);
 		fileRepository.save(fileEntry);
 	}
 	
@@ -97,13 +99,6 @@ public class PatientDataController {
 		/* We don't return the actual password. */
 		
 		patient.setPassword("");
-		SecurityContextHolder.getContext()
-			.getAuthentication()
-			.getAuthorities()
-			.forEach(a -> System.out.println(a));
-		System.out.println("PATIENT: " + patient.toString() + "]");
-		patient.getAuthorities().forEach(a -> System.out.println("\t" + a));
-		System.out.println("]");
 		
 		return patient;
 	}
