@@ -1,0 +1,10 @@
+backend/.project
+backend/.springBeans
+backend/.classpath
+backend/mvnw
+backend/.settings/**
+backend/target/**
+backend/mvnw.cmd
+backend/.mvn/**
+.git/**
+.
