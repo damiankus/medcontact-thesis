@@ -1,0 +1,23 @@
+@CHARSET "UTF-8";
+
+#chat-panel {
+	height: 100%;
+}
+
+.profile-image {
+	width: 96px;
+	height: auto;
+}
+
+#localVideo {
+	width: 800px;
+	height: auto;
+	border-radius: 5px;
+}
+
+#volume-level-range {
+	display:inline-block;
+    vertical-align:middle;
+	width: auto;
+}
+
