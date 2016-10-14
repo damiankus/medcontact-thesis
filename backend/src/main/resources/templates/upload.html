@@ -6,7 +6,7 @@
 <title>File upload test</title>
 </head>
 <body>
-	<form th:action="@{/patient/file/upload}" method="post">
+	<form th:action="@{/patients/file/upload}" method="post">
 		<input th:type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 		<input name="file" type="file"/>
 		<input type="submit" name="Upload"/>

@@ -1,5 +1,18 @@
 package com.medcontact.controller;
 
+import com.medcontact.data.model.FileEntry;
+import com.medcontact.data.model.Opinion;
+import com.medcontact.data.model.Patient;
+import com.medcontact.data.model.Reservation;
+import com.medcontact.data.repository.FileRepository;
+import com.medcontact.data.repository.PatientRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -7,28 +20,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.rowset.serial.SerialBlob;
-import javax.sql.rowset.serial.SerialException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.medcontact.data.model.FileEntry;
-import com.medcontact.data.model.Opinion;
-import com.medcontact.data.model.Patient;
-import com.medcontact.data.model.Reservation;
-import com.medcontact.data.repository.FileRepository;
-import com.medcontact.data.repository.PatientRepository;
-
 @RestController
-@RequestMapping(value="patient")
+@RequestMapping(value="patients")
 public class PatientAccountController {
 	
 	@Autowired
@@ -40,11 +33,7 @@ public class PatientAccountController {
 	@GetMapping(value="all")
 	@ResponseBody
 	public List<Patient> getAllPatients() {
-		ArrayList<Patient> patients = new ArrayList<>();
-		patientRepository.findAll()
-			.forEach(patients::add);
-		
-		return patients;
+		return patientRepository.findAll();
 	}
 	
 	@GetMapping(value="basic")

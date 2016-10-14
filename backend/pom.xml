@@ -9,7 +9,7 @@
 	<packaging>war</packaging>
 
 	<name>login</name>
-	<description>Spring Security Trainig</description>
+	<description>Spring Security Training</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

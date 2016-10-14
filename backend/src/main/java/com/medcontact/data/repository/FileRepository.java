@@ -2,11 +2,11 @@ package com.medcontact.data.repository;
 
 import java.util.List;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.medcontact.data.model.FileEntry;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface FileRepository extends PagingAndSortingRepository<FileEntry, Long> {
+public interface FileRepository extends JpaRepository<FileEntry, Long> {
 	
 	public List<FileEntry> findByFileOwnerUsername(String username);
 }

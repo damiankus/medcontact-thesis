@@ -8,3 +8,4 @@ backend/mvnw.cmd
 backend/.mvn/**
 .git/**
 .
+backend/.idea
