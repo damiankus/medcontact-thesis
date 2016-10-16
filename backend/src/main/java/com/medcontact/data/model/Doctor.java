@@ -15,15 +15,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import lombok.Data;
 import lombok.NonNull;
 
 @Entity
 @Table(name="doctors")
 @DiscriminatorValue("DOCTOR")
-@JsonIgnoreProperties({ "opinions", "reservations", "weeklySchedule",  "notes" })
 @Data
 public class Doctor extends BasicUser {
 	private static final long serialVersionUID = -5663126536666561117L;

@@ -1,9 +1,8 @@
 package com.medcontact.data.repository;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
-
 import com.medcontact.data.model.Opinion;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface OpinionRepository extends PagingAndSortingRepository<Opinion, Long> {
+public interface OpinionRepository extends JpaRepository<Opinion, Long> {
 
 }

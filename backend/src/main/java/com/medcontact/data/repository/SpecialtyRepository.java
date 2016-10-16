@@ -1,9 +1,8 @@
 package com.medcontact.data.repository;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
-
 import com.medcontact.data.model.Specialty;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface SpecialtyRepository extends PagingAndSortingRepository<Specialty, Long> {
+public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
 
 }

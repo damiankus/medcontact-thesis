@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.rowset.serial.SerialBlob;
@@ -28,7 +27,7 @@ import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 
 @RestController
-@RequestMapping(value="patient")
+@RequestMapping(value="patients")
 public class PatientAccountController {
 	
 	@Autowired
@@ -40,12 +39,7 @@ public class PatientAccountController {
 	@GetMapping(value="all")
 	@ResponseBody
 	public List<Patient> getAllPatients() {
-		ArrayList<Patient> patients = new ArrayList<>();
-		patientRepository.findAll()
-			.forEach(patients::add);
-		System.out.println(getCurrentUser().getLastName());
-		
-		return patients;
+		return patientRepository.findAll();
 	}
 	
 	@GetMapping(value="basic")

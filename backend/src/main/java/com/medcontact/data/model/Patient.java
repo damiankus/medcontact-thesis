@@ -1,23 +1,15 @@
 package com.medcontact.data.model;
 
+import lombok.Data;
+
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import lombok.Data;
 
 @Entity
 @Table(name="patients")
 @DiscriminatorValue("PATIENT")
 @Data
-@JsonIgnoreProperties(value={ "files", "reservations", "opinions" })
 public class Patient extends BasicUser {
 	private static final long serialVersionUID = -6160436846217117334L;
 	
