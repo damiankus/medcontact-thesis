@@ -46,7 +46,6 @@ public class BasicUser implements UserDetails {
 	
 	@Column(nullable=false)
 	@NonNull
-	@JsonIgnore
 	protected String password;
 	
 	@Column(nullable=false)
@@ -131,11 +130,14 @@ public class BasicUser implements UserDetails {
 	}
 	
 	/* We use the email as the user name and thus we must 
-	 * after changing the email address we need to modify the username too. */
+	 * after changing the email address we need to modify the user name too.
+	 * Note that we modify the email address so that it doesn't contain
+	 * upper case letters. It should make email comparison easier (we use 
+	 * emails as user names). */
 	
 	public void setEmail(String email) {
-		this.email = email;
-		this.username = email;
+		this.email = email.toLowerCase();
+		this.username = email.toLowerCase();
 	}
 	
 	public static BasicUserBuilder getBuilder() {

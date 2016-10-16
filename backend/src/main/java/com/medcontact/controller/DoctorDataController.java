@@ -1,8 +1,10 @@
 package com.medcontact.controller;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,15 +29,15 @@ private Logger logger = Logger.getLogger(DoctorDataController.class.getName());
 	DoctorRepository doctorRepository;
 	
 	@GetMapping("{id}")
-	public ResponseEntity<JSONObject> addDoctor(
+	public ResponseEntity<Map<String, Object>> addDoctor(
 			@PathVariable("id") Long id) {
 		
-		JSONObject body = new JSONObject();
+		Map<String, Object> body = new HashMap<>();
 		HttpStatus status = HttpStatus.OK;
-		ResponseEntity<JSONObject> response = new ResponseEntity<JSONObject>(body, status);
+		ResponseEntity<Map<String, Object>> response = new ResponseEntity<>(body, status);
 		
 		if (!doctorRepository.exists(id)) {
-			body.put("message", "INVALID_ID");
+			body.put("errors", Arrays.asList("Invalid ID"));
 			status = HttpStatus.BAD_REQUEST;
 		} else {
 			body.put("message", "OK");

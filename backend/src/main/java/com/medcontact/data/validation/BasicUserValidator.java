@@ -6,6 +6,7 @@ import com.medcontact.data.model.BasicUser;
 
 public class BasicUserValidator extends DataValidatorHelper<BasicUser> {
 	public final int MAX_EMAIL_LEN = 128;
+	public final int MIN_PASSWORD_LEN = 6;
 	public final int MAX_PASSWORD_LEN = 128;
 	public final int MAX_FIRST_NAME_LEN = 128;
 	public final int MAX_LAST_NAME_LEN = 128;
@@ -19,10 +20,21 @@ public class BasicUserValidator extends DataValidatorHelper<BasicUser> {
 	}
 	
 	@Override
-	public boolean validate(BasicUser user) {
-		return isEmailValid(user.getEmail())
-				&& isStringLengthValid(user.getPassword(), MAX_PASSWORD_LEN)
-				&& isStringLengthValid(user.getFirstName(), MAX_FIRST_NAME_LEN)
-				&& isStringLengthValid(user.getLastName(), MAX_LAST_NAME_LEN);
+	public ValidationResult validate(BasicUser user) {
+		ValidationResult result = new ValidationResult();
+		
+		if (!isEmailValid(user.getEmail())) {
+			result.getErrors().add("Adres e-mail too long");
+		} else if (!isStringLengthValid(user.getPassword(), MIN_PASSWORD_LEN, MAX_PASSWORD_LEN)) {
+			result.addError("Invalid password length");
+		} else if (!isStringLengthValid(user.getFirstName(), MAX_FIRST_NAME_LEN)) {
+			result.addError("Invalid first name length");
+		} else if (!isStringLengthValid(user.getLastName(), MAX_LAST_NAME_LEN)) {
+			result.addError("Invalid last name length");
+		} else {
+			result.setValid(true);
+		}
+		
+		return result;
 	}
 }

@@ -7,8 +7,19 @@ public class OpinionValidator extends DataValidatorHelper<Opinion> {
 	public final int MAX_OPINION_RATING = 5;
 	
 	@Override
-	public boolean validate(Opinion opinion) {
-		return (isStringLengthValid(opinion.getContent(), MAX_OPINION_LEN))
-				&& (isIntegerValid(opinion.getRating(), 0, MAX_OPINION_RATING));
+	public ValidationResult validate(Opinion opinion) {
+		ValidationResult result = new ValidationResult();
+		
+		if (!isStringLengthValid(opinion.getContent(), MAX_OPINION_LEN)) {
+			result.addError("Invalid opinion content length");
+			
+		} else if (!isIntegerValid(opinion.getRating(), 0, MAX_OPINION_RATING)) {
+			result.addError("Invalid rating value");
+			
+		} else {
+			result.setValid(true);
+		}
+		
+		return result;
 	}
 }

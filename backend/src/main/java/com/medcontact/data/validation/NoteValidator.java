@@ -7,8 +7,19 @@ public class NoteValidator extends DataValidatorHelper<Note> {
 	public final int MAX_CONTENT_LEN = 2048;
 	
 	@Override
-	public boolean validate(Note note) {
-		return isStringLengthValid(note.getTitle(), MAX_TITLE_LEN)
-				&& isStringLengthValid(note.getContent(), MAX_CONTENT_LEN);
+	public ValidationResult validate(Note note) {
+		ValidationResult result = new ValidationResult();
+		
+		if (!isStringLengthValid(note.getTitle(), MAX_TITLE_LEN)){
+			result.addError("Invalid title length");
+			
+		} else if (!isStringLengthValid(note.getContent(), MAX_CONTENT_LEN)) {
+			result.addError("Invalid content length");
+			
+		} else {
+			result.setValid(true);
+		}
+		
+		return result;
 	}
 }

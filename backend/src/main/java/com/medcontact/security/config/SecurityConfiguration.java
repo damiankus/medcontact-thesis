@@ -17,12 +17,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
-				.antMatchers("/patients/**").hasRole("PATIENT")
-				.antMatchers("/doctors/**").hasRole("DOCTOR")
-				.antMatchers("/admins/**").hasRole("ADMIN")
-				.antMatchers("/docinfo/**").permitAll()
-				.antMatchers("/signup/**").permitAll()
-				.antMatchers("/home/**").permitAll()
+//				.antMatchers("/patients/**").hasRole("PATIENT")
+//				.antMatchers("/doctors/**").hasRole("DOCTOR")
+//				.antMatchers("/admins/**").hasRole("ADMIN")
+//				.antMatchers("/docinfo/**").permitAll()
+//				.antMatchers("/signup/**").permitAll()
+//				.antMatchers("/home/**").permitAll()
+//				.and()
+				.anyRequest().permitAll()
 				.and()
 			.formLogin()
 				.loginPage("/login")
@@ -36,7 +38,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.csrf().disable()
 			.httpBasic();
 	}
-	
 	
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

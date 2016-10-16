@@ -13,10 +13,39 @@ public class PatientValidator extends DataValidatorHelper<Patient> {
 	private ReservationValidator reservationValidator = new ReservationValidator();
 	
 	@Override
-	public boolean validate(Patient patient) {
-		return userValidator.validate(patient)
-				&& isListValid(patient.getFiles(), MAX_FILES_SIZE, fileEntryValidator)
-				&& isListValid(patient.getOpinions(), MAX_OPINIONS_SIZE, opinionValidator)
-				&& isListValid(patient.getReservations(), MAX_RESERVATIONS_SIZE, reservationValidator);
+	public ValidationResult validate(Patient patient) {
+		ValidationResult result = new ValidationResult();
+		ValidationResult partialResult = userValidator.validate(patient);
+		
+		if (!partialResult.isValid()) {
+			result.addManyErrors(partialResult.getErrors());
+		} else {
+			partialResult = isListValid(patient.getOpinions(), "opinions", 
+					MAX_OPINIONS_SIZE, opinionValidator);
+			
+			if (!partialResult.isValid()) {
+				result.addManyErrors(partialResult.getErrors());
+			} else {
+				partialResult = isListValid(patient.getReservations(), "reservations", 
+						MAX_RESERVATIONS_SIZE, reservationValidator);
+				
+				if (!partialResult.isValid()) {
+					result.addManyErrors(partialResult.getErrors());
+				} else {
+					partialResult = isListValid(patient.getFiles(), "files", 
+							MAX_FILES_SIZE, fileEntryValidator);
+					
+					if (!partialResult.isValid()) {
+						result.addManyErrors(partialResult.getErrors());
+						
+					} else {
+						result.setValid(true);
+					}
+				}
+			}
+		}
+		
+		return result;
 	}
+	
 }
