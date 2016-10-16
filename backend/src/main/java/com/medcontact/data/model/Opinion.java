@@ -25,7 +25,7 @@ public class Opinion {
 	
 	@Column(length=2048)
 	private String content;
-	private float rating;
+	private int rating;
 	
 	@ManyToOne
 	@JoinColumn(name="rated_doctor_id")

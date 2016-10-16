@@ -2,6 +2,7 @@ package com.medcontact.data.model;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +13,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
-import lombok.NonNull;
 
 @Entity
 @Table(name="reservations")
@@ -33,5 +33,11 @@ public class Reservation {
 	@ManyToOne
 	@JoinColumn(name="doctor_id")
 	private Doctor doctor;
+	
+	public Reservation() {
+		this.date = Date.valueOf(LocalDate.now());
+		this.startTime = Time.valueOf("00:00:00");
+		this.startTime = Time.valueOf("01:00:00");
+	}
 	
 }

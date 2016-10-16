@@ -20,7 +20,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -31,7 +31,6 @@ import lombok.NonNull;
 @Inheritance(strategy=InheritanceType.JOINED)
 @DiscriminatorColumn(name="user_type")
 @Data
-@JsonIgnoreProperties({"password"})
 public class BasicUser implements UserDetails {
 	private static final long serialVersionUID = 2679949213300447361L;
 	
@@ -47,18 +46,23 @@ public class BasicUser implements UserDetails {
 	
 	@Column(nullable=false)
 	@NonNull
+	@JsonIgnore
 	protected String password;
 	
 	@Column(nullable=false)
+	@JsonIgnore
 	protected boolean enabled;
 	
 	@Column(nullable=false)
+	@JsonIgnore
 	protected boolean accountNonExpired;
 	
 	@Column(nullable=false)
+	@JsonIgnore
 	protected boolean credentialsNonExpired;
 	
 	@Column(nullable=false)
+	@JsonIgnore
 	protected boolean accountNonLocked;
 	
 	@Column
@@ -87,9 +91,6 @@ public class BasicUser implements UserDetails {
 	@NonNull
 	protected String lastName;
 	
-//	@Column(nullable=false)
-//	@NonNull
-//	@Enumerated(EnumType.STRING)
 	@Transient
 	protected Sex sex;
 	
@@ -196,6 +197,7 @@ public class BasicUser implements UserDetails {
 	}
 
 	@Override
+	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return Arrays.asList(
 				new SimpleGrantedAuthority(

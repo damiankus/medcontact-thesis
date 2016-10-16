@@ -35,6 +35,13 @@ public class ScheduleTimeSlot {
 	@JoinColumn(name="doctor_id")
 	private Doctor doctor;
 
+	public ScheduleTimeSlot() {
+		super();
+		this.dayOfWeek = DayOfWeek.MONDAY;
+		this.startTime = Time.valueOf("00:00:00");
+		this.endTime = Time.valueOf("01:00:00");
+	}
+	
 	public ScheduleTimeSlot(DayOfWeek dayOfWeek, Time startTime, Time endTime) {
 		super();
 		this.dayOfWeek = dayOfWeek;

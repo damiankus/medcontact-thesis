@@ -1,12 +1,8 @@
 package com.medcontact.data.model;
 
-import java.util.Arrays;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import lombok.Data;
 

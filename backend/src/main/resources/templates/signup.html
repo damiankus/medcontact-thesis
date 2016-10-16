@@ -21,9 +21,11 @@
 		<div class="jumbotron">
 		
 			<form class="form-horizontal" th:action="@{~/signup/save}" method="post">
-				<input type="hidden"
+				<!-- CSRF temproarily DISABLED
+				<input type="hidden" 
 					th:name="${_csrf.parameterName}" 
 					th:value="${_csrf.token}" />
+				 -->
 				
 				<div class="form-group">
 					<span class="col-md-4"></span>

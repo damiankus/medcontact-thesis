@@ -12,5 +12,9 @@ public interface BasicUserRepository extends PagingAndSortingRepository<BasicUse
 	public Optional<BasicUser> findByEmail(String email);
 	
 	@Query("SELECT COUNT(user) FROM BasicUser user WHERE user.email = :email")
-	public boolean isEmailAvailable(@Param("email") String email);
+	public long countUsersByEmail(@Param("email") String email);
+	
+	default public boolean isEmailAvailable(String email) {
+		return (countUsersByEmail(email) == 0) ? true : false;
+	}
 }

@@ -43,6 +43,7 @@ public class PatientAccountController {
 		ArrayList<Patient> patients = new ArrayList<>();
 		patientRepository.findAll()
 			.forEach(patients::add);
+		System.out.println(getCurrentUser().getLastName());
 		
 		return patients;
 	}

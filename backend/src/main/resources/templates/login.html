@@ -25,10 +25,11 @@
 			</div>
 		
 			<form name="f" th:action="@{/login}" class="form-horizontal" action="/login" method="post">
+				<!-- CSRF temproarily DISABLED
 				<input type="hidden" 
 					th:name="${_csrf.parameterName}" 
 					th:value="${_csrf.token}" />
-				
+				 -->
 				<div class="form-group">
 					<span class="col-md-4"></span>
 					<h3 class="col-md-8">Logowanie</h3>				

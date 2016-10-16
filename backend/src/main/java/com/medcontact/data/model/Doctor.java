@@ -1,7 +1,6 @@
 package com.medcontact.data.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +15,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -24,6 +23,7 @@ import lombok.NonNull;
 @Entity
 @Table(name="doctors")
 @DiscriminatorValue("DOCTOR")
+@JsonIgnoreProperties({ "opinions", "reservations", "weeklySchedule",  "notes" })
 @Data
 public class Doctor extends BasicUser {
 	private static final long serialVersionUID = -5663126536666561117L;

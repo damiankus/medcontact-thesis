@@ -58,9 +58,9 @@ public class Application implements CommandLineRunner {
 				.setWeeklySchedule(schedule)
 				.setUniversity("Uniwersytet Jagielloński")
 				.setPassword(passwordEncoder.encode("haslo"))
-				.setFirstName("Jan")
-				.setLastName("Kowalski")
-				.setEmail("jan.becwal@gmail.com")
+				.setFirstName("Gregory")
+				.setLastName("House")
+				.setEmail("house@gmail.com")
 				.build();
 		
 		schedule.forEach(ts -> ts.setDoctor(doctor));
@@ -76,14 +76,14 @@ public class Application implements CommandLineRunner {
 		adminRepository.save(admin);
 		
 		Patient patient = (Patient) Patient.getBuilder()
-				.setFirstName("Gregory")
-				.setLastName("House")
-				.setEmail("house@gmail.com")
+				.setFirstName("Jan")
+				.setLastName("Kowalski")
+				.setEmail("kowal@gmail.com")
 				.setPassword(passwordEncoder.encode("haslo"))
 				.build();
 		Patient patient2 = (Patient) Patient.getBuilder()
 				.setFirstName("Damian")
-				.setLastName("Kuś")
+				.setLastName("Drugi")
 				.setEmail("dkus@gmail.com")
 				.setPassword(passwordEncoder.encode("haslo"))
 				.build();
