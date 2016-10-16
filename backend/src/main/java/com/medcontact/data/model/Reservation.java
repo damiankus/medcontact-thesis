@@ -1,6 +1,7 @@
 package com.medcontact.data.model;
 
 import lombok.Data;
+import lombok.NonNull;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -15,8 +16,17 @@ public class Reservation {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
+	
+	@Column(nullable=false)
+	@NonNull
 	private Date date;
+	
+	@Column(nullable=false)
+	@NonNull
 	private Time startTime;
+	
+	@Column(nullable=false)
+	@NonNull
 	private Time endTime;
 	
 	@ManyToOne
@@ -30,7 +40,7 @@ public class Reservation {
 	public Reservation() {
 		this.date = Date.valueOf(LocalDate.now());
 		this.startTime = Time.valueOf("00:00:00");
-		this.startTime = Time.valueOf("01:00:00");
+		this.startTime = Time.valueOf("00:00:01");
 	}
 	
 }

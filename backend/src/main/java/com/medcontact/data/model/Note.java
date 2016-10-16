@@ -36,8 +36,9 @@ public class Note {
 	@JoinColumn(name="note_owner_id")
 	private Doctor owner;
 	
-	@Column(name="patient_id", nullable=false)
-	private long patientId;
+	@ManyToOne
+	@JoinColumn(name="patient_id")
+	private Patient patient;
 	
 	public Note() {
 		this.title = "";

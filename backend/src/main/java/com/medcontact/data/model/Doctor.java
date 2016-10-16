@@ -27,7 +27,7 @@ public class Doctor extends BasicUser {
 	
 	@Column(nullable=false)
 	@NonNull
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	@JoinTable(name="doctor_specialty", 
 			joinColumns={
 					@JoinColumn(name="doctor_id", nullable=false)

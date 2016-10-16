@@ -3,6 +3,7 @@ package com.medcontact.data.model;
 import java.sql.Time;
 import java.time.DayOfWeek;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,6 +16,7 @@ import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 
 @Entity
 @Table(name="schedules")
@@ -26,9 +28,17 @@ public class ScheduleTimeSlot {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
+	@Column(nullable=false)
+	@NonNull
 	@Enumerated(EnumType.STRING)
 	private DayOfWeek dayOfWeek;
+	
+	@Column(nullable=false)
+	@NonNull
 	private Time startTime;
+	
+	@Column(nullable=false)
+	@NonNull
 	private Time endTime;
 	
 	@ManyToOne

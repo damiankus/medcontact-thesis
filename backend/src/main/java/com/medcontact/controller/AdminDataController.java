@@ -77,6 +77,7 @@ public class AdminDataController {
 			if (!validationResult.isValid()) {
 				body.put("errors", validationResult.getErrors());
 				status = HttpStatus.BAD_REQUEST;
+				
 			} else {
 				
 				/* Make a GET request to the TURN server mediating 
@@ -94,14 +95,16 @@ public class AdminDataController {
 				if (!jsonResponse.getStatusText().equals(HttpStatus.OK.toString())) {
 					body.put("errors", Arrays.asList("Couldn't create consultation room"));
 					status = HttpStatus.SERVICE_UNAVAILABLE;
+				} else {
+
+					/* Replace the original password with a hashed one. */
+					
+					doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
+					doctorRepository.save(doctor);
+					body.put("id", "" + doctor.getId());
+					status = HttpStatus.CREATED;
 				}
 				
-				/* Replace the original password with a hashed one. */
-
-				doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
-				doctorRepository.save(doctor);
-				body.put("id", "" + doctor.getId());
-				status = HttpStatus.CREATED;
 			}
 		}
 		
