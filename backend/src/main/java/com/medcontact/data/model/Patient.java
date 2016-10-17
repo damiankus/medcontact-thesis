@@ -1,6 +1,7 @@
 package com.medcontact.data.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,6 +11,14 @@ import java.util.List;
 @Table(name="patients")
 @DiscriminatorValue("PATIENT")
 @Data
+
+/* This annotations prevents the lombok library
+ * from calling the superclass' equals and hashCode 
+ * methods thus preventing warnings about
+ * overriding the mentioned methods. */
+
+@EqualsAndHashCode(callSuper=false)
+
 public class Patient extends BasicUser {
 	private static final long serialVersionUID = -6160436846217117334L;
 	

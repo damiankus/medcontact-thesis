@@ -88,7 +88,7 @@ public class Application implements CommandLineRunner {
 		Reservation reservation = new Reservation();
 		reservation.setDate(Date.valueOf(LocalDate.now().plus(10, ChronoUnit.DAYS)));
 		reservation.setStartTime(Time.valueOf(LocalTime.NOON));
-		reservation.setStartTime(Time.valueOf(LocalTime.of(13, 0)));
+		reservation.setEndTime(Time.valueOf(LocalTime.of(13, 0)));
 		reservation.setPatient(patient);
 		
 		List<ScheduleTimeSlot> schedule = Arrays.asList(

@@ -5,11 +5,20 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name="admins")
 @DiscriminatorValue("ADMIN")
 @Data
+
+/* This annotations prevents the lombok library
+ * from calling the superclass' equals and hashCode 
+ * methods thus preventing warnings about
+ * overriding the mentioned methods. */
+
+@EqualsAndHashCode(callSuper=false)
+
 public class Admin extends BasicUser {
 	private static final long serialVersionUID = 820358146018064860L;
 	

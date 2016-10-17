@@ -21,6 +21,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -46,6 +48,12 @@ public class BasicUser implements UserDetails {
 	
 	@Column(nullable=false)
 	@NonNull
+	
+	/* Using the JsonProperty annotation allows us
+	 * to not include the password in the serialized 
+	 * JSON object returned to the client. */
+	
+	@JsonProperty(access=Access.WRITE_ONLY)
 	protected String password;
 	
 	@Column(nullable=false)
@@ -65,14 +73,6 @@ public class BasicUser implements UserDetails {
 	protected boolean accountNonLocked;
 	
 	@Column
-//	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-//	@JoinTable(name="user_authority", 
-//			joinColumns={
-//					@JoinColumn(name="user_id", nullable=false)
-//			},
-//			inverseJoinColumns= {
-//					@JoinColumn(name="authority_id", nullable=false)
-//			})
 	@Enumerated(EnumType.STRING)
 	protected ApplicationRole role;
 	
@@ -91,8 +91,8 @@ public class BasicUser implements UserDetails {
 	protected String lastName;
 	
 	@Transient
+	@JsonIgnore
 	protected Sex sex;
-	
 	
 	/* Default constructor. We're setting default values for 
 	 * the class members. */

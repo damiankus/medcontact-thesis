@@ -16,12 +16,20 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
 @Entity
 @Table(name="doctors")
 @DiscriminatorValue("DOCTOR")
 @Data
+
+/* This annotations prevents the lombok library
+ * from calling the superclass' equals and hashCode 
+ * methods thus preventing warnings about
+ * overriding the mentioned methods. */
+
+@EqualsAndHashCode(callSuper=false)
 public class Doctor extends BasicUser {
 	private static final long serialVersionUID = -5663126536666561117L;
 	
@@ -50,6 +58,12 @@ public class Doctor extends BasicUser {
 	@NonNull
 	private String roomId;
 	
+	/* The "busy" field tells whether the doctor
+	 * is currently seeing any patient. */
+	
+	@Column(nullable=false)
+	private boolean busy;
+	
 	@OneToMany(mappedBy="ratedDoctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<Opinion> opinions;
 	
@@ -67,9 +81,11 @@ public class Doctor extends BasicUser {
 	public Doctor() {
 		super();
 		this.specialties = new ArrayList<>();
-		this.title = "default";
-		this.university = "default";
-		this.biography = "default";
+		this.title = "";
+		this.university = "";
+		this.biography = "";
+		this.busy = false;
+		
 		this.opinions = new ArrayList<>();
 		this.reservations = new ArrayList<>();
 		this.weeklySchedule = new ArrayList<>();
@@ -124,6 +140,11 @@ public class Doctor extends BasicUser {
 		
 		public DoctorBuilder setRoomId(String roomId) {
 			((Doctor) user).setRoomId(roomId);
+			return this;
+		}
+		
+		public DoctorBuilder setBusy(boolean busy) {
+			((Doctor) user).setBusy(busy);
 			return this;
 		}
 		
