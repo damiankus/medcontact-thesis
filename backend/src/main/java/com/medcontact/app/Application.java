@@ -58,7 +58,7 @@ public class Application implements CommandLineRunner {
 		Admin admin = (Admin) Admin.getBuilder()
 				.setFirstName("Admin")
 				.setLastName("Adminowski")
-				.setEmail("admin@gmail.com")
+				.setEmail("damian.kus.main@gmail.com")
 				.setPassword(passwordEncoder.encode("haslo"))
 				.build();
 		

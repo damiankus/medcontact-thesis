@@ -26,6 +26,7 @@ public class Admin extends BasicUser {
 		
 		/* This call sets the default values of the
 		 * user data. */
+		
 		super();
 		this.role = ApplicationRole.ADMIN;
 	}
