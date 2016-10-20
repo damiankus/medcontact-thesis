@@ -6,7 +6,6 @@
 	<groupId>com.medcontact</groupId>
 	<artifactId>medcontact</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
 
 	<name>login</name>
 	<description>Spring Security Training</description>
