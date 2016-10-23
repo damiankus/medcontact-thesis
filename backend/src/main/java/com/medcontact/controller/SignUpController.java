@@ -59,7 +59,7 @@ public class SignUpController {
 		
 		return new ResponseEntity<String>(body, status);
 	}
-	
+
 	@PostMapping(value="email/available")
 	public ResponseEntity<String> isEmailAvailable(
 			@RequestParam("email") String email) {
