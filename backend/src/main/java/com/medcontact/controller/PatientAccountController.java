@@ -38,70 +38,70 @@ import com.medcontact.data.repository.ReservationRepository;
 @RequestMapping(value="patients")
 public class PatientAccountController {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
-	
+
 	@Autowired
 	private PatientRepository patientRepository;
-	
+
 	@Autowired
 	private FileRepository fileRepository;
-	
+
 	@Autowired
 	private ReservationRepository reservationRepository;
-	
+
 	@Value("${webrtc.turn.api-endpoint}")
 	private String turnEndpoint;
-	
+
 	@Value("${webrtc.turn.username}")
 	private String turnUsername;
 
 	@Value("${webrtc.turn.domain}")
 	private String turnDomain;
-	
+
 	@Value("${webrtc.turn.application}")
 	private String turnApplicationName;
-	
+
 	@Value("${webrtc.turn.secret}")
 	private String turnSecret;
-	
+
 	@GetMapping("{patientId}/connection/{consultationId}")
 	public ResponseEntity<ConnectionData> getConnectionData(
 			@PathVariable("patientId") Long patientId,
 			@PathVariable("consultationId") Long reservationId) {
-		
+
 		ConnectionData body = null;
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		Patient patient = patientRepository.findOne(patientId);
-		
+
 		if (!patientId.equals(patient.getId())) {
 			status = HttpStatus.BAD_REQUEST;
-			
+
 		} else {
 			Reservation reservation = reservationRepository.findOne(reservationId);
 			LocalDate currentDate = LocalDate.now();
 			Time currentTime = Time.valueOf(LocalTime.now());
-			
+
 			if (reservation == null) {
 				status = HttpStatus.BAD_REQUEST;
 				logger.warn("No reservation with specified ID found");
-				
+
 			} else {
 				Doctor doctor = reservation.getDoctor();
-				
+
 				if (!patientId.equals(reservation.getPatient().getId())) {
 					status = HttpStatus.BAD_REQUEST;
 					logger.warn("Invalid patient ID for the specified reservation");
-					
-				} else if (!(currentDate.isEqual(reservation.getDate().toLocalDate()) 
+
+				} else if (!(currentDate.isEqual(reservation.getDate().toLocalDate())
 						&& currentTime.after(reservation.getStartTime())
 						&& currentTime.before(reservation.getEndTime()))) {
-					
+
 					status = HttpStatus.BAD_REQUEST;
 					logger.warn("Invalid date or time of the reservation");
-					
+
 				} else if (doctor.isBusy()) {
 					status = HttpStatus.BAD_REQUEST;
 					logger.warn("Doctor is currently busy");
-					
+
 				} else {
 					body = new ConnectionData();
 					body.setEndpoint(turnEndpoint);
@@ -113,15 +113,15 @@ public class PatientAccountController {
 				}
 			}
 		}
-		
+
 		return new ResponseEntity<>(body, status);
 	}
-	
+
 	@PostMapping(value="files/add")
 	public void handleFileUpload(
-			@RequestParam("file") MultipartFile file) 
+			@RequestParam("file") MultipartFile file)
 			throws SerialException, SQLException, IOException {
-		
+
 		Patient patient = getCurrentUser();
 		FileEntry fileEntry = new FileEntry();
 		fileEntry.setName(file.getName());
@@ -134,18 +134,18 @@ public class PatientAccountController {
 		patient.getFiles().add(fileEntry);
 		fileRepository.save(fileEntry);
 	}
-	
+
 	/* A utility method fetching the current logged in user's data. */
-	
+
 	private Patient getCurrentUser() {
 		Patient patient = (Patient) SecurityContextHolder.getContext()
 				.getAuthentication()
 				.getPrincipal();
-		
+
 		/* We don't return the actual password. */
-		
+
 		patient.setPassword("");
-		
+
 		return patient;
 	}
 }
