@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.medcontact.data.repository.BasicUserRepository;
-import com.medcontact.mail.MailHelper;
+import com.medcontact.mail.MailUtility;
 
 
 @Controller
 @RequestMapping("password")
 public class PasswordRefreshingController {
-	private MailHelper mailHelper = new MailHelper();
+	private MailUtility mailHelper = new MailUtility();
 	
 	@Value("${general.host}")
 	private String hostname;

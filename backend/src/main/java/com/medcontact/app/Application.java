@@ -7,7 +7,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -86,9 +85,9 @@ public class Application implements CommandLineRunner {
 		note.setPatient(patient);
 		
 		Reservation reservation = new Reservation();
-		reservation.setDate(Date.valueOf(LocalDate.now().plus(10, ChronoUnit.DAYS)));
-		reservation.setStartTime(Time.valueOf(LocalTime.NOON));
-		reservation.setEndTime(Time.valueOf(LocalTime.of(13, 0)));
+		reservation.setDate(Date.valueOf(LocalDate.now()));
+		reservation.setStartTime(Time.valueOf(LocalTime.of(0, 1)));
+		reservation.setEndTime(Time.valueOf(LocalTime.of(23, 59)));
 		reservation.setPatient(patient);
 		
 		List<ScheduleTimeSlot> schedule = Arrays.asList(

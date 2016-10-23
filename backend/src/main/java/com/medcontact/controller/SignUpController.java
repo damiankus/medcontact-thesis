@@ -1,7 +1,5 @@
 package com.medcontact.controller;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.medcontact.data.model.BasicUser;
-import com.medcontact.data.model.BasicUserDetails;
 import com.medcontact.data.model.Patient;
 import com.medcontact.data.repository.BasicUserRepository;
 import com.medcontact.data.repository.PatientRepository;
@@ -38,24 +35,29 @@ public class SignUpController {
 	}
 	
 	@PostMapping(value="save", produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> saveUser(BasicUserDetails userDetails) {
+	public ResponseEntity<String> saveUser(BasicUser user) {
 		
-		Optional<BasicUser> user = userRepository.findByEmail(
-				userDetails.getEmail());
-		ResponseEntity<String> response;
+		String body;
+		HttpStatus status;
 		
-		if (user.isPresent()) {
-			response = new ResponseEntity<String>("The specified email has been taken.", HttpStatus.CONFLICT);
+		if (userRepository.findByEmail(
+					user.getEmail())
+				.isPresent()) {
+			
+			status = HttpStatus.CONFLICT;
+			body = "The specified email has been taken.";
+			
 		} else {
-			response = new ResponseEntity<>("Account has been created.", HttpStatus.OK);
+			status = HttpStatus.OK;
+			body = "Account has been created.";
 			Patient patient = (Patient) Patient.getBuilder()
-					.valueOf(userDetails)
-					.setPassword(passwordEncoder.encode(userDetails.getPassword()))
+					.valueOf(user)
+					.setPassword(passwordEncoder.encode(user.getPassword()))
 					.build();
 			patientRepository.save(patient);
 		}
 		
-		return response;
+		return new ResponseEntity<String>(body, status);
 	}
 	
 	@PostMapping(value="email/available")

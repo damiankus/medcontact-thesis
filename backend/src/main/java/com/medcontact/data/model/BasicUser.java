@@ -177,12 +177,12 @@ public class BasicUser implements UserDetails {
 			return this;
 		}
 		
-		public AbstractUserBuilder<T> valueOf(BasicUserDetails details) {
-			user.setPassword(details.getPassword());
-			user.setEmail(details.getEmail());
-			user.setFirstName(details.getFirstName());
-			user.setLastName(details.getLastName());
-			user.setSex(details.getSex());
+		public AbstractUserBuilder<T> valueOf(BasicUser user) {
+			user.setPassword(user.getPassword());
+			user.setEmail(user.getEmail());
+			user.setFirstName(user.getFirstName());
+			user.setLastName(user.getLastName());
+			user.setSex(user.getSex());
 			
 			return this;
 		}
