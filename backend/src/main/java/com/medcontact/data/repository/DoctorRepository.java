@@ -11,6 +11,6 @@ import com.medcontact.data.model.Doctor;
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 	public Optional<Doctor> findByUsername(String username);
 	
-	@PreAuthorize("#id == authentication.principal.id")
+//	@PreAuthorize("#id == authentication.principal.id")
 	public Doctor findOne(Long id);
 }
