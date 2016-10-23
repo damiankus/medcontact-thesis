@@ -38,7 +38,7 @@ public class BasicUser implements UserDetails {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	protected long id;
+	protected Long id;
 	
 	/* Authentication details required by the UserDetails interface. */
 
@@ -177,12 +177,12 @@ public class BasicUser implements UserDetails {
 			return this;
 		}
 		
-		public AbstractUserBuilder<T> valueOf(BasicUser user) {
-			user.setPassword(user.getPassword());
-			user.setEmail(user.getEmail());
-			user.setFirstName(user.getFirstName());
-			user.setLastName(user.getLastName());
-			user.setSex(user.getSex());
+		public AbstractUserBuilder<T> valueOf(BasicUser otherUser) {
+			user.setPassword(otherUser.getPassword());
+			user.setEmail(otherUser.getEmail());
+			user.setFirstName(otherUser.getFirstName());
+			user.setLastName(otherUser.getLastName());
+			user.setSex(otherUser.getSex());
 			
 			return this;
 		}

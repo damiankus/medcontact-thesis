@@ -54,65 +54,65 @@ public class Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		Admin admin = (Admin) Admin.getBuilder()
-				.setFirstName("Admin")
-				.setLastName("Adminowski")
-				.setEmail("damian.kus.main@gmail.com")
-				.setPassword(passwordEncoder.encode("haslo"))
-				.build();
-		
-		adminRepository.save(admin);
-		
-		Patient patient = (Patient) Patient.getBuilder()
-				.setFirstName("Jan")
-				.setLastName("Kowalski")
-				.setEmail("kowal@gmail.com")
-				.setPassword(passwordEncoder.encode("haslo"))
-				.build();
-		Patient patient2 = (Patient) Patient.getBuilder()
-				.setFirstName("Damian")
-				.setLastName("Drugi")
-				.setEmail("dkus@gmail.com")
-				.setPassword(passwordEncoder.encode("haslo"))
-				.build();
-		patientRepository.save(patient);
-		patientRepository.save(patient2);
-		
-		Note note = new Note();
-		note.setContent("Notatka probna");
-		note.setTitle("NOTATKA PACJENT 1");
-		note.setUploadTime(Timestamp.valueOf(LocalDateTime.now()));
-		note.setPatient(patient);
-		
-		Reservation reservation = new Reservation();
-		reservation.setDate(Date.valueOf(LocalDate.now()));
-		reservation.setStartTime(Time.valueOf(LocalTime.of(0, 1)));
-		reservation.setEndTime(Time.valueOf(LocalTime.of(23, 59)));
-		reservation.setPatient(patient);
-		
-		List<ScheduleTimeSlot> schedule = Arrays.asList(
-				new ScheduleTimeSlot(DayOfWeek.MONDAY, "8:00:00", "12:00:00"));
-		Specialty pulmonology = new Specialty();
-		pulmonology.setCategory("choroby płuc");
-		pulmonology.setName("pulmunologia");
-		
-		Doctor doctor = (Doctor) Doctor.getBuilder()
-				.setSpecialties(Arrays.asList(pulmonology))
-				.setBiography("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-				.setWeeklySchedule(schedule)
-				.setUniversity("Uniwersytet Jagielloński")
-				.setPassword(passwordEncoder.encode("haslo"))
-				.setFirstName("Gregory")
-				.setLastName("House")
-				.setEmail("house@gmail.com")
-				.build();
-		
-		note.setOwner(doctor);
-		doctor.getNotes().add(note);
-		doctor.getReservations().add(reservation);
-		reservation.setDoctor(doctor);
-		
-		schedule.forEach(ts -> ts.setDoctor(doctor));
-		doctorRepository.save(doctor);
+//		Admin admin = (Admin) Admin.getBuilder()
+//				.setFirstName("Admin")
+//				.setLastName("Adminowski")
+//				.setEmail("damian.kus.main@gmail.com")
+//				.setPassword(passwordEncoder.encode("haslo"))
+//				.build();
+//		
+//		adminRepository.save(admin);
+//		
+//		Patient patient = (Patient) Patient.getBuilder()
+//				.setFirstName("Jan")
+//				.setLastName("Kowalski")
+//				.setEmail("kowal@gmail.com")
+//				.setPassword(passwordEncoder.encode("haslo"))
+//				.build();
+//		Patient patient2 = (Patient) Patient.getBuilder()
+//				.setFirstName("Damian")
+//				.setLastName("Drugi")
+//				.setEmail("dkus@gmail.com")
+//				.setPassword(passwordEncoder.encode("haslo"))
+//				.build();
+//		patientRepository.save(patient);
+//		patientRepository.save(patient2);
+//		
+//		Note note = new Note();
+//		note.setContent("Notatka probna");
+//		note.setTitle("NOTATKA PACJENT 1");
+//		note.setUploadTime(Timestamp.valueOf(LocalDateTime.now()));
+//		note.setPatient(patient);
+//		
+//		Reservation reservation = new Reservation();
+//		reservation.setDate(Date.valueOf(LocalDate.now()));
+//		reservation.setStartTime(Time.valueOf(LocalTime.of(0, 1)));
+//		reservation.setEndTime(Time.valueOf(LocalTime.of(23, 59)));
+//		reservation.setPatient(patient);
+//		
+//		List<ScheduleTimeSlot> schedule = Arrays.asList(
+//				new ScheduleTimeSlot(DayOfWeek.MONDAY, "8:00:00", "12:00:00"));
+//		Specialty pulmonology = new Specialty();
+//		pulmonology.setCategory("choroby płuc");
+//		pulmonology.setName("pulmunologia");
+//		
+//		Doctor doctor = (Doctor) Doctor.getBuilder()
+//				.setSpecialties(Arrays.asList(pulmonology))
+//				.setBiography("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
+//				.setWeeklySchedule(schedule)
+//				.setUniversity("Uniwersytet Jagielloński")
+//				.setPassword(passwordEncoder.encode("haslo"))
+//				.setFirstName("Gregory")
+//				.setLastName("House")
+//				.setEmail("house@gmail.com")
+//				.build();
+//		
+//		note.setOwner(doctor);
+//		doctor.getNotes().add(note);
+//		doctor.getReservations().add(reservation);
+//		reservation.setDoctor(doctor);
+//		
+//		schedule.forEach(ts -> ts.setDoctor(doctor));
+//		doctorRepository.save(doctor);
 	}
 }
