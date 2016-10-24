@@ -2,12 +2,12 @@
 <div class="container">
     <div class="jumbotron">
 
-        <div id="error-message-box" class="alert alert-danger" th:if="${param.error != null}" >
+        <div id="error-message-box" class="alert alert-danger">
             <div class="row">Logowanie zakończyło się niepowodzeniem.</div>
             <div class="row">Proszę upewnić się, że podane dane są poprawne.</div>
         </div>
 
-        <form name="f" th:action="@{/login}" class="form-horizontal" action="/login" method="post">
+        <form name="loginForm" class="form-horizontal">
             <div class="form-group">
                 <span class="col-md-4"></span>
                 <h3 class="col-md-8">Logowanie</h3>
@@ -28,7 +28,7 @@
             </div>
 
             <div class="pull-right">
-                <div ng-click="login()" class="btn btn-lg btn-success">Zaloguj się</div>
+                <div ng-click="loginForm.$valid && login()" class="btn btn-lg btn-success">Zaloguj się</div>
             </div>
         </form>
     </div>

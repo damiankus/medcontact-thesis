@@ -8,11 +8,27 @@ angular.module('myApp.login', ['ngRoute'])
   });
 }])
 
-.controller('LoginCtrl', ['REST_API', '$scope', function(REST_API, $scope) {
+.controller('LoginCtrl', ['REST_API', '$scope', '$http', function(REST_API, $scope, $http) {
   console.log("LOGGER: LoginCtr, api: " + REST_API);
 
   $scope.login = function () {
-    console.log("make HTTP request");
+    console.log("POST " + REST_API + "signup/save", $scope.user)
+
+    $http(
+        {
+          method: "POST",
+          url: REST_API + "login",
+          data: $scope.user
+        }
+    ).then(onSuccess(), onFailure());
+
+    function onSuccess(response) {
+      console.log("SUCCESS ", response)
+    }
+
+    function onFailure(response) {
+      console.log("FAILURE", response)
+    }
 
   }
 
