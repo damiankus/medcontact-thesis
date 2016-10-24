@@ -5,6 +5,7 @@ mvnw
 mvnw.cmd  
 .project  
 .settings  
-.springBeans  
+.springBeans
 target
+.idea/
 
