@@ -7,7 +7,7 @@ angular.module('myApp', [
     'myApp.signUp',
     'myApp.version'
 ])
-    // .constant('REST_API', "https://medcontact-api.herokuapp.com/")
+// .constant('REST_API', "https://medcontact-api.herokuapp.com/")
     .constant('REST_API', "http://localhost:8080/")
     .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
             $locationProvider.hashPrefix('!');

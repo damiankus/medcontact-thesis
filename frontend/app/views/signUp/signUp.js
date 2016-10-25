@@ -8,7 +8,7 @@ angular.module('myApp.signUp', ['ngRoute'])
         });
     }])
 
-    .controller('SignUpCtrl', ['REST_API', '$scope', '$http', function (REST_API, $scope, $http) {
+    .controller('SignUpCtrl', ['REST_API', '$scope', '$http', '$location', function (REST_API, $scope, $http, $location) {
         console.log("sign up " + REST_API, $scope);
 
         $scope.create = function () {
@@ -18,17 +18,13 @@ angular.module('myApp.signUp', ['ngRoute'])
                 {
                     method: "POST",
                     url: REST_API + "signup/save",
-                    data: {"firstName": $scope.user.firstName},
+                    data: $scope.user
                 }
-            ).then(onSuccess(), onFailure());
-
+            ).then(function successCallback() {
+                $location.url('/' + "login");
+            }, function errorCallback(response) {
+                console.error(response.data.message)
+            });
         };
 
-        function onSuccess(response) {
-            console.log("SUCCESS ", response)
-        }
-
-        function onFailure(response) {
-            console.log("FAILURE", response)
-        }
     }]);
