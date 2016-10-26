@@ -17,8 +17,9 @@
 </head>
 <body>
   <ul class="menu">
-    <li><a href="#!/login">Login</a></li>
+    <li ng-if="$rootScope.role != 'PATIENT'"><a href="#!/login">Login</a></li>
     <li><a href="#!/signUp">SignUp</a></li>
+    <li ng-if="$rootScope.role == 'PATIENT'"><a href="#!/reservation">Rezerwacja terminu</a></li>
   </ul>
 
   <!--[if lt IE 7]>
@@ -35,6 +36,7 @@
   <script src="app.js"></script>
   <script src="views/login/login.js"></script>
   <script src="views/signUp/signUp.js"></script>
+  <script src="views/patients/reservation/reservation.js"></script>
   <script src="components/version/version.js"></script>
   <script src="components/version/version-directive.js"></script>
   <script src="components/version/interpolate-filter.js"></script>

@@ -1,35 +1,39 @@
 'use strict';
 
 angular.module('myApp.login', ['ngRoute'])
-.config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/login', {
-    templateUrl: 'views/login/login.html',
-    controller: 'LoginCtrl'
-  });
-}])
+    .config(['$routeProvider', function ($routeProvider) {
+        $routeProvider.when('/login', {
+            templateUrl: 'views/login/login.html',
+            controller: 'LoginCtrl'
+        });
+    }])
 
-.controller('LoginCtrl', ['REST_API', '$scope', '$http', function(REST_API, $scope, $http) {
-  console.log("LOGGER: LoginCtr, api: " + REST_API);
+    .controller('LoginCtrl', ['REST_API', 'ROLE', '$rootScope', '$scope', '$http', '$location',
+        function (REST_API, ROLE, $rootScope, $scope, $http, $location) {
+            console.log("LOGGER: LoginCtr, api: " + REST_API);
 
-  $scope.login = function () {
-    console.log("POST " + REST_API + "signup/save", $scope.user)
+            $scope.login = function () {
+                var request = {
+                    method: "POST",
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    url: REST_API + "login",
+                    transformRequest: function (obj) {
+                        var str = [];
+                        for (var p in obj)
+                            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                        return str.join("&");
+                    },
+                    data: $scope.user
+                };
 
-    $http(
-        {
-          method: "POST",
-          url: REST_API + "login",
-          data: $scope.user
-        }
-    ).then(onSuccess(), onFailure());
+                $http(request).then(function () {
+                    $rootScope.role = "PATIENT";
+                    console.log("SUCCESS ");
+                    $location.url('/' + "reservation");
+                }, function errorCallback(response) {
+                    console.error(response.data.message)
+                });
 
-    function onSuccess(response) {
-      console.log("SUCCESS ", response)
-    }
+            }
 
-    function onFailure(response) {
-      console.log("FAILURE", response)
-    }
-
-  }
-
-}]);
+        }]);

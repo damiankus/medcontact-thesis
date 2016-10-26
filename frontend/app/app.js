@@ -5,6 +5,7 @@ angular.module('myApp', [
     'ngRoute',
     'myApp.login',
     'myApp.signUp',
+    'myApp.reservation',
     'myApp.version'
 ])
 // .constant('REST_API', "https://medcontact-api.herokuapp.com/")
