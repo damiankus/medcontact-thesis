@@ -52,11 +52,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
-				.antMatchers("/patients/**").hasRole("PATIENT")
-				.antMatchers("/doctors/**").hasRole("DOCTOR")
-				.antMatchers("/admins/**").hasRole("ADMIN")
-				.antMatchers("/signup/**").permitAll()
-				.antMatchers("/home/**").permitAll()
+//				.antMatchers("/patients/**").hasRole("PATIENT")
+//				.antMatchers("/doctors/**").hasRole("DOCTOR")
+//				.antMatchers("/admins/**").hasRole("ADMIN")
+//				.antMatchers("/signup/**").permitAll()
+//				.antMatchers("/home/**").permitAll()
 				.anyRequest().permitAll()
 				.and()
 			.formLogin()
@@ -152,7 +152,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder getPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 
 	@Bean
 	public FilterRegistrationBean corsFilter() {

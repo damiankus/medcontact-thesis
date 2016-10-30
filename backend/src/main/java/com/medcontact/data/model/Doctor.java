@@ -15,6 +15,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -65,15 +68,19 @@ public class Doctor extends BasicUser {
 	private boolean busy;
 	
 	@OneToMany(mappedBy="ratedDoctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<Opinion> opinions;
 	
 	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<Reservation> reservations;
 	
 	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<ScheduleTimeSlot> weeklySchedule;
 	
 	@OneToMany(mappedBy="owner", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<Note> notes;
 	
 	/* Setting default values. */

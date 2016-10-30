@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 @Entity
@@ -25,5 +27,6 @@ public class Specialty {
 	private String category;
 	
 	@ManyToMany(fetch=FetchType.LAZY, mappedBy="specialties")
+	@JsonIgnore
 	private Set<Doctor> doctorsWithSpecialty;
 }

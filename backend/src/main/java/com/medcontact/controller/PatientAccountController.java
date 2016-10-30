@@ -1,14 +1,20 @@
 package com.medcontact.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
 
 import org.apache.log4j.Logger;
@@ -34,11 +40,19 @@ import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @RestController
 @RequestMapping(value="patients")
 public class PatientAccountController {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
+	@Getter
+	@Setter
+	@Value("${general.files-path-root}")
+	private String userFilesPathRoot; 
+	
 	@Autowired
 	private PatientRepository patientRepository;
 
@@ -117,22 +131,42 @@ public class PatientAccountController {
 		return new ResponseEntity<>(body, status);
 	}
 
-	@PostMapping(value="files/add")
+	@PostMapping(value="{id}/files")
 	public void handleFileUpload(
-			@RequestParam("file") MultipartFile file)
+			@PathVariable("id") Long patientId,
+			@RequestParam("file") List<MultipartFile> files)
 			throws SerialException, SQLException, IOException {
 
 		Patient patient = getCurrentUser();
-		FileEntry fileEntry = new FileEntry();
-		fileEntry.setName(file.getName());
-		fileEntry.setUploadTime(
-				Timestamp.valueOf(
-						LocalDateTime.now()));
-		fileEntry.setFileContent(
-				new SerialBlob(file.getBytes()));
-		fileEntry.setFileOwner(patient);
-		patient.getFiles().add(fileEntry);
-		fileRepository.save(fileEntry);
+
+		if (patient.getId().equals(patientId)) {
+			for (MultipartFile file : files) {
+				String filePath = userFilesPathRoot 
+						+ File.separator 
+						+ patientId
+						+ File.separator
+						+ file.getName();
+				
+				FileEntry fileEntry = new FileEntry();
+				fileEntry.setName(file.getName());
+				fileEntry.setUploadTime(
+						Timestamp.valueOf(
+								LocalDateTime.now()));
+				fileEntry.setUrl(filePath);
+				fileEntry.setFileOwner(patient);
+				fileEntry.setContentType(file.getContentType());
+				patient.getFiles().add(fileEntry);
+				fileRepository.save(fileEntry);
+				
+				Set<OpenOption> options = new HashSet<>();
+				options.add(StandardOpenOption.CREATE);
+				options.add(StandardOpenOption.WRITE);
+				
+				try (FileOutputStream out = new FileOutputStream(filePath)) {
+					out.write(file.getBytes());
+				}
+			}
+		}
 	}
 
 	/* A utility method fetching the current logged in user's data. */
@@ -141,10 +175,6 @@ public class PatientAccountController {
 		Patient patient = (Patient) SecurityContextHolder.getContext()
 				.getAuthentication()
 				.getPrincipal();
-
-		/* We don't return the actual password. */
-
-		patient.setPassword("");
 
 		return patient;
 	}

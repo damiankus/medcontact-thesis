@@ -4,6 +4,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,12 +27,14 @@ public class Patient extends BasicUser {
 	private static final long serialVersionUID = -6160436846217117334L;
 	
 	@OneToMany(mappedBy="fileOwner", fetch=FetchType.LAZY)
+	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<FileEntry> files;
 	
-	@OneToMany(mappedBy="patient", fetch=FetchType.LAZY)
+	@OneToMany(mappedBy="patient", fetch=FetchType.EAGER)
 	private List<Reservation> reservations;
 	
 	@OneToMany(mappedBy="ratingPatient")
+	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<Opinion> opinions;
 	
 	/* Setting default values for the members */

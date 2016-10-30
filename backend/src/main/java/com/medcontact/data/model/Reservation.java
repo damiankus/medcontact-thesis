@@ -4,6 +4,10 @@ import lombok.Data;
 import lombok.NonNull;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
@@ -30,7 +34,8 @@ public class Reservation {
 	private Time endTime;
 	
 	@ManyToOne
-	@JoinColumn(name="patient_id") 
+	@JoinColumn(name="patient_id")
+	@JsonProperty(access=Access.WRITE_ONLY)
 	private Patient patient;
 	
 	@ManyToOne
