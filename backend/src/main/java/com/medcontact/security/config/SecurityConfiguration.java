@@ -23,6 +23,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -70,7 +71,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.logoutSuccessHandler(logoutSuccessHandler)
 				.and()
 			.csrf().disable()
-			.httpBasic();
+			.httpBasic()
+				.and()
+			.cors();
 	}
 	
 	@Autowired
@@ -154,7 +157,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public FilterRegistrationBean corsFilter() {
+	public CorsFilter corsFilter() {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
@@ -162,8 +165,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		config.addAllowedHeader("*");
 		config.addAllowedMethod("*");
 		source.registerCorsConfiguration("/**", config);
+        CorsFilter filter = new CorsFilter(source);
+
 		FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
 		bean.setOrder(0);
-		return bean;
+
+		return filter;
 	}
 }
