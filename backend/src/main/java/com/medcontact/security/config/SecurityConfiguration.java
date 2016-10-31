@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +22,18 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.medcontact.data.model.BasicUser;
+import com.medcontact.data.model.BasicUserDetails;
 
 @Configuration
 @EnableWebSecurity
@@ -90,6 +93,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 					Authentication authentication) throws IOException, ServletException {
 				response.setStatus(HttpStatus.OK.value());
+				
+				try (PrintWriter writer = response.getWriter()) {
+					writer.write(new ObjectMapper().writeValueAsString(
+									new BasicUserDetails(
+											(BasicUser) authentication.getPrincipal())));
+				}
 			}
 		};
     }
@@ -114,10 +123,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 				try {
 					SecurityContextHolder.clearContext();
-					HttpSession session = request.getSession();
-					session.invalidate();
+					request.getSession().invalidate();
 					request.logout();
-					
+					new SecurityContextLogoutHandler().logout(request, response, authentication);
+
 				} catch (ServletException e) {
 					logger.warn(e.getMessage());
 				}
@@ -141,7 +150,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				try (PrintWriter writer = response.getWriter()) {
 					writer.write(message);
 				}
-				
 			}
 		};
     }

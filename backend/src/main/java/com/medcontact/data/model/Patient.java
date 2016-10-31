@@ -1,15 +1,18 @@
 package com.medcontact.data.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name="patients")
@@ -27,14 +30,14 @@ public class Patient extends BasicUser {
 	private static final long serialVersionUID = -6160436846217117334L;
 	
 	@OneToMany(mappedBy="fileOwner", fetch=FetchType.LAZY)
-	@JsonProperty(access=Access.WRITE_ONLY)
+	@JsonIgnore
 	private List<FileEntry> files;
 	
 	@OneToMany(mappedBy="patient", fetch=FetchType.EAGER)
 	private List<Reservation> reservations;
 	
-	@OneToMany(mappedBy="ratingPatient")
-	@JsonProperty(access=Access.WRITE_ONLY)
+	@OneToMany(mappedBy="ratingPatient", fetch=FetchType.LAZY)
+	@JsonIgnore
 	private List<Opinion> opinions;
 	
 	/* Setting default values for the members */

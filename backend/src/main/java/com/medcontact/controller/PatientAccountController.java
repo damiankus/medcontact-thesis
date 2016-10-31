@@ -3,17 +3,18 @@ package com.medcontact.controller;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.OpenOption;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.sql.rowset.serial.SerialException;
 
@@ -134,21 +135,24 @@ public class PatientAccountController {
 	@PostMapping(value="{id}/files")
 	public void handleFileUpload(
 			@PathVariable("id") Long patientId,
-			@RequestParam("file") List<MultipartFile> files)
+			@RequestParam("files") List<MultipartFile> files)
 			throws SerialException, SQLException, IOException {
 
 		Patient patient = getCurrentUser();
+		System.out.println(files.get(0).getOriginalFilename());
 
 		if (patient.getId().equals(patientId)) {
+			patient = patientRepository.findOne(patientId);
+			
 			for (MultipartFile file : files) {
 				String filePath = userFilesPathRoot 
 						+ File.separator 
 						+ patientId
 						+ File.separator
-						+ file.getName();
+						+ file.getOriginalFilename();
 				
 				FileEntry fileEntry = new FileEntry();
-				fileEntry.setName(file.getName());
+				fileEntry.setName(file.getOriginalFilename());
 				fileEntry.setUploadTime(
 						Timestamp.valueOf(
 								LocalDateTime.now()));
@@ -158,14 +162,18 @@ public class PatientAccountController {
 				patient.getFiles().add(fileEntry);
 				fileRepository.save(fileEntry);
 				
-				Set<OpenOption> options = new HashSet<>();
-				options.add(StandardOpenOption.CREATE);
-				options.add(StandardOpenOption.WRITE);
+				File fileToWrite = Paths.get(filePath).toAbsolutePath().toFile();
+				fileToWrite.getParentFile().mkdirs();
+				fileToWrite.createNewFile();
 				
-				try (FileOutputStream out = new FileOutputStream(filePath)) {
+				try (FileOutputStream out = new FileOutputStream(fileToWrite)) {
 					out.write(file.getBytes());
 				}
+				
+				System.out.println("Done, file saved under: " + Paths.get(filePath).toAbsolutePath().toString());
 			}
+		} else {
+			logger.warn("Detected an attempt to upload a file without authorization");
 		}
 	}
 
