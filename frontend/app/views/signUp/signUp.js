@@ -8,9 +8,9 @@ angular.module('myApp.signUp', ['ngRoute'])
         });
     }])
 
-    .controller('SignUpCtrl', ['REST_API', '$scope', '$http', '$location', function (REST_API, $scope, $http, $location) {
-        console.log("sign up " + REST_API, $scope);
-
+    .controller('SignUpCtrl', ['REST_API', '$scope', '$rootScope', '$http', '$location', function (REST_API, $scope, $rootScope, $http, $location) {
+        $scope.signupError = false;
+    	
         $scope.create = function () {
             console.log("POST " + REST_API + "signup/save", $scope.user)
 
@@ -21,9 +21,39 @@ angular.module('myApp.signUp', ['ngRoute'])
                     data: $scope.user
                 }
             ).then(function successCallback() {
-                $location.url('/' + "login");
+            	
+            	/* If a user has managed to successfully create an account
+            	 * he/she should be redirected to the reservations view */
+            	
+            	var request = {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        url: REST_API + "login",
+                        transformRequest: function (obj) {
+                            var str = [];
+                            for (var p in obj)
+                                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                            return str.join("&");
+                        },
+                        data: $scope.user
+                    };
+
+                    $http(request).then(function successCallback(response) {
+                        $rootScope.userDetails = response.data;
+                        $scope.loginError = false;
+                        $scope.loggedIn = true;
+                        $location.url('/reservation');
+                        
+                    }, function errorCallback(response) {
+                        console.error(response.data.message)
+                        $scope.loginError = true;
+                        $scope.loggedIn = false;
+                        $location.url('/' + "login");
+                    });
+                    $scope.signupError = false;
             }, function errorCallback(response) {
-                console.error(response.data.message)
+                console.error(response.data.message);
+                $scope.signupError = true;
             });
         };
 

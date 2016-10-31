@@ -1,6 +1,10 @@
 <body>
 <div class="container">
     <div class="jumbotron">
+				
+				<div ng-show="signupError" class="alert alert-danger">
+            <div class="row">Podany adres e-mail jest już zajęty</div>
+        </div>
 
         <form class="form-horizontal" name="signUpForm">
 
