@@ -31,10 +31,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.medcontact.data.model.BasicUser;
-import com.medcontact.data.model.BasicUserDetails;
-
 @Configuration
 @EnableWebSecurity
 //@EnableGlobalMethodSecurity(prePostEnabled=true, securedEnabled=true, proxyTargetClass=true)
@@ -93,12 +89,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 					Authentication authentication) throws IOException, ServletException {
 				response.setStatus(HttpStatus.OK.value());
-				
-				try (PrintWriter writer = response.getWriter()) {
-					writer.write(new ObjectMapper().writeValueAsString(
-									new BasicUserDetails(
-											(BasicUser) authentication.getPrincipal())));
-				}
 			}
 		};
     }

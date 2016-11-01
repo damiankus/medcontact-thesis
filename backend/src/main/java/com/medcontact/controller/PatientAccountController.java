@@ -1,12 +1,9 @@
 package com.medcontact.controller;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Time;
@@ -21,6 +18,7 @@ import javax.sql.rowset.serial.SerialException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,6 +38,7 @@ import com.medcontact.data.model.Reservation;
 import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
+import com.medcontact.exception.UnauthorizedUserException;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -52,7 +51,12 @@ public class PatientAccountController {
 	@Getter
 	@Setter
 	@Value("${general.files-path-root}")
-	private String userFilesPathRoot; 
+	private String patientFilesPathRoot; 
+	
+	@Getter
+	@Setter
+	@Value("${general.host}")
+	private String host;
 	
 	@Autowired
 	private PatientRepository patientRepository;
@@ -136,54 +140,93 @@ public class PatientAccountController {
 	public void handleFileUpload(
 			@PathVariable("id") Long patientId,
 			@RequestParam("files") List<MultipartFile> files)
-			throws SerialException, SQLException, IOException {
+			throws UnauthorizedUserException, SerialException, SQLException, IOException {
 
-		Patient patient = getCurrentUser();
-		System.out.println(files.get(0).getOriginalFilename());
-
-		if (patient.getId().equals(patientId)) {
-			patient = patientRepository.findOne(patientId);
+		if (isEntitled(patientId)) {
+			
+			/* We have to load patient from the repository
+			 * because using principal object from the 
+			 * authentication context causes throwing an lazy 
+			 * loading exception */
+			
+			Patient patient = patientRepository.findOne(patientId);
 			
 			for (MultipartFile file : files) {
-				String filePath = userFilesPathRoot 
+				String filePath = patientFilesPathRoot 
 						+ File.separator 
 						+ patientId
 						+ File.separator
 						+ file.getOriginalFilename();
+				
+				String fileUrl = patientFilesPathRoot 
+						+ "/" + patientId + "/files/";
 				
 				FileEntry fileEntry = new FileEntry();
 				fileEntry.setName(file.getOriginalFilename());
 				fileEntry.setUploadTime(
 						Timestamp.valueOf(
 								LocalDateTime.now()));
-				fileEntry.setUrl(filePath);
 				fileEntry.setFileOwner(patient);
 				fileEntry.setContentType(file.getContentType());
-				patient.getFiles().add(fileEntry);
+				fileEntry.setUrl(fileUrl);
+				fileEntry.setPath(Paths.get(filePath).toAbsolutePath().toString());
+				patient.getFileEntries().add(fileEntry);
+
+				fileEntry = fileRepository.save(fileEntry);
+				fileEntry.setUrl(fileUrl + fileEntry.getId());
 				fileRepository.save(fileEntry);
 				
 				File fileToWrite = Paths.get(filePath).toAbsolutePath().toFile();
 				fileToWrite.getParentFile().mkdirs();
 				fileToWrite.createNewFile();
 				
+				System.out.println("File name: " + file.getName());
+				System.out.println("File original name: " + file.getOriginalFilename());
+				System.out.println("File path  " + filePath);
+				System.out.println(fileToWrite.getAbsolutePath());
+				
 				try (FileOutputStream out = new FileOutputStream(fileToWrite)) {
 					out.write(file.getBytes());
 				}
 				
-				System.out.println("Done, file saved under: " + Paths.get(filePath).toAbsolutePath().toString());
+				logger.info("Done, file saved under: " + Paths.get(filePath).toAbsolutePath().toString());
 			}
-		} else {
-			logger.warn("Detected an attempt to upload a file without authorization");
 		}
 	}
+	
+	
+	@GetMapping(value="{id}/files/{fileId}")
+	public FileSystemResource getFile(
+			@PathVariable("id") Long patientId,
+			@PathVariable("fileId") Long fileId) 
+					throws UnauthorizedUserException, FileNotFoundException {
+		
+		if (isEntitled(patientId)) {
+			FileEntry fileEntry = fileRepository.findOne(fileId);
+			
+			if (fileEntry != null) {
+				return new FileSystemResource(fileEntry.getPath());
+			}
+		}
+		
+		throw new FileNotFoundException();
+	}
+	
+	/* A utility method checking if a user with the given ID is entitled to 
+	 * obtain access to a resource */
 
-	/* A utility method fetching the current logged in user's data. */
-
-	private Patient getCurrentUser() {
-		Patient patient = (Patient) SecurityContextHolder.getContext()
+	private boolean isEntitled(Long patientId) throws UnauthorizedUserException {
+		Object principal = SecurityContextHolder.getContext()
 				.getAuthentication()
 				.getPrincipal();
-
-		return patient;
+		
+		if (!(principal instanceof Patient) 
+			|| (!((Patient) principal).getId().equals(patientId))) {
+			
+			logger.warn("Detected an attempt to upload a file without authorization " + principal.toString());
+			throw new UnauthorizedUserException();
+		}
+		
+		return true;
 	}
 }

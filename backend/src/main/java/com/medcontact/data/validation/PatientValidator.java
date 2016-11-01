@@ -32,7 +32,7 @@ public class PatientValidator extends DataValidatorHelper<Patient> {
 				if (!partialResult.isValid()) {
 					result.addManyErrors(partialResult.getErrors());
 				} else {
-					partialResult = isListValid(patient.getFiles(), "files", 
+					partialResult = isListValid(patient.getFileEntries(), "files", 
 							MAX_FILES_SIZE, fileEntryValidator);
 					
 					if (!partialResult.isValid()) {

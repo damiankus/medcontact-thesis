@@ -31,7 +31,7 @@ public class Patient extends BasicUser {
 	
 	@OneToMany(mappedBy="fileOwner", fetch=FetchType.LAZY)
 	@JsonIgnore
-	private List<FileEntry> files;
+	private List<FileEntry> fileEntries;
 	
 	@OneToMany(mappedBy="patient", fetch=FetchType.EAGER)
 	private List<Reservation> reservations;
@@ -44,7 +44,7 @@ public class Patient extends BasicUser {
 	
 	public Patient() {
 		super();
-		this.files = new ArrayList<>();
+		this.fileEntries = new ArrayList<>();
 		this.opinions = new ArrayList<>();
 		this.reservations = new ArrayList<>();
 		this.role = ApplicationRole.PATIENT;
@@ -59,8 +59,8 @@ public class Patient extends BasicUser {
 			this.user = new Patient();
 		}
 		
-		public PatientBuilder setFiles(List<FileEntry> files) {
-			((Patient) user).setFiles(files);
+		public PatientBuilder setFiles(List<FileEntry> fileEntries) {
+			((Patient) user).setFileEntries(fileEntries);
 			return this;
 		}
 		
