@@ -7,7 +7,7 @@ backend/target/**
 backend/mvnw.cmd
 backend/.mvn/**
 backend/*.iml
-backend/users/*
+backend/patients/*
 .git/**
 .
 .idea

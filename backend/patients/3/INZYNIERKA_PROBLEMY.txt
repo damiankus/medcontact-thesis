@@ -1,9 +1,0 @@
-Problemy z aplikacją:
-
-- po rejestracji nie można przenieść się do ekranu rezerwacji
-
-- nie można zbindować ścieżki action w formularzu przesyłania plików
-
-- nie można znaleźć plików CSS
-
-- nie odświeża się wartość userDetails -> przycisk logowania nie zmienia się na przycisk wylogowania!
