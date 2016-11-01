@@ -35,7 +35,10 @@ angular.module('myApp.signUp', ['ngRoute'])
                                 str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
                             return str.join("&");
                         },
-                        data: $scope.user
+                        data: {
+                        	username: $scope.user.email, 
+                        	password: $scope.user.password
+                        }
                     };
 
                     $http(request).then(function successCallback(response) {

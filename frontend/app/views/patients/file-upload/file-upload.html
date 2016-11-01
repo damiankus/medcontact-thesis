@@ -2,9 +2,9 @@
 	<div class="container">
 		<div class="well">
 			<form id="file-upload-form" class="form-inline" method="post" 
-					action="http://localhost:8080/patients/3/files" enctype="multipart/form-data">
+					action="http://localhost:8080/patients/3/files" enctype="multipart/form-data" target="hidden-frame">
+				<h4>Udostępnianie plików</h4>
 				<fieldset>
-					<legend>Udostępnianie plików</legend>
 					<textarea id="filename-area" class="form-control" placeholder="Nazwa pliku" readonly></textarea>
 					<label class="btn btn-default btn-file">
    						<input id="uploaded-file" type="file" name="files" style="display: none;" multiple/>
@@ -12,8 +12,32 @@
 					</label>
 					<button  id="file-cancel-btn" type="button" class="hidden btn btn-danger">Anuluj</button>
 					<button id="file-upload-btn" type="submit" class="btn btn-success" disabled>Prześlij</button>
+					<label id="file-upload-success" class="collapse label label-md label-success glyphicon glyphicon-ok"></label>
 				</fieldset>
 			</form>
+			<iframe class="hidden" name="hidden-frame"></iframe>
+		</div>
+		
+		<div class="well">
+			<h4>Przesłane pliki</h4>
+			<table id="files-table" class="table table-hover">
+				<thead>
+					<tr>
+						<th>Nazwa pliku</th>
+						<th>Data przesłania</th>
+						<th>Typ pliku</th>
+						<th>Link</th>
+						<th></th>
+				<tbody>
+					<tr>
+						<td>Nazwa pliku</td>
+						<td>Data przesłania</td>
+						<td>Typ</td>
+						<td>Link</td>
+						<td><button class="glyphicon glyphicon-ok btn-sm btn-success"></button></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </body>

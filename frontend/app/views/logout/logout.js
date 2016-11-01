@@ -8,8 +8,8 @@ angular.module('myApp.logout', ['ngRoute'])
         });
     }])
 
-    .controller('LogoutCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location',
-        function (REST_API, $rootScope, $scope, $http, $location) {
+    .controller('LogoutCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService',
+        function (REST_API, $rootScope, $scope, $http, $location, UserService) {
     		if ($rootScope.user !== 'undefined') {
     			
     			 var request = {
@@ -18,7 +18,7 @@ angular.module('myApp.logout', ['ngRoute'])
 				};
     			
     			$http(request).then(function successCallback() {
-    				$rootScope.role = '';
+    				UserService.setUser({})
     				console.log('User has logged out');
     				
     			}, function errorCallback(response) {
@@ -26,7 +26,5 @@ angular.module('myApp.logout', ['ngRoute'])
     			});
     		}
     		
-    		$rootScope.user = {};
     		$location.url('/');
-    		console.log("cUR ID: " + $rootScope.user.id);
         }]);

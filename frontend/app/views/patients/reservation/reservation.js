@@ -9,8 +9,5 @@ angular.module('myApp.reservation', ['ngRoute'])
     }])
 
     .controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', function (REST_API, $rootScope, $scope, $http, $location) {
-        console.log("reservation " + REST_API, $scope);
-        console.log($rootScope)
-
-
+        console.log("reservationController " + REST_API, $scope);
     }]);
