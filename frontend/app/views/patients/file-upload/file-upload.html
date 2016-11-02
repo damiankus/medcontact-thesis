@@ -1,5 +1,5 @@
 <body>
-	<div class="container">
+	<div class="container" ng-app="myApp" ng-controller="FileUploadCtrl"> 
 		<div class="well">
 			<form id="file-upload-form" class="form-inline" method="post" 
 					action="http://localhost:8080/patients/3/files" enctype="multipart/form-data" target="hidden-frame">
@@ -29,12 +29,11 @@
 						<th>Link</th>
 						<th></th>
 				<tbody>
-					<tr>
-						<td>Nazwa pliku</td>
-						<td>Data przesłania</td>
-						<td>Typ</td>
-						<td>Link</td>
-						<td><button class="glyphicon glyphicon-ok btn-sm btn-success"></button></td>
+					<tr ng-repeat="file in files">
+						<td>{{ file.name }}</td>
+						<td>{{ file.uploadTime | date : 'dd-MM-yyyy HH:mm:ss	' }}</td>
+						<td>{{ file.contentType }}</td>
+						<td><a ng-href="{{ file.url }}"><button class="btn btn-sm btn-success"> Pobierz</button></a></td>
 					</tr>
 				</tbody>
 			</table>

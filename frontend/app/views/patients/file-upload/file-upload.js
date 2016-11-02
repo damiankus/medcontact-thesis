@@ -64,8 +64,6 @@ angular.module('myApp.fileUpload', ['ngRoute'])
 			$("#file-upload-form").submit(function (event) {
 				var formData = new FormData($(this)[0]);
 				event.preventDefault();
-
-				console.log(formData);
 				
 				$.ajax({
 					url: $scope.fileServiceUrl,
@@ -84,8 +82,8 @@ angular.module('myApp.fileUpload', ['ngRoute'])
 							.delay(500);
 					},
 					
-					error: function(jq,status,message) {
-				        alert("[ERROR]: Access forbidden");
+					error: function(jq, status, message) {
+				        alert("[ERROR]: An error occurred");
 				    },
 					
 					cache: false,
@@ -104,7 +102,8 @@ angular.module('myApp.fileUpload', ['ngRoute'])
 		
 		$http.get(REST_API + "patients/" + $scope.user.id + "/fileEntries")
 			.then(function successCallback(response) {
-				console.log($rootScope.files);
+				$scope.files = response.data._embedded.fileEntries;
+				console.log($scope.files);
 				
 			}, function errorCallback(response) {
 				console.log("[ERROR]: " + response);

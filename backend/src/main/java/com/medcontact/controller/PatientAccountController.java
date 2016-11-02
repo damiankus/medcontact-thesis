@@ -1,10 +1,12 @@
 package com.medcontact.controller;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -13,12 +15,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.rowset.serial.SerialException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -152,16 +154,28 @@ public class PatientAccountController {
 			Patient patient = patientRepository.findOne(patientId);
 			
 			for (MultipartFile file : files) {
-				String filePath = patientFilesPathRoot 
-						+ File.separator 
-						+ patientId
-						+ File.separator
-						+ file.getOriginalFilename();
+				String filePath = String.format(
+						"%s/%d/%s", 
+						patientFilesPathRoot,
+						patientId,
+						file.getOriginalFilename());
 				
-				String fileUrl = patientFilesPathRoot 
-						+ "/" + patientId + "/files/";
+				String fileUrl = String.format(
+						"%s%s/%d/files/", 
+						host, 
+						patientFilesPathRoot,
+						patientId);
 				
-				FileEntry fileEntry = new FileEntry();
+				FileEntry fileEntry = fileRepository.findByFilenameAndOwnerId(
+						file.getOriginalFilename(), patientId);
+				
+				if (fileEntry == null) {
+					fileEntry = new FileEntry();
+					fileEntry.setFileOwner(patient);
+					patient.getFileEntries().add(fileEntry);
+					fileEntry = fileRepository.save(fileEntry);
+				}
+				
 				fileEntry.setName(file.getOriginalFilename());
 				fileEntry.setUploadTime(
 						Timestamp.valueOf(
@@ -169,10 +183,10 @@ public class PatientAccountController {
 				fileEntry.setFileOwner(patient);
 				fileEntry.setContentType(file.getContentType());
 				fileEntry.setUrl(fileUrl);
+				fileEntry.setContentLength(file.getSize());
 				fileEntry.setPath(Paths.get(filePath).toAbsolutePath().toString());
 				patient.getFileEntries().add(fileEntry);
 
-				fileEntry = fileRepository.save(fileEntry);
 				fileEntry.setUrl(fileUrl + fileEntry.getId());
 				fileRepository.save(fileEntry);
 				
@@ -186,30 +200,40 @@ public class PatientAccountController {
 				System.out.println(fileToWrite.getAbsolutePath());
 				
 				try (FileOutputStream out = new FileOutputStream(fileToWrite)) {
-					out.write(file.getBytes());
+					Files.deleteIfExists(fileToWrite.toPath());
+					Files.copy(file.getInputStream(), fileToWrite.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				}
 				
-				logger.info("Done, file saved under: " + Paths.get(filePath).toAbsolutePath().toString());
+				logger.info("File saved under: " + Paths.get(filePath).toAbsolutePath().toString());
 			}
 		}
 	}
 	
 	
 	@GetMapping(value="{id}/files/{fileId}")
-	public FileSystemResource getFile(
+	public void getFile(
 			@PathVariable("id") Long patientId,
-			@PathVariable("fileId") Long fileId) 
-					throws UnauthorizedUserException, FileNotFoundException {
+			@PathVariable("fileId") Long fileId,
+			HttpServletResponse response) 
+					throws UnauthorizedUserException, IOException {
 		
 		if (isEntitled(patientId)) {
 			FileEntry fileEntry = fileRepository.findOne(fileId);
 			
 			if (fileEntry != null) {
-				return new FileSystemResource(fileEntry.getPath());
+				response.setContentType(fileEntry.getContentType());
+				response.setContentLengthLong(fileEntry.getContentLength());
+				response.setHeader(
+						"Content-Disposition",
+					     String.format("attachment; filename=\"%s\"",
+					                fileEntry.getName()));
+						
+				try (OutputStream out = response.getOutputStream();) {
+					Files.copy(
+							Paths.get(fileEntry.getPath()),out);
+				}
 			}
 		}
-		
-		throw new FileNotFoundException();
 	}
 	
 	/* A utility method checking if a user with the given ID is entitled to 

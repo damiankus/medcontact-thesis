@@ -15,15 +15,16 @@ import javax.persistence.Table;
 import javax.sql.rowset.serial.SerialException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Data;
 import lombok.NonNull;
+import lombok.ToString;
 
 @Entity
 @Table(name="files")
 @Data
+@ToString(exclude="fileOwner")
+
 public class FileEntry {
 	
 	@Id
@@ -50,6 +51,10 @@ public class FileEntry {
 	@JsonIgnore
 	private String path;
 	
+	@Column(nullable=false)
+	@JsonIgnore
+	private long contentLength;
+	
 	@ManyToOne
 	@JoinColumn(name="file_owner_id")
 	@JsonIgnore
@@ -61,6 +66,7 @@ public class FileEntry {
 		this.url = "";
 		this.path = "";
 		this.contentType = "text/plain";
+		this.contentLength = 0L;
 		this.fileOwner = new Patient();
 	}
 }
