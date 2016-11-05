@@ -1,9 +1,6 @@
 package com.medcontact.data.validation;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 import com.medcontact.data.model.domain.Reservation;
 
@@ -16,15 +13,12 @@ public class ReservationValidator extends DataValidatorHelper<Reservation> {
 		/* Check if the reservation date and time
 		 * are earlier than now. */
 		
-		if (reservation.getStartTime().getTime()
-				>= reservation.getEndTime().getTime()) {
+		if (reservation.getStartDateTime().isAfter(reservation.getEndDateTime())) {
 			result.addError("Reservation end time before start time");
 			
-		} else if (reservation.getStartTime().before(Time.valueOf(LocalTime.now()))) {
+		} else if (reservation.getStartDateTime().isBefore(LocalDateTime.now())) {
 			result.addError("Invalid reservation start time");
 		
-		} else if (reservation.getDate().before(Date.valueOf(LocalDate.now()))) {
-			result.addError("Invalid reservation date");
 		} else {
 			result.setValid(true);
 		}

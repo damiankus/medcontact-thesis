@@ -1,9 +1,6 @@
 package com.medcontact.app;
 
-import java.sql.Date;
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -85,13 +82,13 @@ public class Application implements CommandLineRunner {
 		note.setPatient(patient);
 		
 		Reservation reservation = new Reservation();
-		reservation.setDate(Date.valueOf(LocalDate.now()));
-		reservation.setStartTime(Time.valueOf(LocalTime.of(0, 1)));
-		reservation.setEndTime(Time.valueOf(LocalTime.of(23, 59)));
+		reservation.setStartDateTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(1, 0)));
+		reservation.setEndDateTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59)));
 		reservation.setPatient(patient);
 		
 		List<ScheduleTimeSlot> schedule = Arrays.asList(
-				new ScheduleTimeSlot(DayOfWeek.MONDAY, "8:00:00", "12:00:00"));
+				new ScheduleTimeSlot(LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0)),
+						LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 0))));
 		Specialty pulmonology = new Specialty();
 		pulmonology.setCategory("choroby płuc");
 		pulmonology.setName("pulmunologia");

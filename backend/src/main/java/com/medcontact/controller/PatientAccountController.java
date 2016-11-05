@@ -8,33 +8,36 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.rowset.serial.SerialException;
 
-import com.medcontact.data.model.dto.BasicDoctorDetails;
-import com.medcontact.data.repository.DoctorRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
+import com.medcontact.data.model.dto.BasicDoctorDetails;
+import com.medcontact.data.model.dto.ConnectionData;
+import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
@@ -99,8 +102,7 @@ public class PatientAccountController {
 
         } else {
             Reservation reservation = reservationRepository.findOne(reservationId);
-            LocalDate currentDate = LocalDate.now();
-            Time currentTime = Time.valueOf(LocalTime.now());
+            LocalDateTime currentDateTime = LocalDateTime.now();
 
             if (reservation == null) {
                 status = HttpStatus.BAD_REQUEST;
@@ -113,9 +115,8 @@ public class PatientAccountController {
                     status = HttpStatus.BAD_REQUEST;
                     logger.warn("Invalid patient ID for the specified reservation");
 
-                } else if (!(currentDate.isEqual(reservation.getDate().toLocalDate())
-                        && currentTime.after(reservation.getStartTime())
-                        && currentTime.before(reservation.getEndTime()))) {
+                } else if (currentDateTime.isAfter(reservation.getStartDateTime())
+                        && currentDateTime.isBefore(reservation.getEndDateTime())) {
 
                     status = HttpStatus.BAD_REQUEST;
                     logger.warn("Invalid date or time of the reservation");

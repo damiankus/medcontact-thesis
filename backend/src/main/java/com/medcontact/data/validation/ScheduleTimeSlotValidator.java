@@ -8,9 +8,7 @@ public class ScheduleTimeSlotValidator extends DataValidatorHelper<ScheduleTimeS
 	public ValidationResult validate(ScheduleTimeSlot scheduleTimeSlot) {
 		ValidationResult result = new ValidationResult();
 		
-		if (scheduleTimeSlot.getStartTime().getTime() >=
-				scheduleTimeSlot.getEndTime().getTime()) {
-			
+		if (scheduleTimeSlot.getStartDateTime().isAfter(scheduleTimeSlot.getEndDateTime())) {
 			result.addError("Consultation time slot end time before start time");
 			
 		} else {

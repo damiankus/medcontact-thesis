@@ -1,12 +1,9 @@
 package com.medcontact.data.model.domain;
 
-import java.sql.Time;
-import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,7 +11,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.medcontact.data.model.domain.Doctor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -33,16 +29,11 @@ public class ScheduleTimeSlot {
 	
 	@Column(nullable=false)
 	@NonNull
-	@Enumerated(EnumType.STRING)
-	private DayOfWeek dayOfWeek;
+	private LocalDateTime startDateTime;
 	
 	@Column(nullable=false)
 	@NonNull
-	private Time startTime;
-	
-	@Column(nullable=false)
-	@NonNull
-	private Time endTime;
+	private LocalDateTime endDateTime;
 	
 	@ManyToOne
 	@JoinColumn(name="doctor_id")
@@ -50,22 +41,19 @@ public class ScheduleTimeSlot {
 
 	public ScheduleTimeSlot() {
 		super();
-		this.dayOfWeek = DayOfWeek.MONDAY;
-		this.startTime = Time.valueOf("00:00:00");
-		this.endTime = Time.valueOf("01:00:00");
+		this.startDateTime = LocalDateTime.of(2000, 1, 1, 1, 0);
+		this.endDateTime = LocalDateTime.of(2100, 12, 31, 23, 59);
 	}
 	
-	public ScheduleTimeSlot(DayOfWeek dayOfWeek, Time startTime, Time endTime) {
+	public ScheduleTimeSlot(LocalDateTime startTime, LocalDateTime endTime) {
 		super();
-		this.dayOfWeek = dayOfWeek;
-		this.startTime = startTime;
-		this.endTime = endTime;
+		this.startDateTime = startTime;
+		this.endDateTime = endTime;
 	}
 	
-	public ScheduleTimeSlot(DayOfWeek dayOfWeek, String startTime, String endTime) {
+	public ScheduleTimeSlot(String startTime, String endTime) {
 		super();
-		this.dayOfWeek = dayOfWeek;
-		this.startTime = Time.valueOf(startTime);
-		this.endTime = Time.valueOf(endTime);
+		this.startDateTime = LocalDateTime.parse(startTime);
+		this.endDateTime = LocalDateTime.parse(endTime);
 	}
 }

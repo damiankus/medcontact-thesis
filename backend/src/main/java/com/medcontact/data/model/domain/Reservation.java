@@ -1,19 +1,22 @@
 package com.medcontact.data.model.domain;
 
-import com.medcontact.data.model.domain.Doctor;
-import com.medcontact.data.model.domain.Patient;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.ToString;
+import java.time.LocalDateTime;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.time.LocalDate;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.ToString;
 
 @Entity
 @Table(name="reservations")
@@ -27,15 +30,11 @@ public class Reservation {
 	
 	@Column(nullable=false)
 	@NonNull
-	private Date date;
+	private LocalDateTime startDateTime;
 	
 	@Column(nullable=false)
 	@NonNull
-	private Time startTime;
-	
-	@Column(nullable=false)
-	@NonNull
-	private Time endTime;
+	private LocalDateTime endDateTime;
 	
 	@ManyToOne
 	@JoinColumn(name="patient_id")
@@ -47,9 +46,8 @@ public class Reservation {
 	private Doctor doctor;
 	
 	public Reservation() {
-		this.date = Date.valueOf(LocalDate.now());
-		this.startTime = Time.valueOf("00:00:00");
-		this.startTime = Time.valueOf("00:00:01");
+		this.startDateTime = LocalDateTime.of(2000, 1, 1, 1, 0);
+		this.endDateTime = LocalDateTime.of(2100, 12, 31, 23, 59);
 	}
 	
 }
