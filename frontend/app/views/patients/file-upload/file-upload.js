@@ -9,8 +9,8 @@ myApp.config(['$routeProvider', function ($routeProvider) {
     });
 }])
 
-myApp.controller('FileUploadCtrl', ['REST_API', '$scope', '$http', '$location', 'UserService',
-    function (REST_API, $scope, $http, $location, UserService) {
+myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService',
+    function (REST_API, $rootScope, $scope, $http, $location, UserService) {
 		
 		$scope.user = UserService.getUser();
 		

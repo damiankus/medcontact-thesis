@@ -19,6 +19,7 @@ myApp.controller('LogoutCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$l
 
             $http(request).then(function successCallback() {
                 UserService.setUser({})
+                delete $rootScope.userDetails;
                 console.log('User has logged out');
 
             }, function errorCallback(response) {

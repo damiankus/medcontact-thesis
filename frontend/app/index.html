@@ -1,70 +1,79 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html lang="en" ng-app="myApp" class="no-js"> <!--<![endif]-->
+<!--[if lt IE 7]>
+<html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en" ng-app="myApp" class="no-js"> <!--<![endif]-->
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Medcontact</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  
-  <link rel="stylesheet" href="assets/bower_components/html5-boilerplate/dist/css/normalize.css">
-  <link rel="stylesheet" href="assets/bower_components/html5-boilerplate/dist/css/main.css">
-  <link rel="stylesheet" href="assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
-  
-  <link rel="stylesheet" href="app.css">
-	<link rel="stylesheet" href="assets/file-upload.css">
-	<link rel="stylesheet" href="assets/css/logout.css">
-	<link rel="stylesheet" href="assets/css/consultation.css">
-	<link rel="stylesheet" href="assets/css/signup.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Medcontact</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="assets/bower_components/html5-boilerplate/dist/css/normalize.css">
+    <link rel="stylesheet" href="assets/bower_components/html5-boilerplate/dist/css/main.css">
+    <link rel="stylesheet" href="assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="app.css">
 </head>
 
 <body>
-  <nav class="navbar navbar-default bg-primary">
-	 <ul id="home-nav-btns" class="nav navbar-nav pull-left">
-	 	<li class="nav-item nav-brand">
-	 		<a href="#!"><h4>Medcontact</h4></a>
-	 	</li>
-	 </ul>
-	 <ul id="home-login-btns" class="nav navbar-nav pull-right">
-	  <li ng-show="userDetails.role === 'PATIENT'" class="nav-item">
-	   	<a href="#!/reservation" class="nav-link">Rezerwacja terminu</a>
-		</li>
-		<li class="nav-item">
-			<a href="#!/signUp" class="btn btn-default navbar-btn">Rejestracja</a>
-		</li>
-		<li ng-show="userDetails.id === undefined" class="nav-item">
-			<a href="#!/login" class="btn btn-success navbar-btn">Logowanie</a>
-		</li>
-		<li ng-show="userDetails.id !== undefined" class="nav-item">
-			<a href="#!/logout" class="btn btn-default navbar-btn">Wyloguj się</a>
-		</li>
-	 </ul>
-  </nav>
+<nav class="navbar navbar-default bg-primary">
+    <ul id="home-nav-btns" class="nav navbar-nav pull-left">
+        <li class="nav-item nav-brand">
+            <a href="#!"><h4>Medcontact</h4></a>
+        </li>
+    </ul>
+    <ul id="home-login-btns" class="nav navbar-nav pull-right">
+        <li ng-if="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
+            <a href="#!/reservation" class="btn btn-default navbar-btn">Rezerwacja terminu</a>
+        </li>
+        <li ng-show="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
+            <a href="#!/file-upload" class="btn btn-default navbar-btn">Pliki</a>
+        </li>
+        <li ng-show="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
+            <a href="#!/personal-data" class="btn btn-default navbar-btn">Dane Osobowe</a>
+        </li>
 
-  <!--[if lt IE 7]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-  <![endif]-->
+        <li ng-show="userDetails.id" class="nav-item">
+            <a href="#!/logout" class="btn btn-default navbar-btn">Wyloguj się</a>
+        </li>
 
-  <div ng-view></div>
 
-  <!-- In production use:
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
-  -->
-  <script src="assets/bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
-  <script src="assets/bower_components/jquery/dist/jquery.min.js"></script>
-  <script src="assets/bower_components/angular/angular.js"></script>
-  <script src="assets/bower_components/angular-route/angular-route.js"></script>
-  <script src="components/version/version.js"></script>
-  <script src="components/version/version-directive.js"></script>
-  <script src="components/version/interpolate-filter.js"></script>
-  <script src="app.js"></script>
-  <script src="views/login/login.js"></script>
-  <script src="views/logout/logout.js"></script>
-  <script src="views/signUp/signUp.js"></script>
-  <script src="views/patients/reservation/reservation.js"></script>
-  <script src="views/patients/file-upload/file-upload.js"></script>
+        <li ng-show="!userDetails.id" class="nav-item">
+            <a href="#!/signUp" class="btn btn-default navbar-btn">Rejestracja</a>
+        </li>
+        <li ng-show="!userDetails.id" class="nav-item">
+            <a href="#!/login" class="btn btn-success navbar-btn">Logowanie</a>
+        </li>
+
+    </ul>
+</nav>
+
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<div ng-view></div>
+
+<!-- In production use:
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
+-->
+<script src="assets/bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
+<script src="assets/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="assets/bower_components/angular/angular.js"></script>
+<script src="assets/bower_components/angular-route/angular-route.min.js"></script>
+<script src="app.js"></script>
+<script src="views/login/login.js"></script>
+<script src="views/logout/logout.js"></script>
+<script src="views/signUp/signUp.js"></script>
+<script src="views/patients/reservation/reservation.js"></script>
+<script src="views/patients/file-upload/file-upload.js"></script>
+<script src="views/patients/personal-data/personal-data.js"></script>
 </body>
 </html>
