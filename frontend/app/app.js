@@ -1,13 +1,8 @@
 'use strict';
 
 // Declare app level module which depends on views, and components
-angular.module('myApp', [
+var myApp = angular.module('myApp', [
     'ngRoute',
-    'myApp.login',
-    'myApp.logout',
-    'myApp.signUp',
-    'myApp.reservation',
-    'myApp.fileUpload',
     'myApp.version'
 ])
 // .constant('REST_API', "https://medcontact-api.herokuapp.com/")
@@ -49,7 +44,7 @@ angular.module('myApp', [
     		for (var prop in user) {
     			scope.user[prop] = user[prop];
     		}
-    	}
+    	};
     	
     	return accessor;
     });

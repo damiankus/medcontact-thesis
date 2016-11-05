@@ -1,15 +1,15 @@
 'use strict';
 
-angular.module('myApp.fileUpload', ['ngRoute'])
 
-.config(['$routeProvider', function ($routeProvider) {
+
+myApp.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/file-upload', {
         templateUrl: 'views/patients/file-upload/file-upload.html',
         controller: 'FileUploadCtrl'
     });
 }])
 
-.controller('FileUploadCtrl', ['REST_API', '$scope', '$http', '$location', 'UserService',
+myApp.controller('FileUploadCtrl', ['REST_API', '$scope', '$http', '$location', 'UserService',
     function (REST_API, $scope, $http, $location, UserService) {
 		
 		$scope.user = UserService.getUser();
