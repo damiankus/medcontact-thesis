@@ -1,14 +1,13 @@
 <body>
 <div class="container">
-    <div class="jumbotron" ng-app="myApp" ng-controller="DoctorListCtrl">
+    <div class="jumbotron">
 
         <div class="form-group">
             <span class="col-md-4"></span>
             <h2 class="col-md-8">Lista lekarzy</h2>
         </div>
-        
-        
-        <table id="doctors-table" class="table table-hover">
+
+        <table class="table table-hover">
             <thead>
             <tr>
                 <th>#</th>
@@ -17,28 +16,16 @@
                 <th>Terminy</th>
             </tr>
             </thead>
- <!--          	<tbody>
-							<tr ng-repeat="doctor in doctors">
-							  <td>{{ $index }}</td>
-								<td>{{ doctor.specialties }}</td>
-								<td>{{ doctor.firstName doctor.lastName}}</td>
-								<td><a ng-href="{{ doctor }}"><button class="btn btn-sm btn-success"> Terminy</button></a></td>
-							</tr>
-						</tbody>
-		-->				
             <tbody>
-            <tr>
-                <td>1</td>
-                <td>psychiatra</td>
-                <td>Jan Kowalski</td>
-                <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Pokaż terminy" onclick="location.href='doctor/1/terms';" /></td>
+            <tr ng-repeat="doctor in doctors">
+                <td>{{ $index }}</td>
+                <td ng-repeat="specialization in doctor.specialties">{{ specialization.name }} {{$last ? '' : ', '}} </td>
+                <td>{{ doctor.firstName + doctor.lastName}}</td>
+                <td><a ng-href="{{ doctor }}">
+                    <a href="#!/available-schedule/{{doctor.id}}" class="btn btn-sm btn-success">Pokaż terminy</a>
+                </a></td>
             </tr>
-            <tr>
-                <td>2</td>
-                <td>kardiolog</td>
-                <td>Jakub Nowak</td>
-                <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Pokaż terminy" onclick="location.href='doctor/2/terms';" /></td>
-            </tr>
+
             </tbody>
         </table>
     </div>

@@ -2,18 +2,18 @@ package com.medcontact.controller;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import com.medcontact.data.model.dto.BasicDoctorDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -114,5 +114,13 @@ public class DoctorDataController {
 		}
 		
 		return new ResponseEntity<>(body, status);
+	}
+
+	@GetMapping(value = "")
+	@ResponseBody
+	public List<BasicDoctorDetails> getDoctors() {
+		return doctorRepository.findAll()
+				.stream()
+				.map(BasicDoctorDetails::new).collect(Collectors.toList());
 	}
 }	

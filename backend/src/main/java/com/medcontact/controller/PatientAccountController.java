@@ -68,9 +68,6 @@ public class PatientAccountController {
     private PatientRepository patientRepository;
 
     @Autowired
-    private DoctorRepository doctorRepository;
-
-    @Autowired
     private FileRepository fileRepository;
 
     @Autowired
@@ -90,6 +87,10 @@ public class PatientAccountController {
 
     @Value("${webrtc.turn.secret}")
     private String turnSecret;
+    
+    @Autowired
+    private DoctorRepository doctorRepository;
+    
 
     @GetMapping("{patientId}/connection/{consultationId}")
     public ResponseEntity<ConnectionData> getConnectionData(
