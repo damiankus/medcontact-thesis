@@ -7,9 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.medcontact.data.model.BasicUser;
-import com.medcontact.data.model.BasicUserDetails;
-import com.medcontact.data.model.Patient;
+import com.medcontact.data.model.domain.BasicUser;
+import com.medcontact.data.model.dto.BasicUserDetails;
+import com.medcontact.data.model.domain.Patient;
 
 @Controller
 public class LoggedInUserController {

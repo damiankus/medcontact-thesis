@@ -1,4 +1,4 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
+import com.medcontact.data.model.enums.ApplicationRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;

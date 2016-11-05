@@ -1,4 +1,4 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.domain;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +16,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.medcontact.data.model.enums.ApplicationRole;
+import com.medcontact.data.model.enums.Sex;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

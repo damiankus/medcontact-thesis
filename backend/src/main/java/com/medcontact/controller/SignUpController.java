@@ -1,7 +1,7 @@
 package com.medcontact.controller;
 
-import com.medcontact.data.model.BasicUser;
-import com.medcontact.data.model.Patient;
+import com.medcontact.data.model.domain.BasicUser;
+import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.repository.BasicUserRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.exception.EmailTakenException;

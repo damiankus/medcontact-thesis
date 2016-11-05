@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.medcontact.data.model.BasicUser;
+import com.medcontact.data.model.domain.BasicUser;
 
 public interface BasicUserRepository extends JpaRepository<BasicUser, Long> {
 	public Optional<BasicUser> findByEmail(String email);

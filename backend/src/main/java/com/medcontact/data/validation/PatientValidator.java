@@ -1,6 +1,6 @@
 package com.medcontact.data.validation;
 
-import com.medcontact.data.model.Patient;
+import com.medcontact.data.model.domain.Patient;
 
 public class PatientValidator extends DataValidatorHelper<Patient> {
 	public final int MAX_FILES_SIZE = Integer.MAX_VALUE;

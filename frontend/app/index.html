@@ -30,7 +30,10 @@
     </ul>
     <ul id="home-login-btns" class="nav navbar-nav pull-right">
         <li ng-if="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
-            <a href="#!/reservation" class="btn btn-default navbar-btn">Rezerwacja terminu</a>
+            <a href="#!/reservation" class="btn btn-default navbar-btn">Rezerwacje</a>
+        </li>
+        <li ng-if="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
+            <a href="#!/doctor-list" class="btn btn-default navbar-btn">Lekarze</a>
         </li>
         <li ng-show="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
             <a href="#!/file-upload" class="btn btn-default navbar-btn">Pliki</a>
@@ -38,12 +41,9 @@
         <li ng-show="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
             <a href="#!/personal-data" class="btn btn-default navbar-btn">Dane Osobowe</a>
         </li>
-
         <li ng-show="userDetails.id" class="nav-item">
             <a href="#!/logout" class="btn btn-default navbar-btn">Wyloguj się</a>
         </li>
-
-
         <li ng-show="!userDetails.id" class="nav-item">
             <a href="#!/signUp" class="btn btn-default navbar-btn">Rejestracja</a>
         </li>
@@ -75,5 +75,6 @@
 <script src="views/patients/reservation/reservation.js"></script>
 <script src="views/patients/file-upload/file-upload.js"></script>
 <script src="views/patients/personal-data/personal-data.js"></script>
+<script src="views/patients/doctor-list/doctor-list.js"></script>
 </body>
 </html>

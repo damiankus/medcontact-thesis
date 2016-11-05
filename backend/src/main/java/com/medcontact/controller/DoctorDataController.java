@@ -19,7 +19,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.medcontact.data.model.Doctor;
+import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.repository.BasicUserRepository;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.validation.DoctorValidator;

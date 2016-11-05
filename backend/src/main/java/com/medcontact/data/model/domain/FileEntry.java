@@ -1,4 +1,4 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.domain;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -15,8 +15,6 @@ import javax.persistence.Table;
 import javax.sql.rowset.serial.SerialException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Data;
 import lombok.NonNull;

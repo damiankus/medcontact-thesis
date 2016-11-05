@@ -1,5 +1,7 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.dto;
 
+import com.medcontact.data.model.domain.BasicUser;
+import com.medcontact.data.model.enums.ApplicationRole;
 import lombok.Data;
 
 @Data

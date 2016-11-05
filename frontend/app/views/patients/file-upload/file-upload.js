@@ -7,7 +7,7 @@ myApp.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'views/patients/file-upload/file-upload.html',
         controller: 'FileUploadCtrl'
     });
-}])
+}]);
 
 myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {

@@ -3,7 +3,7 @@ package com.medcontact.data.repository;
 import java.util.List;
 
 
-import com.medcontact.data.model.Reservation;
+import com.medcontact.data.model.domain.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {

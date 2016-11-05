@@ -2,7 +2,7 @@ package com.medcontact.data.validation;
 
 import java.util.regex.Pattern;
 
-import com.medcontact.data.model.BasicUser;
+import com.medcontact.data.model.domain.BasicUser;
 
 public class BasicUserValidator extends DataValidatorHelper<BasicUser> {
 	public final int MAX_EMAIL_LEN = 128;
