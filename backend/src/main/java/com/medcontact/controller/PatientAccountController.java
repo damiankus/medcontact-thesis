@@ -65,9 +65,6 @@ public class PatientAccountController {
     private PatientRepository patientRepository;
 
     @Autowired
-    private DoctorRepository doctorRepository;
-
-    @Autowired
     private FileRepository fileRepository;
 
     @Autowired
@@ -243,20 +240,6 @@ public class PatientAccountController {
 			}
 		}
 	}
-
-    @GetMapping(value = "{id}/doctors")
-    @ResponseBody
-    public List<BasicDoctorDetails> getDoctors(@PathVariable("id") Long patientId) {
-        System.out.println(1);
-        //TODO replace all doctor to doctor only visible to Patient
-        return doctorRepository.findAll()
-                .stream()
-                .map(doctor -> {
-                            System.out.println();
-                            return new BasicDoctorDetails(doctor);
-                        }
-                ).collect(Collectors.toList());
-    }
 
 	/* A utility method checking if a user waith the given ID is entitled to
      * obtain access to a resource */

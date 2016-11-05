@@ -1,9 +1,12 @@
 package com.medcontact.data.model.dto;
 
 import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.domain.Specialty;
 import com.medcontact.data.model.enums.Sex;
 
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class BasicDoctorDetails {
@@ -15,6 +18,7 @@ public class BasicDoctorDetails {
     private final String university;
     private final String biography;
     private final String title;
+    private final List<Specialty> specialties;
 
     public BasicDoctorDetails(Doctor doctor) {
         this.id = doctor.getId();
@@ -25,5 +29,6 @@ public class BasicDoctorDetails {
         this.university = doctor.getUniversity();
         this.biography = doctor.getBiography();
         this.title = doctor.getTitle();
+        this.specialties = doctor.getSpecialties();
     }
 }

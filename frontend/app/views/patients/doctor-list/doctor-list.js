@@ -1,6 +1,5 @@
 'use strict';
 
-
 myApp.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/doctor-list', {
         templateUrl: 'views/patients/doctor-list/doctor-list.html',
@@ -11,12 +10,13 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 myApp.controller('DoctorListCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
         getDoctors();
+        $scope.a = "a";
 
         function getDoctors() {
-            $http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/doctors")
+            $http.get(REST_API + "doctors")
                 .then(function successCallback(response) {
-                        console.log(response);
                         $scope.doctors = response.data;
+                        console.log($scope.doctors);
                     }, function errorCallback(response) {
                         console.log("[ERROR]: " + response.data.message);
                     }
