@@ -1,4 +1,4 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.domain;
 
 import java.sql.Time;
 import java.time.DayOfWeek;
@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.medcontact.data.model.domain.Doctor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;

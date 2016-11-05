@@ -1,6 +1,6 @@
 package com.medcontact.data.validation;
 
-import com.medcontact.data.model.Doctor;
+import com.medcontact.data.model.domain.Doctor;
 
 public class DoctorValidator extends DataValidatorHelper<Doctor> {
 	public final int MAX_UNIVERSITY_LEN = 128;

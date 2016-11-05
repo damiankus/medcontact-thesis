@@ -3,7 +3,7 @@ package com.medcontact.data.validation;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import com.medcontact.data.model.FileEntry;
+import com.medcontact.data.model.domain.FileEntry;
 
 public class FileEntryValidator extends DataValidatorHelper<FileEntry> {
 	public int MAX_DESCRIPTION_LEN = 128;

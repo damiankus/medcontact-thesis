@@ -2,6 +2,8 @@
 
 @import url('/assets/css/consultation.css');
 @import url('/assets/css/signup.css');
+@import url('/assets/css/file-upload.css');
+
 
 .menu {
   list-style: none;

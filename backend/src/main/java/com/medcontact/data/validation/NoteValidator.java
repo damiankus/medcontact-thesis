@@ -1,6 +1,6 @@
 package com.medcontact.data.validation;
 
-import com.medcontact.data.model.Note;
+import com.medcontact.data.model.domain.Note;
 
 public class NoteValidator extends DataValidatorHelper<Note> {
 	public final int MAX_TITLE_LEN = 128;

@@ -1,6 +1,6 @@
 package com.medcontact.data.validation;
 
-import com.medcontact.data.model.Specialty;
+import com.medcontact.data.model.domain.Specialty;
 
 public class SpecialtyValidator extends DataValidatorHelper<Specialty> {
 	public final int MAX_SPECIALTY_LEN = 128;

@@ -1,6 +1,6 @@
 package com.medcontact.data.validation;
 
-import com.medcontact.data.model.ScheduleTimeSlot;
+import com.medcontact.data.model.domain.ScheduleTimeSlot;
 
 public class ScheduleTimeSlotValidator extends DataValidatorHelper<ScheduleTimeSlot> {
 	

@@ -1,9 +1,10 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.domain;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.medcontact.data.model.enums.ApplicationRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

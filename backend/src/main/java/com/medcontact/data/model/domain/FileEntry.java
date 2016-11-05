@@ -1,4 +1,4 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.domain;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;

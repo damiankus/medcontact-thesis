@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import com.medcontact.data.model.BasicUser;
+import com.medcontact.data.model.domain.BasicUser;
 import com.medcontact.data.repository.BasicUserRepository;
 
 public class ApplicationUserDetailsService implements UserDetailsService {

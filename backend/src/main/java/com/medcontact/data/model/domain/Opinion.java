@@ -1,4 +1,4 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

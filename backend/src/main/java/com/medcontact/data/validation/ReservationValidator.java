@@ -5,7 +5,7 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import com.medcontact.data.model.Reservation;
+import com.medcontact.data.model.domain.Reservation;
 
 public class ReservationValidator extends DataValidatorHelper<Reservation> {
 	

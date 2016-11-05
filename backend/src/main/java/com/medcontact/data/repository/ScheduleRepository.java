@@ -1,6 +1,6 @@
 package com.medcontact.data.repository;
 
-import com.medcontact.data.model.ScheduleTimeSlot;
+import com.medcontact.data.model.domain.ScheduleTimeSlot;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

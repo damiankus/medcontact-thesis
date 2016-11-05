@@ -1,4 +1,4 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.enums;
 
 public enum ApplicationRole {
 	ADMIN(1, "ADMIN"),

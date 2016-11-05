@@ -1,6 +1,6 @@
 package com.medcontact.data.validation;
 
-import com.medcontact.data.model.Opinion;
+import com.medcontact.data.model.domain.Opinion;
 
 public class OpinionValidator extends DataValidatorHelper<Opinion> {
 	public final int MAX_OPINION_LEN = 2048;

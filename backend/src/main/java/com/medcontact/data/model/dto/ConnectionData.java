@@ -1,4 +1,4 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.dto;
 
 import lombok.Data;
 import lombok.NonNull;

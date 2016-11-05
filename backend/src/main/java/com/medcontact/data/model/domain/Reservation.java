@@ -1,5 +1,7 @@
-package com.medcontact.data.model;
+package com.medcontact.data.model.domain;
 
+import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.domain.Patient;
 import lombok.Data;
 import lombok.NonNull;
 
