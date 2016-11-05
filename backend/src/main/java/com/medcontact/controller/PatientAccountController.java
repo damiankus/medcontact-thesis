@@ -152,6 +152,7 @@ public class PatientAccountController {
 			 * authentication context causes throwing an lazy 
 			 * loading exception */
 			
+        	System.out.println("Uploaded files: " + files.size());
 			Patient patient = patientRepository.findOne(patientId);
 			
 			for (MultipartFile file : files) {
@@ -167,29 +168,34 @@ public class PatientAccountController {
 						patientFilesPathRoot,
 						patientId);
 				
-				FileEntry fileEntry = fileRepository.findByFilenameAndOwnerId(
+				List<FileEntry> foundEntries = fileRepository.findByFilenameAndOwnerId(
 						file.getOriginalFilename(), patientId);
 				
-				if (fileEntry == null) {
-					fileEntry = new FileEntry();
-					fileEntry.setFileOwner(patient);
-					patient.getFileEntries().add(fileEntry);
-					fileEntry = fileRepository.save(fileEntry);
-				}
-				
+				FileEntry fileEntry = (foundEntries.size() > 0)
+					? foundEntries.get(0)
+					: new FileEntry();
+					
 				fileEntry.setName(file.getOriginalFilename());
 				fileEntry.setUploadTime(
 						Timestamp.valueOf(
 								LocalDateTime.now()));
 				fileEntry.setFileOwner(patient);
 				fileEntry.setContentType(file.getContentType());
-				fileEntry.setUrl(fileUrl);
 				fileEntry.setContentLength(file.getSize());
 				fileEntry.setPath(Paths.get(filePath).toAbsolutePath().toString());
 				patient.getFileEntries().add(fileEntry);
 
 				fileEntry.setUrl(fileUrl + fileEntry.getId());
-				fileRepository.save(fileEntry);
+				fileEntry = fileRepository.save(fileEntry);
+
+				/* If the entry is saved for the first time
+				 * we need to update its URL */
+				
+				if (foundEntries.size() == 0) {
+					System.out.println("ALREADY IN REPO");
+					fileEntry.setUrl(fileUrl + fileEntry.getId());
+					fileRepository.save(fileEntry);
+				}
 				
 				File fileToWrite = Paths.get(filePath).toAbsolutePath().toFile();
 				fileToWrite.getParentFile().mkdirs();
@@ -262,7 +268,7 @@ public class PatientAccountController {
         if (!(principal instanceof Patient)
                 || (!((Patient) principal).getId().equals(patientId))) {
 
-            logger.warn("Detected an attempt to upload a file without authorization " + principal.toString());
+            logger.warn("An attempt to upload a file without authorization detected - " + principal.toString());
             throw new UnauthorizedUserException();
         }
 

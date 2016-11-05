@@ -82,6 +82,7 @@ public class BasicUser implements UserDetails {
 	
 	@Column(nullable=false, unique=true)
 	@NonNull
+	@JsonProperty(access=Access.WRITE_ONLY)
 	protected String email;
 	
 	@Column(nullable=false)

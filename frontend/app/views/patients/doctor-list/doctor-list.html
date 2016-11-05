@@ -1,20 +1,31 @@
 <body>
 <div class="container">
-    <div class="jumbotron">
+    <div class="jumbotron" ng-app="myApp" ng-controller="DoctorListCtrl">
 
         <div class="form-group">
             <span class="col-md-4"></span>
             <h2 class="col-md-8">Lista lekarzy</h2>
         </div>
-        <table class="table">
+        
+        
+        <table id="doctors-table" class="table table-hover">
             <thead>
             <tr>
                 <th>#</th>
-                <th>Specjalizacja</th>
+                <th>Specjalizacje</th>
                 <th>Imię i nazwisko</th>
                 <th>Terminy</th>
             </tr>
             </thead>
+ <!--          	<tbody>
+							<tr ng-repeat="doctor in doctors">
+							  <td>{{ $index }}</td>
+								<td>{{ doctor.specialties }}</td>
+								<td>{{ doctor.firstName doctor.lastName}}</td>
+								<td><a ng-href="{{ doctor }}"><button class="btn btn-sm btn-success"> Terminy</button></a></td>
+							</tr>
+						</tbody>
+		-->				
             <tbody>
             <tr>
                 <td>1</td>

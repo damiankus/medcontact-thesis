@@ -7,7 +7,29 @@ myApp.config(['$routeProvider', function ($routeProvider) {
     });
 }]);
 
-myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location',
-    function (REST_API, $rootScope, $scope, $http, $location) {
+myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService',
+    function (REST_API, $rootScope, $scope, $http, $location, UserService) {
     console.log("reservationController ", REST_API, $rootScope);
+    
+    $rootScope.userDetails = UserService.getUser();
+    
+    $http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations")
+	    .then(function successCallback(response) {
+			$scope.reservations	 = response.data._embedded.reservations;
+			
+			for (var reservation of $scope.reservations) {
+				$http.get(reservation._links.doctor.href)
+					.then(function successCallback(response) {
+						console.log("DOCTOR: ");
+						console.log(response);
+						reservation["doctor"] = response.data;
+					
+					}, function errorCallback(response) {
+						console.log("[ERROR]: " + response.data);
+					});
+			}
+			
+		}, function errorCallback(response) {
+			console.log("[ERROR]: " + response.data.message);
+		});
 }]);

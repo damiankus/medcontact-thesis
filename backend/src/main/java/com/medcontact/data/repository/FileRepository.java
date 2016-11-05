@@ -14,5 +14,5 @@ public interface FileRepository extends JpaRepository<FileEntry, Long> {
 	public List<FileEntry> findByFileOwnerUsername(String username);
 	
 	@Query("SELECT f FROM FileEntry f WHERE f.fileOwner.id = :ownerId AND f.name = :filename")
-	public FileEntry findByFilenameAndOwnerId(@Param("filename") String filename, @Param("ownerId") Long ownerId);
+	public List<FileEntry> findByFilenameAndOwnerId(@Param("filename") String filename, @Param("ownerId") Long ownerId);
 }

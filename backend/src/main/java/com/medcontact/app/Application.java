@@ -107,7 +107,7 @@ public class Application implements CommandLineRunner {
 				.setEmail("house@gmail.com")
 				.build();
 		
-		note.setOwner(doctor);
+		note.setDoctor(doctor);
 		doctor.getNotes().add(note);
 		doctor.getReservations().add(reservation);
 		reservation.setDoctor(doctor);

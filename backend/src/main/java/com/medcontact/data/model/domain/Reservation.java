@@ -4,6 +4,7 @@ import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.Patient;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name="reservations")
 @Data
+@ToString(exclude={"patient", "doctor"})
 public class Reservation {
 	
 	@Id

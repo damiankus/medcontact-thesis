@@ -15,6 +15,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -60,6 +61,7 @@ public class Doctor extends BasicUser {
 	
 	@Column(nullable=false)
 	@NonNull
+	@JsonIgnore
 	private String roomId;
 	
 	/* The "busy" field tells whether the doctor
@@ -80,7 +82,7 @@ public class Doctor extends BasicUser {
 	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<ScheduleTimeSlot> weeklySchedule;
 	
-	@OneToMany(mappedBy="owner", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<Note> notes;
 	

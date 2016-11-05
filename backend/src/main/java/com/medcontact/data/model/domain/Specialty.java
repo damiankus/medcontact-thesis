@@ -13,10 +13,12 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Table(name="specialties")
 @Data
+@ToString(exclude="doctorsWithSpecialty")
 public class Specialty {
 
 	@Id

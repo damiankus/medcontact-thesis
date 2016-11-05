@@ -18,11 +18,13 @@ import com.medcontact.data.model.domain.Doctor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.ToString;
 
 @Entity
 @Table(name="schedules")
 @Data
 @AllArgsConstructor
+@ToString(exclude="doctor")
 public class ScheduleTimeSlot {
 	
 	@Id

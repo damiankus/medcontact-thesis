@@ -16,10 +16,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Table(name="notes")
 @Data
+@ToString(exclude="doctor")
 public class Note {
 	
 	@Id
@@ -38,7 +40,7 @@ public class Note {
 	@ManyToOne
 	@JoinColumn(name="note_owner_id")
 	@JsonProperty(access=Access.WRITE_ONLY)
-	private Doctor owner;
+	private Doctor doctor;
 	
 	@ManyToOne
 	@JoinColumn(name="patient_id")
@@ -49,6 +51,6 @@ public class Note {
 		this.title = "";
 		this.content = "";
 		this.uploadTime = Timestamp.valueOf(LocalDateTime.now());
-		this.owner = new Doctor();
+		this.doctor = new Doctor();
 	}
 }

@@ -12,12 +12,12 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
 		
-		$scope.user = UserService.getUser();
+		$rootScope.userDetails = UserService.getUser();
 		
-		if ($scope.user.id !== undefined
-				&& $scope.user.id !== null) {
+		if ($rootScope.userDetails.id !== undefined
+				&& $rootScope.userDetails.id !== null) {
 			
-			$scope.fileServiceUrl = REST_API + "patients/" + $scope.user.id + "/files";
+			$scope.fileServiceUrl = REST_API + "patients/" + $rootScope.userDetails.id + "/files";
 			
 			var fileInput = $("#uploaded-file");
 			var cancelBtn = $("#file-cancel-btn");
@@ -33,6 +33,7 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 				/* Show the filename in the text area */
 				
 				if (fileInput[0].files[0] !== null) {
+					console.log("# of files: " + fileInput[0].files.length);
 					var fileNames = "";
 					var maxLength = 0;
 					var fileCount = fileInput[0].files.length;
@@ -63,6 +64,15 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 			
 			$("#file-upload-form").submit(function (event) {
 				var formData = new FormData($(this)[0]);
+				var submittedFiles = [];
+				console.log("FIles:")
+				console.log(JSON.stringify($(this)[0].files));
+				
+				for (var file of fileInput[0].files) {
+					console.log(file.name);
+				}
+				
+				console.log(formData);
 				event.preventDefault();
 				
 				$.ajax({
@@ -83,7 +93,7 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 					},
 					
 					error: function(jq, status, message) {
-				        alert("[ERROR]: An error occurred");
+				        alert("[ERROR]: " + message);
 				    },
 					
 					cache: false,
@@ -100,10 +110,9 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 		
 		/* Load file info from the server */
 		
-		$http.get(REST_API + "patients/" + $scope.user.id + "/fileEntries")
+		$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/fileEntries")
 			.then(function successCallback(response) {
 				$scope.files = response.data._embedded.fileEntries;
-				console.log($scope.files);
 				
 			}, function errorCallback(response) {
 				console.log("[ERROR]: " + response);

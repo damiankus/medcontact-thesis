@@ -7,7 +7,7 @@
 				<fieldset>
 					<textarea id="filename-area" class="form-control" placeholder="Nazwa pliku" readonly></textarea>
 					<label class="btn btn-default btn-file">
-   						<input id="uploaded-file" type="file" name="files" style="display: none;" multiple/>
+   						<input id="uploaded-file" type="file" name="files" class="hidden" multiple/>
    						Wybierz plik
 					</label>
 					<button  id="file-cancel-btn" type="button" class="hidden btn btn-danger">Anuluj</button>
@@ -26,8 +26,9 @@
 						<th>Nazwa pliku</th>
 						<th>Data przesłania</th>
 						<th>Typ pliku</th>
-						<th>Link</th>
 						<th></th>
+					</tr>
+				</thead>
 				<tbody>
 					<tr ng-repeat="file in files">
 						<td>{{ file.name }}</td>
