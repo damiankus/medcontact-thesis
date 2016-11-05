@@ -9,7 +9,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,7 @@ import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
+import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.FileRepository;
@@ -256,6 +259,30 @@ public class PatientAccountController {
                             return new BasicDoctorDetails(doctor);
                         }
                 ).collect(Collectors.toList());
+    }
+    
+    @GetMapping(value = "{id}/current-reservations")
+    @ResponseBody
+    public List<BasicReservationData> getCurrentReservations(
+    		@PathVariable("id") Long patientId) {
+    	LocalDateTime prevMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0));
+    	
+        return patientRepository.findOne(patientId)
+        		.getReservations()
+                .stream()
+                .filter(r -> r.getStartDateTime().isAfter(prevMidnight))
+                .map(r -> {
+                	BasicReservationData details = new BasicReservationData();
+                	details.setDoctorId(r.getDoctor().getId());
+                	details.setDoctorName(r.getDoctor().getFirstName()
+                			+ " " + r.getDoctor().getLastName());
+                	details.setDoctorBusy(r.getDoctor().isBusy());
+                	details.setStartDateTime(r.getStartDateTime());
+                	details.setEndDateTime(r.getEndDateTime());
+                	
+                	return details;
+                })
+                .collect(Collectors.toList());
     }
 
 	/* A utility method checking if a user waith the given ID is entitled to
