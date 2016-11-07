@@ -1,13 +1,13 @@
 'use strict';
 
 myApp.config(['$routeProvider', function ($routeProvider) {
-    $routeProvider.when('/patient-consultation', {
-        templateUrl: 'views/patients/consultation/consultation.html',
-        controller: 'ConsultationPatientCtrl'
+    $routeProvider.when('/doctor-consultation', {
+        templateUrl: 'views/doctors/consultation/consultation.html',
+        controller: 'ConsultationDoctorCtrl'
     });
 }]);
 
-myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
+myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
 
         var webrtc = {};

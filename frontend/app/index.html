@@ -30,9 +30,20 @@
         </li>
     </ul>
     <ul id="home-login-btns" class="nav navbar-nav pull-right">
+        <!--ALL-->
+        <li ng-show="userDetails.id" class="nav-item">
+            <a href="#!/logout" class="btn btn-default navbar-btn">Wyloguj się</a>
+        </li>
+        <!--GUEST-->
+        <li ng-show="!userDetails.id" class="nav-item">
+            <a href="#!/signUp" class="btn btn-default navbar-btn">Rejestracja</a>
+        </li>
+        <li ng-show="!userDetails.id" class="nav-item">
+            <a href="#!/login" class="btn btn-success navbar-btn">Logowanie</a>
+        </li>
         <!--PATIENT-->
         <li ng-if="userDetails.id && userDetails.role === 'PATIENT' && userDetails.consultation" class="nav-item">
-            <a href="#!/consultation" class="btn btn-default navbar-btn">Rozmowa</a>
+            <a href="#!/patient-consultation" class="btn btn-default navbar-btn">Konsultacja</a>
         </li>
         <li ng-if="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
             <a href="#!/reservation" class="btn btn-default navbar-btn">Rezerwacje</a>
@@ -46,25 +57,14 @@
         <li ng-show="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
             <a href="#!/personal-data" class="btn btn-default navbar-btn">Dane Osobowe</a>
         </li>
-
         <!--DOCTOR-->
         <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item">
             <a href="#!/add-schedule" class="btn btn-default navbar-btn">dodaje termin</a>
         </li>
-
-
-        <!--ALL-->
-        <li ng-show="userDetails.id" class="nav-item">
-            <a href="#!/logout" class="btn btn-default navbar-btn">Wyloguj się</a>
+        <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item">
+            <a href="#!/doctor-consultation" class="btn btn-default navbar-btn">Konsultacja</a>
         </li>
 
-        <!--GUEST-->
-        <li ng-show="!userDetails.id" class="nav-item">
-            <a href="#!/signUp" class="btn btn-default navbar-btn">Rejestracja</a>
-        </li>
-        <li ng-show="!userDetails.id" class="nav-item">
-            <a href="#!/login" class="btn btn-success navbar-btn">Logowanie</a>
-        </li>
 
     </ul>
 </nav>
@@ -86,15 +86,20 @@
 <script src="assets/bower_components/angular-route/angular-route.min.js"></script>
 <script src="assets/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
 <script src="app.js"></script>
-<script src="views/login/login.js"></script>
+<!--ALL-->
 <script src="views/logout/logout.js"></script>
+<!--GUEST-->
+<script src="views/login/login.js"></script>
 <script src="views/signUp/signUp.js"></script>
+<!--PATIENT-->
 <script src="views/patients/reservation/reservation.js"></script>
 <script src="views/patients/file-upload/file-upload.js"></script>
 <script src="views/patients/personal-data/personal-data.js"></script>
 <script src="views/patients/doctor-list/doctor-list.js"></script>
 <script src="views/patients/available-schedule/available-schedule.js"></script>
 <script src="views/patients/consultation/consultation.js"></script>
+<!--DOCTOR-->
 <script src="views/doctors/add-schedule/add-schedule.js"></script>
+<script src="views/doctors/consultation/consultation.js"></script>
 </body>
 </html>

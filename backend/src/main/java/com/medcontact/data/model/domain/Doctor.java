@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
+import com.medcontact.data.model.builders.DoctorBuilder;
 import com.medcontact.data.model.enums.ApplicationRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -103,64 +104,8 @@ public class Doctor extends BasicUser {
 		this.notes = new ArrayList<>();
 		this.role = ApplicationRole.DOCTOR;
 	}
-	
-	public static DoctorBuilder getBuilder() {
-		return new DoctorBuilder();
-	}
-	
-	public static class DoctorBuilder extends BasicUser.BasicUserBuilder {
-		public DoctorBuilder() {
-			this.user = new Doctor();
-		}
-		
-		public DoctorBuilder setTitle(String title) {
-			((Doctor) user).setTitle(title);
-			return this;
-		}
-		
-		public DoctorBuilder setUniversity(String university) {
-			((Doctor) user).setUniversity(university);
-			return this;
-		}
-		
-		public DoctorBuilder setBiography(String biography) {
-			((Doctor) user).setBiography(biography);
-			return this;
-		}
-		
-		public DoctorBuilder setSpecialties(List<Specialty> specialties) {
-			((Doctor) user).setSpecialties(specialties);
-			return this;
-		}
-		
-		public DoctorBuilder setOpinions(List<Opinion> opinions) {
-			((Doctor) user).setOpinions(opinions);
-			return this;
-		}
-		
-		public DoctorBuilder setReservations(List<Reservation> reservations) {
-			((Doctor) user).setReservations(reservations);
-			return this;
-		}
-		
-		public DoctorBuilder setWeeklySchedule(List<ScheduleTimeSlot> schedule) {
-			((Doctor) user).setWeeklySchedule(schedule);
-			return this;
-		}
-		
-		public DoctorBuilder setRoomId(String roomId) {
-			((Doctor) user).setRoomId(roomId);
-			return this;
-		}
-		
-		public DoctorBuilder setBusy(boolean busy) {
-			((Doctor) user).setBusy(busy);
-			return this;
-		}
-		
-		public DoctorBuilder setNotes(List<Note> notes) {
-			((Doctor) user).setNotes(notes);
-			return this;
-		}
+
+	public void addSchedule(ScheduleTimeSlot scheduleTimeSlot) {
+		weeklySchedule.add(scheduleTimeSlot);
 	}
 }

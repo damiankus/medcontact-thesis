@@ -272,17 +272,7 @@ public class PatientAccountController {
         		.getReservations()
                 .stream()
                 .filter(r -> r.getStartDateTime().isAfter(prevMidnight))
-                .map(r -> {
-                	BasicReservationData details = new BasicReservationData();
-                	details.setDoctorId(r.getDoctor().getId());
-                	details.setDoctorName(r.getDoctor().getFirstName()
-                			+ " " + r.getDoctor().getLastName());
-                	details.setDoctorBusy(r.getDoctor().isBusy());
-                	details.setStartDateTime(r.getStartDateTime());
-                	details.setEndDateTime(r.getEndDateTime());
-                	
-                	return details;
-                })
+                .map(BasicReservationData::new)
                 .collect(Collectors.toList());
     }
 

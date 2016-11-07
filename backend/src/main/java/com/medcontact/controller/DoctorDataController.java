@@ -7,7 +7,10 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.medcontact.data.model.domain.BasicUser;
+import com.medcontact.data.model.domain.ScheduleTimeSlot;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
+import com.medcontact.data.model.dto.ScheduleShortData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -123,4 +126,13 @@ public class DoctorDataController {
 				.stream()
 				.map(BasicDoctorDetails::new).collect(Collectors.toList());
 	}
+
+	@PostMapping(value = "{id}/schedules")
+	@ResponseStatus(value = HttpStatus.CREATED, reason = "Schedule added.")
+	@ResponseBody
+	public void saveUser(@RequestBody ScheduleShortData schedule, @PathVariable("id") Long id) {
+		ScheduleTimeSlot scheduleTimeSlot = new ScheduleTimeSlot(schedule.getStart(), schedule.getEnd());
+		doctorRepository.findOne(id).addSchedule(scheduleTimeSlot);
+	}
+
 }	
