@@ -129,10 +129,14 @@ public class DoctorDataController {
 
 	@PostMapping(value = "{id}/schedules")
 	@ResponseStatus(value = HttpStatus.CREATED, reason = "Schedule added.")
-	@ResponseBody
-	public void saveUser(@RequestBody ScheduleShortData schedule, @PathVariable("id") Long id) {
+	public void saveDoctorSchedule(@RequestBody ScheduleShortData schedule, @PathVariable("id") Long id) {
 		ScheduleTimeSlot scheduleTimeSlot = new ScheduleTimeSlot(schedule.getStart(), schedule.getEnd());
 		doctorRepository.findOne(id).addSchedule(scheduleTimeSlot);
 	}
 
+	@GetMapping(value = "{id}/schedules")
+	@ResponseBody
+	public List<ScheduleTimeSlot> getSpecificDoctorsSchedules(@PathVariable("id") Long id) {
+		return doctorRepository.findOne(id).getWeeklySchedule();
+	}
 }	

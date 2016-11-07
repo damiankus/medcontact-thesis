@@ -9,8 +9,7 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
-    console.log("reservationController ", REST_API, $rootScope);
-    
+
     $rootScope.userDetails = UserService.getUser();
     
     $http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/current-reservations")
