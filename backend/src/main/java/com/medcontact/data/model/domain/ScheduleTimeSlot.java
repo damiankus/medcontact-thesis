@@ -45,8 +45,9 @@ public class ScheduleTimeSlot {
 		this.endDateTime = LocalDateTime.of(2100, 12, 31, 23, 59);
 	}
 	
-	public ScheduleTimeSlot(LocalDateTime startTime, LocalDateTime endTime) {
+	public ScheduleTimeSlot(Doctor doctor, LocalDateTime startTime, LocalDateTime endTime) {
 		super();
+		this.doctor = doctor;
 		this.startDateTime = startTime;
 		this.endDateTime = endTime;
 	}

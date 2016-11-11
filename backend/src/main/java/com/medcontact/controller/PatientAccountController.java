@@ -18,8 +18,10 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.rowset.serial.SerialException;
 
+import com.medcontact.data.model.domain.*;
 import com.medcontact.data.model.dto.PersonalDataPassword;
 import com.medcontact.data.model.dto.NewReservation;
+import com.medcontact.data.repository.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,17 +31,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.medcontact.data.model.domain.Doctor;
-import com.medcontact.data.model.domain.FileEntry;
-import com.medcontact.data.model.domain.Patient;
-import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
 import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
-import com.medcontact.data.repository.DoctorRepository;
-import com.medcontact.data.repository.FileRepository;
-import com.medcontact.data.repository.PatientRepository;
-import com.medcontact.data.repository.ReservationRepository;
 import com.medcontact.exception.UnauthorizedUserException;
 
 import lombok.Getter;
@@ -68,6 +62,9 @@ public class PatientAccountController {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
     @Value("${webrtc.turn.api-endpoint}")
     private String turnEndpoint;
@@ -249,7 +246,7 @@ public class PatientAccountController {
     public List<BasicReservationData> getCurrentReservations(
     		@PathVariable("id") Long patientId) {
     	LocalDateTime prevMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0));
-    	
+
         return patientRepository.findOne(patientId)
         		.getReservations()
                 .stream()
@@ -262,8 +259,11 @@ public class PatientAccountController {
     @ResponseBody
     public void addNewReservations(
             @PathVariable("id") Long patientId, @RequestBody NewReservation newReservation) {
-
-        doctorRepository.findOne(newReservation.getDoctorId()).addReservation(newReservation.getScheduleId());
+        Doctor doctor = doctorRepository.findOne(newReservation.getDoctorId());
+        Patient patient = patientRepository.findOne(patientId);
+        ScheduleTimeSlot scheduleTimeSlot = scheduleRepository.findOne(newReservation.getScheduleId());
+        doctor.addReservation(new Reservation(patient, doctor, scheduleTimeSlot.getStartDateTime(), scheduleTimeSlot.getEndDateTime()));
+        doctorRepository.save(doctor);
     }
 
     @PostMapping(value = "{id}/personal-data")

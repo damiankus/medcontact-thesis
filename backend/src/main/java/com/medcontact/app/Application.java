@@ -87,9 +87,6 @@ public class Application implements CommandLineRunner {
 		reservation.setEndDateTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59)));
 		reservation.setPatient(patient);
 		
-		List<ScheduleTimeSlot> schedule = Arrays.asList(
-				new ScheduleTimeSlot(LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0)),
-						LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 0))));
 		Specialty pulmonology = new Specialty();
 		pulmonology.setCategory("choroby płuc");
 		pulmonology.setName("pulmunologia");
@@ -97,7 +94,6 @@ public class Application implements CommandLineRunner {
 		Doctor doctor = (Doctor) DoctorBuilder.getBuilder()
 				.setSpecialties(Arrays.asList(pulmonology))
 				.setBiography("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-				.setWeeklySchedule(schedule)
 				.setUniversity("Uniwersytet Jagielloński")
 				.setPassword(passwordEncoder.encode("haslo"))
 				.setFirstName("Gregory")
@@ -109,8 +105,11 @@ public class Application implements CommandLineRunner {
 		doctor.getNotes().add(note);
 		doctor.getReservations().add(reservation);
 		reservation.setDoctor(doctor);
-		
-		schedule.forEach(ts -> ts.setDoctor(doctor));
+
+		List<ScheduleTimeSlot> schedule = Arrays.asList(
+				new ScheduleTimeSlot(doctor, LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0)),
+						LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 0))));
+
 		doctorRepository.save(doctor);
 	}
 }
