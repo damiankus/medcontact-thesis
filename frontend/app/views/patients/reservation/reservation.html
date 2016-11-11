@@ -24,7 +24,15 @@
 								<td>{{ reservation.startDateTime | date : 'dd-MM-yyyy' }}</td>
 								<td>{{ reservation.startDateTime | date : 'HH:mm:ss' }}</td>
 								<td>{{ reservation.endDateTime | date : 'HH:mm:ss' }}</td>
+<<<<<<< HEAD
+								<td><a ng-attr-id="call-btn-{{ $index + 1 }}" 
+									ng-href="patients/{{userDetails.id}}/connection/{{reservation.id}}">
+										<button class="call-btn btn btn-sm btn-danger" disabled> Zadzwoń</button>
+									</a>
+								</td>
+=======
 								<td><a ng-href="patients/{{userDetails.id}}/connection/{{reservation.id}}"><button class="call-btn btn btn-sm btn-danger" disabled> Zadzwoń</button></a></td>
+>>>>>>> 916d4433a442e64b52bdce8dbfe8b7c690a84158
 							</tr>
             <tbody>
         </table>

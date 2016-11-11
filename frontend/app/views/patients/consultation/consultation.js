@@ -1,6 +1,7 @@
 'use strict';
 
 myApp.config(['$routeProvider', function ($routeProvider) {
+<<<<<<< HEAD
     $routeProvider.when('/patient-consultation', {
         templateUrl: 'views/patients/consultation/consultation.html',
         controller: 'ConsultationPatientCtrl'
@@ -8,6 +9,15 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 }]);
 
 myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
+=======
+    $routeProvider.when('/consultation', {
+        templateUrl: 'views/patients/consultation/consultation.html',
+        controller: 'ConsultationCtrl'
+    });
+}]);
+
+myApp.controller('ConsultationCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
+>>>>>>> 916d4433a442e64b52bdce8dbfe8b7c690a84158
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
 
         var webrtc = {};
