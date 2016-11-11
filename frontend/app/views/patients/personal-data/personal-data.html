@@ -2,31 +2,43 @@
 <div class="container">
     <div class="jumbotron">
 
-        <form name="f">
+        <form id="user-data-form" class="form-horizontal">
 
             <div class="form-group">
                 <span class="col-md-4"></span>
-                <h2 class="col-md-8">Ustawienia konta</h2>
+                <h2 class="col-md-8">Dane użytkownika</h2>
             </div>
 
             <div class="form-group">
                 <label class="col-md-4 control-label">Imię: </label>
                 <div class="col-md-8">
+<<<<<<< HEAD
+                    <input name="firstName" type="text" class="form-control" required="required" placeholder="wczytana wartość"/>
+=======
                     <input name="firstname" type="text" class="form-control" required="required" ng-model="userDetails.firstName"/>
+>>>>>>> 97350675f24519b154d746fc8d9fdbaa70815fd6
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-4 control-label">Nazwisko: </label>
                 <div class="col-md-8">
+<<<<<<< HEAD
+                    <input name="lastName" type=text class="form-control" required="required" placeholder="wczytana wartość"/>
+=======
                     <input name="surname" type="text" class="form-control" required="required" ng-model="userDetails.lastName"/>
+>>>>>>> 97350675f24519b154d746fc8d9fdbaa70815fd6
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-4 control-label">Adres e-mail: </label>
                 <div class="col-md-8">
+<<<<<<< HEAD
+                    <input name="email" type="email" class="form-control" required="required" placeholder="wczytana wartość"/>
+=======
                     <input name="username" type="email" class="form-control" required="required" ng-model="userDetails.email"/>
+>>>>>>> 97350675f24519b154d746fc8d9fdbaa70815fd6
                 </div>
             </div>
 
@@ -54,7 +66,12 @@
             </div>
 
             <div class="pull-right">
+<<<<<<< HEAD
+            		<input id="restore-btn" class="btn btn-lg btn-default" type="button" value="Cofnij zmiany" />
+                <input name="submit-btn" class="btn btn-lg btn-success" type="submit" value="Zapisz zmiany" />
+=======
                 <input ng-click="changePersonalData()" name="submit-btn" class="btn btn-lg btn-success" type="submit" value="Zapisz zmiany" />
+>>>>>>> 97350675f24519b154d746fc8d9fdbaa70815fd6
             </div>
 
         </form>

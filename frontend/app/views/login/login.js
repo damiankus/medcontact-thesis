@@ -8,7 +8,6 @@ myApp.config(['$routeProvider', function ($routeProvider) {
     });
 }]);
 
-// .controller('LoginCtrl', ['REST_API', 'ROLE', '$rootScope', '$scope', '$http', '$location',
 myApp.controller('LoginCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
         $scope.loginError = false;

@@ -1,28 +1,40 @@
+<<<<<<< HEAD
+
+<!-- Include Required Prerequisites -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/3/css/bootstrap.css" />
+ 
+<!-- Include Date Range Picker -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+=======
+>>>>>>> 97350675f24519b154d746fc8d9fdbaa70815fd6
 <body>
 <div class="container">
     <div class="jumbotron">
-        <div class="form-group">
-            <span class="col-md-4"></span>
-            <h2 class="col-md-8">Lista terminów</h2>
-        </div>
-        <div class="form-group">
-            <span class="col-md-4"></span>
-            <h3 class="col-md-8">{{schedules[0].doctor.firstName}} {{schedules[0].doctor.lastName}}</h3>
-        </div>
-        <table class="table">
-            <thead ng-repeat-start="schedule in schedules">
-            <tr>
-                <th>{{schedule.startDateTime | date:'EEEE dd-mm-yyyy'}}</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody ng-repeat-end="item in items">
-            <tr >
-                <td>{{schedule.startDateTime | date:'HH:mm'}} - {{schedule.endDateTime | date:'HH:mm'}}</td>
-                <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Rezerwuj"
-                           ng-click="bookTerm(schedule.id)"/></td>
-            </tr>
-            </tbody>
-        </table>
+
+        <form name="scheduleForm" class="form-horizontal">
+            <div class="form-group">
+                <span class="col-md-4"></span>
+                <h2 class="col-md-8">Dodawanie nowego terminu</h2>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">Termin: </label>
+                <div class="col-md-8">
+                    <input name="daterange" type="text" ng-model="schedule" class="form-control" required="required" />
+                </div>
+            </div>
+
+            <div class="pull-right">
+                <input ng-click="scheduleForm.$valid && addSchedule()" class="btn btn-lg btn-success" value="Dodaj termin" />
+            </div>
+
+        </form>
+
     </div>
 </div>
+
+</body>
