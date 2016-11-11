@@ -2,13 +2,8 @@
 
 // Declare app level module which depends on views, and components
 var myApp = angular.module('myApp', ['ngRoute'])
-<<<<<<< HEAD
- .constant('REST_API', "https://medcontact-api.herokuapp.com/")
-//    .constant('REST_API', "http://localhost:8080/")
-=======
 // .constant('REST_API', "https://medcontact-api.herokuapp.com/")
     .constant('REST_API', "http://localhost:8080/")
->>>>>>> 916d4433a442e64b52bdce8dbfe8b7c690a84158
     .config(['$locationProvider', '$routeProvider', '$httpProvider',
         function ($locationProvider, $routeProvider, $httpProvider) {
             $locationProvider.hashPrefix('!');
