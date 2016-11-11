@@ -12,21 +12,21 @@
             <div class="form-group">
                 <label class="col-md-4 control-label">Imię: </label>
                 <div class="col-md-8">
-                    <input name="firstname" type="email" class="form-control" required="required" value="Wczytać z bazy tutaj"/>
+                    <input name="firstname" type="text" class="form-control" required="required" ng-model="userDetails.firstName"/>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-4 control-label">Nazwisko: </label>
                 <div class="col-md-8">
-                    <input name="surname" type="email" class="form-control" required="required" value="Wczytać z bazy tutaj"/>
+                    <input name="surname" type="text" class="form-control" required="required" ng-model="userDetails.lastName"/>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-4 control-label">Adres e-mail: </label>
                 <div class="col-md-8">
-                    <input name="username" type="email" class="form-control" required="required" value="Wczytać z bazy tutaj"/>
+                    <input name="username" type="email" class="form-control" required="required" ng-model="userDetails.email"/>
                 </div>
             </div>
 
@@ -37,24 +37,24 @@
             <div class="form-group">
                 <label class="col-md-4 control-label">Stare hasło: </label>
                 <div class="col-md-8">
-                    <input name="oldpassword" type="password" class="form-control" />
+                    <input name="oldpassword" type="password" class="form-control" ng-model="oldPassword" />
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-4 control-label">Nowe hasło: </label>
                 <div class="col-md-8">
-                    <input name="newpassword1" type="password" class="form-control" />
+                    <input name="newpassword1" type="password" class="form-control" ng-model="newPassword1" />
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-4 control-label">Powtórz hasło: </label>
                 <div class="col-md-8">
-                    <input name="newpassword2" type="password" class="form-control" />
+                    <input name="newpassword2" type="password" class="form-control" ng-model="newPassword2" />
                 </div>
             </div>
 
             <div class="pull-right">
-                <input name="submit-btn" class="btn btn-lg btn-success" type="submit" value="Zapisz zmiany" />
+                <input ng-click="changePersonalData()" name="submit-btn" class="btn btn-lg btn-success" type="submit" value="Zapisz zmiany" />
             </div>
 
         </form>

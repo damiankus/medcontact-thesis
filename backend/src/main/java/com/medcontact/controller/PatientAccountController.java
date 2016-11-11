@@ -18,19 +18,14 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.rowset.serial.SerialException;
 
+import com.medcontact.data.model.dto.PersonalDataPassword;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.medcontact.data.model.domain.Doctor;
@@ -274,6 +269,16 @@ public class PatientAccountController {
                 .filter(r -> r.getStartDateTime().isAfter(prevMidnight))
                 .map(BasicReservationData::new)
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping(value = "{id}/personal-data")
+    @ResponseBody
+    public void postChangePersonalData (
+            @PathVariable("id") Long patientId,
+            @RequestBody PersonalDataPassword personalDataPassword) {
+        Patient patient = patientRepository.findOne(patientId);
+        patient.changePersonalData(personalDataPassword);
+        patientRepository.save(patient);
     }
 
 	/* A utility method checking if a user waith the given ID is entitled to
