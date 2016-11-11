@@ -7,39 +7,20 @@
         </div>
         <div class="form-group">
             <span class="col-md-4"></span>
-            <h3 class="col-md-8">Jan Kowalski</h3>
+            <h3 class="col-md-8">{{schedules[0].doctor.firstName}} {{schedules[0].doctor.lastName}}</h3>
         </div>
         <table class="table">
-            <thead>
+            <thead ng-repeat-start="schedule in schedules">
             <tr>
-                <th>Poniedziałek 07-11-2016</th>
+                <th>{{schedule.startDateTime | date:'EEEE dd-mm-yyyy'}}</th>
                 <th></th>
             </tr>
             </thead>
-            <tbody>
-            <tr>
-                <td>8:00-8:30</td>
-                <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Rezerwuj" onclick="location.href='aaa';" /></td>
-            </tr>
-            <tr>
-                <td>8:30-9:00</td>
-                <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Rezerwuj" onclick="location.href='aaa';" /></td>
-            </tr>
-            </tbody>
-            <thead>
-            <tr>
-                <th>Wtorek 08-11-2016</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>8:00-8:30</td>
-                <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Rezerwuj" onclick="location.href='aaa';" /></td>
-            </tr>
-            <tr>
-                <td>8:30-9:00</td>
-                <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Rezerwuj" onclick="location.href='aaa';" /></td>
+            <tbody ng-repeat-end="item in items">
+            <tr >
+                <td>{{schedule.startDateTime | date:'HH:mm'}} - {{schedule.endDateTime | date:'HH:mm'}}</td>
+                <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Rezerwuj"
+                           ng-click="bookTerm(schedule.id)"/></td>
             </tr>
             </tbody>
         </table>

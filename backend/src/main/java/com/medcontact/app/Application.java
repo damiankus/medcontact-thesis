@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
+import com.medcontact.data.model.builders.DoctorBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -92,7 +93,7 @@ public class Application implements CommandLineRunner {
 		Specialty pulmonology = new Specialty();
 		pulmonology.setName("pulmunologia");
 		
-		Doctor doctor = (Doctor) Doctor.getBuilder()
+		Doctor doctor = (Doctor) DoctorBuilder.getBuilder()
 				.setSpecialties(Arrays.asList(pulmonology))
 				.setBiography("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
 				.setWeeklySchedule(schedule)

@@ -49,5 +49,9 @@ public class Reservation {
 		this.startDateTime = LocalDateTime.of(2000, 1, 1, 1, 0);
 		this.endDateTime = LocalDateTime.of(2100, 12, 31, 23, 59);
 	}
-	
+
+	public Reservation(Patient patient, Doctor doctor, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+		this.startDateTime = LocalDateTime.of(2000, 1, 1, 1, 0);
+		this.endDateTime = LocalDateTime.of(2100, 12, 31, 23, 59);
+	}
 }

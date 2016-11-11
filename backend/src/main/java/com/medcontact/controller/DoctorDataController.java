@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -25,7 +26,9 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.domain.ScheduleTimeSlot;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
+import com.medcontact.data.model.dto.ScheduleShortData;
 import com.medcontact.data.repository.BasicUserRepository;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.validation.DoctorValidator;
@@ -128,7 +131,23 @@ public class DoctorDataController {
 	public List<BasicDoctorDetails> getDoctors() {
 		return doctorRepository.findAll()
 				.stream()
-				.map(BasicDoctorDetails::new).collect(Collectors.toList());
+				.map(BasicDoctorDetails::new)
+				.collect(Collectors.toList());
+	}
+
+	@PostMapping(value = "{id}/schedules")
+	@ResponseStatus(value = HttpStatus.CREATED, reason = "Schedule added.")
+	public void saveDoctorSchedule(@RequestBody ScheduleShortData schedule, @PathVariable("id") Long id) {
+		ScheduleTimeSlot scheduleTimeSlot = new ScheduleTimeSlot(schedule.getStart(), schedule.getEnd());
+		Doctor doctor = doctorRepository.findOne(id);
+		doctor.addSchedule(scheduleTimeSlot);
+		doctorRepository.save(doctor);
+	}
+
+	@GetMapping(value = "{id}/schedules")
+	@ResponseBody
+	public List<ScheduleTimeSlot> getSpecificDoctorsSchedules(@PathVariable("id") Long id) {
+		return doctorRepository.findOne(id).getWeeklySchedule();
 	}
 	
 	@GetMapping(value = "{id}/busy")

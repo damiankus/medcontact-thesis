@@ -9,7 +9,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,6 +41,9 @@ import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
 import com.medcontact.data.model.dto.BasicReservationDetails;
 import com.medcontact.data.model.dto.ConnectionData;
+import com.medcontact.data.model.dto.NewReservation;
+import com.medcontact.data.model.dto.PersonalDataPassword;
+import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
@@ -69,6 +75,9 @@ public class PatientAccountController {
 
     @Autowired
     private ReservationRepository reservationRepository;
+    
+    @Autowired
+    private DoctorRepository doctorRepository;
 
     @Value("${webrtc.turn.api-endpoint}")
     private String turnEndpoint;
@@ -250,21 +259,13 @@ public class PatientAccountController {
     		throw new UnauthorizedUserException();
     	}
     	
+    	LocalDateTime prevMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 1));
+    	
         return patientRepository.findOne(patientId)
         		.getReservations()
                 .stream()
-                .filter(r -> r.getEndDateTime().isAfter(LocalDateTime.now()))
-                .map(r -> {
-                	BasicReservationDetails details = new BasicReservationDetails();
-                	details.setDoctorId(r.getDoctor().getId());
-                	details.setDoctorName(r.getDoctor().getFirstName()
-                			+ " " + r.getDoctor().getLastName());
-                	details.setDoctorBusy(r.getDoctor().isBusy());
-                	details.setStartDateTime(r.getStartDateTime());
-                	details.setEndDateTime(r.getEndDateTime());
-                	
-                	return details;
-                })
+                .filter(r -> r.getStartDateTime().isAfter(prevMidnight))
+                .map(BasicReservationDetails::new)
                 .collect(Collectors.toList());
     }
     
@@ -285,7 +286,24 @@ public class PatientAccountController {
                 .collect(Collectors.toList());
     }
 
-    
+    @PostMapping(value = "{id}/current-reservations")
+    @ResponseBody
+    public void addNewReservations(
+            @PathVariable("id") Long patientId, @RequestBody NewReservation newReservation) {
+
+        doctorRepository.findOne(newReservation.getDoctorId()).addReservation(newReservation.getScheduleId());
+    }
+
+    @PostMapping(value = "{id}/personal-data")
+    @ResponseBody
+    public void postChangePersonalData (
+            @PathVariable("id") Long patientId,
+            @RequestBody PersonalDataPassword personalDataPassword) {
+        Patient patient = patientRepository.findOne(patientId);
+        patient.changePersonalData(personalDataPassword);
+        patientRepository.save(patient);
+    }
+
 	/* A utility method checking if a user waith the given ID is entitled to
      * obtain access to a resource */
 

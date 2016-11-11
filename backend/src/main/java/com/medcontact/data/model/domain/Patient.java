@@ -11,6 +11,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.medcontact.data.model.dto.PersonalDataPassword;
 import com.medcontact.data.model.enums.ApplicationRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -54,7 +55,17 @@ public class Patient extends BasicUser {
 	public static PatientBuilder getBuilder() {
 		return new PatientBuilder();
 	}
-	
+
+public void changePersonalData(PersonalDataPassword personalDataPassword) {
+		this.firstName = personalDataPassword.getFirstName();
+		this.lastName = personalDataPassword.getLastName();
+		this.email = personalDataPassword.getEmail();
+
+		if(this.password.equals(personalDataPassword.getOldPassword()) &&
+				personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2()))
+			this.password = personalDataPassword.getNewPassword1();
+	}
+
 	public static class PatientBuilder extends BasicUser.BasicUserBuilder {
 		public PatientBuilder() {
 			this.user = new Patient();
