@@ -7,23 +7,30 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import com.medcontact.data.model.dto.BasicDoctorDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.dto.BasicDoctorDetails;
 import com.medcontact.data.repository.BasicUserRepository;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.validation.DoctorValidator;
 import com.medcontact.data.validation.ValidationResult;
+import com.medcontact.exception.UserNotFoundException;
 
 @RestController
 @RequestMapping("doctors")
@@ -122,5 +129,18 @@ public class DoctorDataController {
 		return doctorRepository.findAll()
 				.stream()
 				.map(BasicDoctorDetails::new).collect(Collectors.toList());
+	}
+	
+	@GetMapping(value = "{id}/busy")
+	@ResponseBody
+	public boolean isDoctorBusy(
+			@PathVariable("id") Long doctorId) throws UserNotFoundException {
+		
+		Doctor doctor = doctorRepository.findOne(doctorId);
+		if (doctor == null) {
+			throw new UserNotFoundException();
+		}
+		
+		return doctor.isBusy();
 	}
 }	

@@ -12,5 +12,4 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 	
 	@PreAuthorize("#id == authentication.principal.id")
 	public Doctor findOne(Long id);
-	
 }

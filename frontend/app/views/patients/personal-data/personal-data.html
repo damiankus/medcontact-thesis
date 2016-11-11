@@ -2,31 +2,31 @@
 <div class="container">
     <div class="jumbotron">
 
-        <form name="f">
+        <form id="user-data-form" class="form-horizontal">
 
             <div class="form-group">
                 <span class="col-md-4"></span>
-                <h2 class="col-md-8">Ustawienia konta</h2>
+                <h2 class="col-md-8">Dane użytkownika</h2>
             </div>
 
             <div class="form-group">
                 <label class="col-md-4 control-label">Imię: </label>
                 <div class="col-md-8">
-                    <input name="firstname" type="email" class="form-control" required="required" value="Wczytać z bazy tutaj"/>
+                    <input name="firstName" type="text" class="form-control" required="required" placeholder="wczytana wartość"/>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-4 control-label">Nazwisko: </label>
                 <div class="col-md-8">
-                    <input name="surname" type="email" class="form-control" required="required" value="Wczytać z bazy tutaj"/>
+                    <input name="lastName" type=text class="form-control" required="required" placeholder="wczytana wartość"/>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="col-md-4 control-label">Adres e-mail: </label>
                 <div class="col-md-8">
-                    <input name="username" type="email" class="form-control" required="required" value="Wczytać z bazy tutaj"/>
+                    <input name="email" type="email" class="form-control" required="required" placeholder="wczytana wartość"/>
                 </div>
             </div>
 
@@ -54,6 +54,7 @@
             </div>
 
             <div class="pull-right">
+            		<input id="restore-btn" class="btn btn-lg btn-default" type="button" value="Cofnij zmiany" />
                 <input name="submit-btn" class="btn btn-lg btn-success" type="submit" value="Zapisz zmiany" />
             </div>
 

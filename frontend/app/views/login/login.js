@@ -36,6 +36,7 @@ myApp.controller('LoginCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$lo
                         $rootScope.userDetails = UserService.getUser();
                         $scope.loginError = false;
                         $scope.loggedIn = true;
+                        
                         if ($rootScope.userDetails.role == 'DOCTOR'){
                             $location.url('/add-schedule');
                         }

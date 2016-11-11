@@ -9,9 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,9 +36,8 @@ import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
-import com.medcontact.data.model.dto.BasicReservationData;
+import com.medcontact.data.model.dto.BasicReservationDetails;
 import com.medcontact.data.model.dto.ConnectionData;
-import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
@@ -88,10 +85,6 @@ public class PatientAccountController {
     @Value("${webrtc.turn.secret}")
     private String turnSecret;
     
-    @Autowired
-    private DoctorRepository doctorRepository;
-    
-
     @GetMapping("{patientId}/connection/{consultationId}")
     public ResponseEntity<ConnectionData> getConnectionData(
             @PathVariable("patientId") Long patientId,
@@ -247,33 +240,22 @@ public class PatientAccountController {
 			}
 		}
 	}
-
-    @GetMapping(value = "{id}/doctors")
-    @ResponseBody
-    public List<BasicDoctorDetails> getDoctors(@PathVariable("id") Long patientId) {
-        System.out.println(1);
-        //TODO replace all doctor to doctor only visible to Patient
-        return doctorRepository.findAll()
-                .stream()
-                .map(doctor -> {
-                            System.out.println();
-                            return new BasicDoctorDetails(doctor);
-                        }
-                ).collect(Collectors.toList());
-    }
     
     @GetMapping(value = "{id}/current-reservations")
     @ResponseBody
-    public List<BasicReservationData> getCurrentReservations(
-    		@PathVariable("id") Long patientId) {
-    	LocalDateTime prevMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0));
+    public List<BasicReservationDetails> getCurrentReservations(
+    		@PathVariable("id") Long patientId) throws UnauthorizedUserException {
+    	
+    	if (!isEntitled(patientId)) {
+    		throw new UnauthorizedUserException();
+    	}
     	
         return patientRepository.findOne(patientId)
         		.getReservations()
                 .stream()
-                .filter(r -> r.getStartDateTime().isAfter(prevMidnight))
+                .filter(r -> r.getEndDateTime().isAfter(LocalDateTime.now()))
                 .map(r -> {
-                	BasicReservationData details = new BasicReservationData();
+                	BasicReservationDetails details = new BasicReservationDetails();
                 	details.setDoctorId(r.getDoctor().getId());
                 	details.setDoctorName(r.getDoctor().getFirstName()
                 			+ " " + r.getDoctor().getLastName());
@@ -285,7 +267,25 @@ public class PatientAccountController {
                 })
                 .collect(Collectors.toList());
     }
+    
+    @GetMapping(value = "{id}/appointed-doctors")
+    @ResponseBody
+    public List<BasicDoctorDetails> getDoctorsAppointedForPatient(
+    		@PathVariable("id") Long patientId) throws UnauthorizedUserException {
+    	
+    	if (!isEntitled(patientId)) {
+    		throw new UnauthorizedUserException();
+    	}
+    	
+        return patientRepository.findOne(patientId)
+        		.getReservations()
+                .stream()
+                .filter(r -> r.getEndDateTime().isAfter(LocalDateTime.now()))
+                .map(r -> new BasicDoctorDetails(r.getDoctor()))
+                .collect(Collectors.toList());
+    }
 
+    
 	/* A utility method checking if a user waith the given ID is entitled to
      * obtain access to a resource */
 

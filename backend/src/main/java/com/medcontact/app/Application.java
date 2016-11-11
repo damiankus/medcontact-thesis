@@ -90,7 +90,6 @@ public class Application implements CommandLineRunner {
 				new ScheduleTimeSlot(LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0)),
 						LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 0))));
 		Specialty pulmonology = new Specialty();
-		pulmonology.setCategory("choroby płuc");
 		pulmonology.setName("pulmunologia");
 		
 		Doctor doctor = (Doctor) Doctor.getBuilder()
