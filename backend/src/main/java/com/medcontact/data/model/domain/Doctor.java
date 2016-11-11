@@ -108,4 +108,8 @@ public class Doctor extends BasicUser {
 	public void addSchedule(ScheduleTimeSlot scheduleTimeSlot) {
 		weeklySchedule.add(scheduleTimeSlot);
 	}
+
+	public void addReservation(long scheduleId) {
+		reservations.add(new Reservation());
+	}
 }

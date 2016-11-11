@@ -10,7 +10,6 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 myApp.controller('DoctorListCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
         getDoctors();
-        $scope.a = "a";
 
         function getDoctors() {
             $http.get(REST_API + "doctors")

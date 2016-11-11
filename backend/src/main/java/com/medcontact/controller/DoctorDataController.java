@@ -1,9 +1,6 @@
 package com.medcontact.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -13,6 +10,7 @@ import com.medcontact.data.model.dto.BasicDoctorDetails;
 import com.medcontact.data.model.dto.ScheduleShortData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.hateoas.alps.Doc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -124,14 +122,17 @@ public class DoctorDataController {
 	public List<BasicDoctorDetails> getDoctors() {
 		return doctorRepository.findAll()
 				.stream()
-				.map(BasicDoctorDetails::new).collect(Collectors.toList());
+				.map(BasicDoctorDetails::new)
+				.collect(Collectors.toList());
 	}
 
 	@PostMapping(value = "{id}/schedules")
 	@ResponseStatus(value = HttpStatus.CREATED, reason = "Schedule added.")
 	public void saveDoctorSchedule(@RequestBody ScheduleShortData schedule, @PathVariable("id") Long id) {
 		ScheduleTimeSlot scheduleTimeSlot = new ScheduleTimeSlot(schedule.getStart(), schedule.getEnd());
-		doctorRepository.findOne(id).addSchedule(scheduleTimeSlot);
+		Doctor doctor = doctorRepository.findOne(id);
+		doctor.addSchedule(scheduleTimeSlot);
+		doctorRepository.save(doctor);
 	}
 
 	@GetMapping(value = "{id}/schedules")

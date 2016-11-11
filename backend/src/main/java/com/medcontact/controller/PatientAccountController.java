@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.rowset.serial.SerialException;
 
 import com.medcontact.data.model.dto.PersonalDataPassword;
+import com.medcontact.data.model.dto.NewReservation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -242,20 +243,6 @@ public class PatientAccountController {
 			}
 		}
 	}
-
-    @GetMapping(value = "{id}/doctors")
-    @ResponseBody
-    public List<BasicDoctorDetails> getDoctors(@PathVariable("id") Long patientId) {
-        System.out.println(1);
-        //TODO replace all doctor to doctor only visible to Patient
-        return doctorRepository.findAll()
-                .stream()
-                .map(doctor -> {
-                            System.out.println();
-                            return new BasicDoctorDetails(doctor);
-                        }
-                ).collect(Collectors.toList());
-    }
     
     @GetMapping(value = "{id}/current-reservations")
     @ResponseBody
@@ -269,6 +256,14 @@ public class PatientAccountController {
                 .filter(r -> r.getStartDateTime().isAfter(prevMidnight))
                 .map(BasicReservationData::new)
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping(value = "{id}/current-reservations")
+    @ResponseBody
+    public void addNewReservations(
+            @PathVariable("id") Long patientId, @RequestBody NewReservation newReservation) {
+
+        doctorRepository.findOne(newReservation.getDoctorId()).addReservation(newReservation.getScheduleId());
     }
 
     @PostMapping(value = "{id}/personal-data")

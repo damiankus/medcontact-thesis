@@ -42,16 +42,15 @@ myApp.controller('SignUpCtrl', ['REST_API', '$scope', '$rootScope', '$http', '$l
                 };
 
                 $http(request).then(function successCallback(response) {
-                    $rootScope.userDetails = response.data;
                     $scope.loginError = false;
-                    $scope.loggedIn = true;
-                    $location.url('/reservation');
+                    $scope.loggedIn = false;
+                    $location.url('/login');
 
                 }, function errorCallback(response) {
                     console.error(response.data.message);
                     $scope.loginError = true;
                     $scope.loggedIn = false;
-                    $location.url('/' + "login");
+                    $location.url('/login');
                 });
                 $scope.signupError = false;
             }, function errorCallback(response) {

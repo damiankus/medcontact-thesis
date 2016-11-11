@@ -20,7 +20,7 @@
             <tr >
                 <td>{{schedule.startDateTime | date:'HH:mm'}} - {{schedule.endDateTime | date:'HH:mm'}}</td>
                 <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Rezerwuj"
-                           ng-click="bookTerm()"/></td>
+                           ng-click="bookTerm(schedule.id)"/></td>
             </tr>
             </tbody>
         </table>
