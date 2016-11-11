@@ -26,6 +26,7 @@ public class Specialty {
 	private long id;
 	
 	private String name;
+	private String category;
 	
 	@ManyToMany(fetch=FetchType.LAZY, mappedBy="specialties")
 	@JsonIgnore

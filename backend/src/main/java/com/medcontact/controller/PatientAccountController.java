@@ -18,20 +18,15 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.rowset.serial.SerialException;
 
+import com.medcontact.data.model.dto.PersonalDataPassword;
+import com.medcontact.data.model.dto.NewReservation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.medcontact.data.model.domain.Doctor;
@@ -39,10 +34,8 @@ import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
-import com.medcontact.data.model.dto.BasicReservationDetails;
+import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
-import com.medcontact.data.model.dto.NewReservation;
-import com.medcontact.data.model.dto.PersonalDataPassword;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
@@ -75,9 +68,6 @@ public class PatientAccountController {
 
     @Autowired
     private ReservationRepository reservationRepository;
-    
-    @Autowired
-    private DoctorRepository doctorRepository;
 
     @Value("${webrtc.turn.api-endpoint}")
     private String turnEndpoint;
@@ -94,6 +84,10 @@ public class PatientAccountController {
     @Value("${webrtc.turn.secret}")
     private String turnSecret;
     
+    @Autowired
+    private DoctorRepository doctorRepository;
+    
+
     @GetMapping("{patientId}/connection/{consultationId}")
     public ResponseEntity<ConnectionData> getConnectionData(
             @PathVariable("patientId") Long patientId,
@@ -252,37 +246,15 @@ public class PatientAccountController {
     
     @GetMapping(value = "{id}/current-reservations")
     @ResponseBody
-    public List<BasicReservationDetails> getCurrentReservations(
-    		@PathVariable("id") Long patientId) throws UnauthorizedUserException {
-    	
-    	if (!isEntitled(patientId)) {
-    		throw new UnauthorizedUserException();
-    	}
-    	
-    	LocalDateTime prevMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 1));
+    public List<BasicReservationData> getCurrentReservations(
+    		@PathVariable("id") Long patientId) {
+    	LocalDateTime prevMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0));
     	
         return patientRepository.findOne(patientId)
         		.getReservations()
                 .stream()
                 .filter(r -> r.getStartDateTime().isAfter(prevMidnight))
-                .map(BasicReservationDetails::new)
-                .collect(Collectors.toList());
-    }
-    
-    @GetMapping(value = "{id}/appointed-doctors")
-    @ResponseBody
-    public List<BasicDoctorDetails> getDoctorsAppointedForPatient(
-    		@PathVariable("id") Long patientId) throws UnauthorizedUserException {
-    	
-    	if (!isEntitled(patientId)) {
-    		throw new UnauthorizedUserException();
-    	}
-    	
-        return patientRepository.findOne(patientId)
-        		.getReservations()
-                .stream()
-                .filter(r -> r.getEndDateTime().isAfter(LocalDateTime.now()))
-                .map(r -> new BasicDoctorDetails(r.getDoctor()))
+                .map(BasicReservationData::new)
                 .collect(Collectors.toList());
     }
 

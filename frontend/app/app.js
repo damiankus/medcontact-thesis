@@ -42,17 +42,6 @@ var myApp = angular.module('myApp', ['ngRoute'])
                 scope.user[prop] = user[prop];
             }
         };
-        
-        accessor.getUserOrRedirect = function (location, url) {
-        	var userDetails = accessor.getUser();
-        	
-        	if (userDetails === undefined || userDetails === null) {
-        		location.url(url);
-        		
-        	} else {
-        		return userDetails;
-        	}
-        };
 
         return accessor;
     });

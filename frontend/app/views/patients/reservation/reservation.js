@@ -12,12 +12,6 @@ myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http'
 
     $rootScope.userDetails = UserService.getUser();
     
-    for (var callBtn of $(".call-btn")) {
-    	window.setInterval(function checkIfAvailable() {
-    		$http.get()
-    	}, 5000);
-    }
-    
     $http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/current-reservations")
 	    .then(function successCallback(response) {
 			$scope.reservations	 = response.data;
