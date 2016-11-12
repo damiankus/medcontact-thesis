@@ -9,9 +9,31 @@
             </div>
 
             <div class="form-group">
-                <label class="col-md-4 control-label">Termin: </label>
-                <div class="col-md-8">
-                    <input name="daterange" type="text" ng-model="schedule" class="form-control" required="required" />
+                <label class="col-md-4 control-label">Data: </label>
+                <div class='col-md-6 input-group date' id="datePickerDiv">
+                    <input id='datePicker' type='text' class="form-control" />
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar">
+                    </span>
+                </span>
+                </div>
+
+                <label class="col-md-4 control-label">Początek terminu: </label>
+                <div class='col-md-6 input-group date' id='startTimePickerDiv'>
+                    <input id="startTimePicker"  type='text' class="form-control" />
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar">
+                    </span>
+                </span>
+                </div>
+
+                <label class="col-md-4 control-label">Koniec terminu: </label>
+                <div class='col-md-6 input-group date' id='endTimePickerDiv'>
+                    <input id="endTimePicker" ng-model="endTime" type='text' class="form-control" />
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar">
+                    </span>
+                </span>
                 </div>
             </div>
 
