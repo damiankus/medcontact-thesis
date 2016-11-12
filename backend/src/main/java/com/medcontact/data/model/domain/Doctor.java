@@ -18,9 +18,8 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-
-import com.medcontact.data.model.builders.DoctorBuilder;
 import com.medcontact.data.model.enums.ApplicationRole;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;

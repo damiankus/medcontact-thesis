@@ -9,33 +9,37 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.rowset.serial.SerialException;
 
-import com.medcontact.data.model.dto.PersonalDataPassword;
-import com.medcontact.data.model.dto.NewReservation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
-import com.medcontact.data.model.dto.BasicDoctorDetails;
 import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
+import com.medcontact.data.model.dto.NewReservation;
+import com.medcontact.data.model.dto.PersonalDataPassword;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
@@ -202,10 +206,11 @@ public class PatientAccountController {
 				fileToWrite.getParentFile().mkdirs();
 				fileToWrite.createNewFile();
 				
-				System.out.println("File name: " + file.getName());
-				System.out.println("File original name: " + file.getOriginalFilename());
-				System.out.println("File path  " + filePath);
-				System.out.println(fileToWrite.getAbsolutePath());
+				logger.info("Saved new file");
+				logger.info("File name: " + file.getName());
+				logger.info("File original name: " + file.getOriginalFilename());
+				logger.info("File path  " + filePath);
+				logger.info(fileToWrite.getAbsolutePath());
 				
 				try (FileOutputStream out = new FileOutputStream(fileToWrite)) {
 					Files.deleteIfExists(fileToWrite.toPath());
@@ -248,12 +253,11 @@ public class PatientAccountController {
     @ResponseBody
     public List<BasicReservationData> getCurrentReservations(
     		@PathVariable("id") Long patientId) {
-    	LocalDateTime prevMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0));
     	
         return patientRepository.findOne(patientId)
         		.getReservations()
                 .stream()
-                .filter(r -> r.getStartDateTime().isAfter(prevMidnight))
+                .filter(r -> !r.getEndDateTime().isBefore(LocalDateTime.now()))
                 .map(BasicReservationData::new)
                 .collect(Collectors.toList());
     }

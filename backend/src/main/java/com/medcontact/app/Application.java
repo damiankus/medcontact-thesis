@@ -82,10 +82,6 @@ public class Application implements CommandLineRunner {
 		note.setUploadTime(Timestamp.valueOf(LocalDateTime.now()));
 		note.setPatient(patient);
 		
-		Reservation reservation = new Reservation();
-		reservation.setStartDateTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(1, 0)));
-		reservation.setEndDateTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59)));
-		reservation.setPatient(patient);
 		
 		List<ScheduleTimeSlot> schedule = Arrays.asList(
 				new ScheduleTimeSlot(LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0)),
@@ -107,8 +103,15 @@ public class Application implements CommandLineRunner {
 		
 		note.setDoctor(doctor);
 		doctor.getNotes().add(note);
-		doctor.getReservations().add(reservation);
-		reservation.setDoctor(doctor);
+
+		for (int i = 0; i < 23; i++) {
+			Reservation reservation = new Reservation();
+			reservation.setStartDateTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(i, 0)));
+			reservation.setEndDateTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(i + 1, 0)));
+			reservation.setPatient(patient);
+			reservation.setDoctor(doctor);
+			doctor.getReservations().add(reservation);
+		}
 		
 		schedule.forEach(ts -> ts.setDoctor(doctor));
 		doctorRepository.save(doctor);
