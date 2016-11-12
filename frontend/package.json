@@ -1,9 +1,9 @@
 {
-  "name": "angular-seed",
+  "name": "medcontact-thesis-frontend",
   "private": true,
   "version": "0.0.0",
-  "description": "A starter project for AngularJS",
-  "repository": "https://github.com/angular/angular-seed",
+  "description": "medcontact thesis",
+  "repository": "https://github.com/damiankus/medcontact-thesis",
   "license": "MIT",
   "dependencies": {
     "bower": "^1.7.7",
@@ -13,7 +13,7 @@
     "postinstall": "bower install",
 
     "prestart": "npm install",
-    "start": "http-server -p ${PORT:-8000} -c-1 ./app",
+    "start": "http-server -a localhost -p 8000 -c-1 ./app",
 
     "pretest": "npm install",
 

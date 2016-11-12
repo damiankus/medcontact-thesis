@@ -262,7 +262,10 @@ public class PatientAccountController {
         Doctor doctor = doctorRepository.findOne(newReservation.getDoctorId());
         Patient patient = patientRepository.findOne(patientId);
         ScheduleTimeSlot scheduleTimeSlot = scheduleRepository.findOne(newReservation.getScheduleId());
-        doctor.addReservation(new Reservation(patient, doctor, scheduleTimeSlot.getStartDateTime(), scheduleTimeSlot.getEndDateTime()));
+        Reservation reservation = new Reservation(patient, doctor, scheduleTimeSlot.getStartDateTime(), scheduleTimeSlot.getEndDateTime());
+        doctor.addReservation(reservation);
+        patient.addReservatin(reservation);
+        patientRepository.save(patient);
         doctorRepository.save(doctor);
     }
 
