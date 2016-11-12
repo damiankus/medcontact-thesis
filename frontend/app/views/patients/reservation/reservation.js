@@ -17,9 +17,15 @@ myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http'
             .then(function successCallback(response) {
                 console.log(response);
                 $scope.reservations	 = response.data;
+                console.log(response.data)
 
             }, function errorCallback(response) {
                 console.log("[ERROR]: " + response.data.message);
             });
+    }
+
+    $scope.call = function (reservationId) {
+        console.log("Reservation Id: "+ reservationId);
+        //TODO
     }
 }]);
