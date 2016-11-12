@@ -137,8 +137,8 @@ public class DoctorDataController {
 	@PostMapping(value = "{id}/schedules")
 	@ResponseStatus(value = HttpStatus.CREATED, reason = "Schedule added.")
 	public void saveDoctorSchedule(@RequestBody ScheduleShortData schedule, @PathVariable("id") Long id) {
-		ScheduleTimeSlot scheduleTimeSlot = new ScheduleTimeSlot(schedule.getStart(), schedule.getEnd());
 		Doctor doctor = doctorRepository.findOne(id);
+		ScheduleTimeSlot scheduleTimeSlot = new ScheduleTimeSlot(doctor, schedule.getStart(), schedule.getEnd());
 		doctor.addSchedule(scheduleTimeSlot);
 		doctorRepository.save(doctor);
 	}

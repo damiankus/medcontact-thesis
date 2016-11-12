@@ -28,7 +28,7 @@ myApp.controller('AvailableScheduleCtrl', ['REST_API', "$rootScope", '$scope', '
         }
 
         $scope.bookTerm = function (scheduleId) {
-            $http.put(REST_API + "patients/" + $rootScope.userDetails.id + "/current-reservations", {scheduleId: scheduleId, doctorId: $routeParams.doctorId})
+            $http.post(REST_API + "patients/" + $rootScope.userDetails.id + "/current-reservations", {scheduleId: scheduleId, doctorId: $routeParams.doctorId})
                 .then(function successCallback(response) {
                         console.log("success");
                     }, function errorCallback(response) {

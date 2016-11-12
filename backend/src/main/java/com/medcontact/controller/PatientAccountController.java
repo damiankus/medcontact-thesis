@@ -36,6 +36,7 @@ import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
+import com.medcontact.data.model.domain.ScheduleTimeSlot;
 import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.NewReservation;
@@ -44,6 +45,7 @@ import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
+import com.medcontact.data.repository.ScheduleRepository;
 import com.medcontact.exception.UnauthorizedUserException;
 
 import lombok.Getter;
@@ -72,6 +74,9 @@ public class PatientAccountController {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
     @Value("${webrtc.turn.api-endpoint}")
     private String turnEndpoint;
@@ -266,8 +271,14 @@ public class PatientAccountController {
     @ResponseBody
     public void addNewReservations(
             @PathVariable("id") Long patientId, @RequestBody NewReservation newReservation) {
-
-        doctorRepository.findOne(newReservation.getDoctorId()).addReservation(newReservation.getScheduleId());
+        Doctor doctor = doctorRepository.findOne(newReservation.getDoctorId());
+        Patient patient = patientRepository.findOne(patientId);
+        ScheduleTimeSlot scheduleTimeSlot = scheduleRepository.findOne(newReservation.getScheduleId());
+        Reservation reservation = new Reservation(patient, doctor, scheduleTimeSlot.getStartDateTime(), scheduleTimeSlot.getEndDateTime());
+        doctor.addReservation(reservation);
+        patient.addReservatin(reservation);
+        patientRepository.save(patient);
+        doctorRepository.save(doctor);
     }
 
     @PostMapping(value = "{id}/personal-data")

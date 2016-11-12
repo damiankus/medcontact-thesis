@@ -24,7 +24,7 @@
 								<td>{{ reservation.startDateTime | date : 'dd-MM-yyyy' }}</td>
 								<td>{{ reservation.startDateTime | date : 'HH:mm:ss' }}</td>
 								<td>{{ reservation.endDateTime | date : 'HH:mm:ss' }}</td>
-								<td><a ng-href="#"><button class="btn btn-sm btn-success"> Zadzwoń</button></a></td>
+								<td><button ng-click="call(reservation.id)" class="btn btn-sm btn-success"> Zadzwoń</button></td>
 							</tr>
             <tbody>
         </table>

@@ -66,7 +66,11 @@ public void changePersonalData(PersonalDataPassword personalDataPassword) {
 			this.password = personalDataPassword.getNewPassword1();
 	}
 
-	public static class PatientBuilder extends BasicUser.BasicUserBuilder {
+	public void addReservatin(Reservation reservation) {
+		this.reservations.add(reservation);
+	}
+
+    public static class PatientBuilder extends BasicUser.BasicUserBuilder {
 		public PatientBuilder() {
 			this.user = new Patient();
 		}

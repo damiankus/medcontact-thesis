@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 public class BasicReservationData {
-	
+	private long id;
 	private LocalDateTime startDateTime;
 	private LocalDateTime endDateTime;
 	private Long doctorId;
@@ -15,6 +15,7 @@ public class BasicReservationData {
 	private boolean doctorBusy;
 	
 	public BasicReservationData(Reservation reservation) {
+		id = reservation.getId();
 		doctorId = reservation.getDoctor().getId();
 		doctorName = reservation.getDoctor().getFirstName() + " " + reservation.getDoctor().getLastName();
 		doctorBusy = reservation.getDoctor().isBusy();
