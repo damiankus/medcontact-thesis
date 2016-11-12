@@ -143,6 +143,8 @@ public class DoctorDataController {
 		doctorRepository.save(doctor);
 	}
 
+	@GetMapping(value = "{id}/schedules")
+	@ResponseBody
 	public List<ScheduleTimeSlot> getSpecificDoctorsSchedules(@PathVariable("id") Long id) {
 		return doctorRepository.findOne(id).getWeeklySchedule();
 	}

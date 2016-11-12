@@ -30,20 +30,20 @@ import lombok.EqualsAndHashCode;
 
 public class Patient extends BasicUser {
 	private static final long serialVersionUID = -6160436846217117334L;
-	
+
 	@OneToMany(mappedBy="fileOwner", fetch=FetchType.LAZY)
 	@JsonIgnore
 	private List<FileEntry> fileEntries;
-	
+
 	@OneToMany(mappedBy="patient", fetch=FetchType.EAGER)
 	private List<Reservation> reservations;
-	
+
 	@OneToMany(mappedBy="ratingPatient", fetch=FetchType.LAZY)
 	@JsonIgnore
 	private List<Opinion> opinions;
-	
+
 	/* Setting default values for the members */
-	
+
 	public Patient() {
 		super();
 		this.fileEntries = new ArrayList<>();
@@ -51,7 +51,7 @@ public class Patient extends BasicUser {
 		this.reservations = new ArrayList<>();
 		this.role = ApplicationRole.PATIENT;
 	}
-	
+
 	public static PatientBuilder getBuilder() {
 		return new PatientBuilder();
 	}
@@ -74,17 +74,17 @@ public void changePersonalData(PersonalDataPassword personalDataPassword) {
 		public PatientBuilder() {
 			this.user = new Patient();
 		}
-		
+
 		public PatientBuilder setFiles(List<FileEntry> fileEntries) {
 			((Patient) user).setFileEntries(fileEntries);
 			return this;
 		}
-		
+
 		public PatientBuilder setOpinions(List<Opinion> opinions) {
 			((Patient) user).setOpinions(opinions);
 			return this;
 		}
-		
+
 		public PatientBuilder setReservations(List<Reservation> reservations) {
 			((Patient) user).setReservations(reservations);
 			return this;
