@@ -24,7 +24,9 @@
 								<td>{{ reservation.startDateTime | date : 'dd-MM-yyyy' }}</td>
 								<td>{{ reservation.startDateTime | date : 'HH:mm:ss' }}</td>
 								<td>{{ reservation.endDateTime | date : 'HH:mm:ss' }}</td>
-								<td><button ng-click="call(reservation.id)" class="btn btn-sm btn-success"> Zadzwoń</button></td>
+								
+								<td><button ng-attr-id="{{ 'call-btn-' + reservation.id }}" 
+									ng-click="call(reservation.id)" class="call-btn btn btn-sm btn-default"> Zadzwoń</button></td>
 							</tr>
             <tbody>
         </table>

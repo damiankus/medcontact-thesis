@@ -4,6 +4,7 @@
 var myApp = angular.module('myApp', ['ngRoute'])
 // .constant('REST_API', "https://medcontact-api.herokuapp.com/")
     .constant('REST_API', "http://localhost:8080/")
+    .constant('WS_ENDPOINT', 'ws://localhost:8080/ws/websocket')
     .config(['$locationProvider', '$routeProvider', '$httpProvider',
         function ($locationProvider, $routeProvider, $httpProvider) {
             $locationProvider.hashPrefix('!');
@@ -41,6 +42,18 @@ var myApp = angular.module('myApp', ['ngRoute'])
             for (var prop in user) {
                 scope.user[prop] = user[prop];
             }
+        };
+        
+        accessor.getUserOrRedirect = function (location, url) {
+        	var user = accessor.getUser();
+        	
+        	if (user === undefined
+    			|| user === null) {
+        		
+        		location.url(url);
+        	}
+        	
+        	return user;
         };
 
         return accessor;

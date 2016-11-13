@@ -18,9 +18,9 @@
             </thead>
             <tbody>
             <tr ng-repeat="doctor in doctors">
-                <td>{{ $index }}</td>
+                <td>{{ $index + 1 }}</td>
                 <td ng-repeat="specialization in doctor.specialties">{{ specialization.name }} {{$last ? '' : ', '}} </td>
-                <td>{{ doctor.firstName + doctor.lastName}}</td>
+                <td>{{ doctor.firstName + " " + doctor.lastName}}</td>
                 <td><a ng-href="{{ doctor }}">
                     <a href="#!/available-schedule/{{doctor.id}}" class="btn btn-sm btn-success">Pokaż terminy</a>
                 </a></td>

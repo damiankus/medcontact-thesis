@@ -9,7 +9,7 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 myApp.controller('AvailableScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService', '$routeParams',
     function (REST_API, $rootScope, $scope, $http, $location, UserService, $routeParams) {
-        $rootScope.userDetails = UserService.getUser();
+	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
         getSchedule();
 
         function getSchedule() {

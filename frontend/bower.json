@@ -10,6 +10,8 @@
     "angular-route": "~1.5.0",
     "html5-boilerplate": "^5.3.0",
     "bootstrap": "~3.3.7",
-    "eonasdan-bootstrap-datetimepicker":"latest"
+    "eonasdan-bootstrap-datetimepicker": "latest",
+    "sockjs-client": "^1.1.1",
+    "stomp-websocket": "^2.3.3"
   }
 }

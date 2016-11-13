@@ -10,8 +10,7 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 myApp.controller('PersonalDataCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
-        $rootScope.userDetails = UserService.getUser()
-
+        $rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
 
         $scope.changePersonalData = function () {
             var personalDataPassword = {

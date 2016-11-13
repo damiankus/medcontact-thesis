@@ -3,14 +3,17 @@ package com.medcontact.data.model.domain;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.sql.rowset.serial.SerialException;
 
@@ -52,13 +55,16 @@ public class FileEntry {
 	private String path;
 	
 	@Column(nullable=false)
-	@JsonIgnore
 	private long contentLength;
 	
 	@ManyToOne
 	@JoinColumn(name="file_owner_id")
 	@JsonIgnore
 	private Patient fileOwner;
+	
+	@OneToMany(mappedBy="fileEntry", fetch=FetchType.LAZY)
+	@JsonIgnore
+	private List<SharedFile> sharedFiles;
 	
 	public FileEntry() throws SerialException, SQLException {
 		this.name = "";

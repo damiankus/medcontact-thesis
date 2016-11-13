@@ -10,11 +10,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import com.medcontact.data.model.dto.PersonalDataPassword;
 import com.medcontact.data.model.enums.ApplicationRole;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Table(name="patients")
@@ -27,7 +28,7 @@ import lombok.EqualsAndHashCode;
  * overriding the mentioned methods. */
 
 @EqualsAndHashCode(callSuper=false)
-
+@ToString(exclude={"fileEntries", "reservations", "opinions"})
 public class Patient extends BasicUser {
 	private static final long serialVersionUID = -6160436846217117334L;
 
@@ -60,7 +61,7 @@ public void changePersonalData(PersonalDataPassword personalDataPassword) {
 		this.firstName = personalDataPassword.getFirstName();
 		this.lastName = personalDataPassword.getLastName();
 		this.email = personalDataPassword.getEmail();
-
+		
 		if(this.password.equals(personalDataPassword.getOldPassword()) &&
 				personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2()))
 			this.password = personalDataPassword.getNewPassword1();

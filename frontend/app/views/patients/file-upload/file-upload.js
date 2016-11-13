@@ -12,7 +12,7 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
 		
-		$rootScope.userDetails = UserService.getUser();
+		$rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
 		
 		if ($rootScope.userDetails.id !== undefined
 				&& $rootScope.userDetails.id !== null) {
@@ -62,18 +62,12 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 				setControlsToDefault(fileInput, uploadBtn, cancelBtn, filenameArea);
 			});
 			
-			$("#file-upload-form").submit(function (event) {
+			$("#file-upload-form").unbind("submit").bind("submit", function (event) {
+				event.preventDefault();
+				
 				var formData = new FormData($(this)[0]);
 				var submittedFiles = [];
-				console.log("FIles:")
-				console.log(JSON.stringify($(this)[0].files));
-				
-				for (var file of fileInput[0].files) {
-					console.log(file.name);
-				}
-				
-				console.log(formData);
-				event.preventDefault();
+				var fileEntries = [];
 				
 				$.ajax({
 					url: $scope.fileServiceUrl,
@@ -91,9 +85,8 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 							.fadeOut()
 							.delay(500);
 					},
-					
 					error: function(jq, status, message) {
-				        alert("[ERROR]: " + message);
+				        alert("[ERROR]: Files upload failure");
 				    },
 					
 					cache: false,
@@ -101,7 +94,7 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 					processData: false,
 					crossDomain: true
 				});
-			});
+		});
 			
 		} else {
 			console.log("No user data has been found");

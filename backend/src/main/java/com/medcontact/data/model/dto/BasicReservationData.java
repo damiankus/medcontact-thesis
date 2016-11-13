@@ -12,13 +12,13 @@ public class BasicReservationData {
 	private LocalDateTime endDateTime;
 	private Long doctorId;
 	private String doctorName;
-	private boolean doctorBusy;
+	private boolean doctorAvailable;
 	
 	public BasicReservationData(Reservation reservation) {
 		id = reservation.getId();
 		doctorId = reservation.getDoctor().getId();
 		doctorName = reservation.getDoctor().getFirstName() + " " + reservation.getDoctor().getLastName();
-		doctorBusy = reservation.getDoctor().isBusy();
+		doctorAvailable = reservation.getDoctor().isAvailable();
 		startDateTime = reservation.getStartDateTime();
 		endDateTime = reservation.getEndDateTime();
 	}

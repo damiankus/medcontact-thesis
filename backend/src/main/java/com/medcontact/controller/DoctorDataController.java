@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,9 @@ public class DoctorDataController {
 	private Logger logger = Logger.getLogger(DoctorDataController.class.getName());
 	private DoctorValidator doctorValidator = new DoctorValidator();
 
+	@Autowired
+	private SimpMessagingTemplate brokerMessagingTemplate;
+	
 	@Autowired
 	BasicUserRepository userRepository;
 	
@@ -147,5 +151,21 @@ public class DoctorDataController {
 	@ResponseBody
 	public List<ScheduleTimeSlot> getSpecificDoctorsSchedules(@PathVariable("id") Long id) {
 		return doctorRepository.findOne(id).getWeeklySchedule();
+	}
+	
+	@GetMapping("{id}/available/toggle")
+	public boolean toggleDoctorAvailable(@PathVariable("id") Long id) {
+		Doctor doctor = doctorRepository.findOne(id);
+		
+		if (doctor != null) {
+			doctor.toggleAvailability();
+			doctorRepository.save(doctor);
+			boolean isAvailable = doctor.isAvailable();
+			logger.info("Doctor [" + id + "] availability status has changed to: " 
+					+ ("" + doctor.isAvailable()).toUpperCase());
+			brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/available", "" + isAvailable);
+		}
+		
+		return (doctor != null) ? doctor.isAvailable() : false;
 	}
 }	

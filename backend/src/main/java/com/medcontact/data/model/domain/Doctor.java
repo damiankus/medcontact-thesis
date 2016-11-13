@@ -68,7 +68,7 @@ public class Doctor extends BasicUser {
 	 * is currently seeing any patient. */
 	
 	@Column(nullable=false)
-	private boolean busy;
+	private boolean available;
 	
 	@OneToMany(mappedBy="ratedDoctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JsonProperty(access=Access.WRITE_ONLY)
@@ -86,6 +86,9 @@ public class Doctor extends BasicUser {
 	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<Note> notes;
 	
+	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<SharedFile> sharedFiles;
+	
 	/* Setting default values. */
 	
 	public Doctor() {
@@ -94,7 +97,7 @@ public class Doctor extends BasicUser {
 		this.title = "";
 		this.university = "";
 		this.biography = "";
-		this.busy = false;
+		this.available = false;
 		
 		this.opinions = new ArrayList<>();
 		this.reservations = new ArrayList<>();
@@ -110,5 +113,9 @@ public class Doctor extends BasicUser {
 
 	public void addReservation(Reservation reservation) {
 		reservations.add(reservation);
+	}
+	
+	public void toggleAvailability() {
+		this.available = !this.available;
 	}
 }

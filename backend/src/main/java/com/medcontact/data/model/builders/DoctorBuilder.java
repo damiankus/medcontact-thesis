@@ -53,8 +53,8 @@ public class DoctorBuilder extends BasicUser.BasicUserBuilder {
         return this;
     }
 
-    public DoctorBuilder setBusy(boolean busy) {
-        ((Doctor) user).setBusy(busy);
+    public DoctorBuilder setAvailable(boolean available) {
+        ((Doctor) user).setAvailable(available);
         return this;
     }
 

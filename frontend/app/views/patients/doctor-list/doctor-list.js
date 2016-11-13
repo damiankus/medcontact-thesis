@@ -9,6 +9,7 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 myApp.controller('DoctorListCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
+		$rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
         getDoctors();
 
         function getDoctors() {

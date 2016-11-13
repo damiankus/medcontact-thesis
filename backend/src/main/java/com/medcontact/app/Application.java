@@ -30,7 +30,8 @@ import com.medcontact.data.repository.PatientRepository;
 @ComponentScan(basePackages={
 		"com.medcontact.controller", 
 		"com.medcontact.security.config", 
-		"com.medcontact.data.config"
+		"com.medcontact.data.config",
+		"com.medcontact.websocket"
 })
 public class Application implements CommandLineRunner {
 
@@ -99,14 +100,23 @@ public class Application implements CommandLineRunner {
 		
 		note.setDoctor(doctor);
 		doctor.getNotes().add(note);
-
-		for (int i = 0; i < 23; i++) {
+		int currentHour = LocalTime.now().getHour() - 1;
+		LocalDate currentDate = LocalDate.now();
+		
+		for (int i = 0; i < 5; i++) {
+			if (currentHour + i > 23) {
+				currentHour = 0;
+				currentDate = currentDate.plusDays(1);
+			}
+			
 			Reservation reservation = new Reservation();
-			reservation.setStartDateTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(i, 0)));
-			reservation.setEndDateTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(i + 1, 0)));
+			reservation.setStartDateTime(LocalDateTime.of(currentDate, LocalTime.of(currentHour, 0)));
+			reservation.setEndDateTime(LocalDateTime.of(currentDate, LocalTime.of((currentHour + 1) % 24, 0)));
 			reservation.setPatient(patient);
 			reservation.setDoctor(doctor);
 			doctor.getReservations().add(reservation);
+			
+			currentHour++;
 		}
 		
 

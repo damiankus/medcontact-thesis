@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +33,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.medcontact.data.model.domain.BasicUser;
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Patient;
@@ -41,6 +45,7 @@ import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.NewReservation;
 import com.medcontact.data.model.dto.PersonalDataPassword;
+import com.medcontact.data.model.dto.UserFilename;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
@@ -55,6 +60,11 @@ import lombok.Setter;
 @RequestMapping(value = "patients")
 public class PatientAccountController {
     private Logger logger = Logger.getLogger(this.getClass().getName());
+    
+    private Cache<UserFilename, FileEntry> cachedFileEntries = CacheBuilder.newBuilder()
+			.expireAfterWrite(2, TimeUnit.MINUTES)
+			.concurrencyLevel(4)
+			.build();
 
     @Getter
     @Setter
@@ -130,7 +140,7 @@ public class PatientAccountController {
                     status = HttpStatus.BAD_REQUEST;
                     logger.warn("Invalid date or time of the reservation");
 
-                } else if (doctor.isBusy()) {
+                } else if (!doctor.isAvailable()) {
                     status = HttpStatus.BAD_REQUEST;
                     logger.warn("Doctor is currently busy");
 
@@ -156,36 +166,47 @@ public class PatientAccountController {
             throws UnauthorizedUserException, SerialException, SQLException, IOException {
 
         if (isEntitled(patientId)) {
-
-			/* We have to load patient from the repository
+        	
+        	/* We have to load patient from the repository
              * because using principal object from the
-			 * authentication context causes throwing an lazy 
+			 * authentication context causes throwing a lazy 
 			 * loading exception */
-			
-        	System.out.println("Uploaded files: " + files.size());
-			Patient patient = patientRepository.findOne(patientId);
-			
+    		
+    		Patient patient = patientRepository.findOne(patientId);
+        	
 			for (MultipartFile file : files) {
+				
 				String filePath = String.format(
 						"%s/%d/%s", 
 						patientFilesPathRoot,
 						patientId,
-						file.getOriginalFilename());
+						file.getName());
 				
 				String fileUrl = String.format(
 						"%s%s/%d/files/", 
-						host, 
+						host,
 						patientFilesPathRoot,
 						patientId);
 				
 				List<FileEntry> foundEntries = fileRepository.findByFilenameAndOwnerId(
-						file.getOriginalFilename(), patientId);
+						file.getName(), patientId);
+				
+				/* We use file entries cache because it's possible that 
+				 * file upload is divided into 2 or more subsequent method calls.
+				 * Because of that the file entry repository might not be able to 
+				 * save the file entry quickly enough so that it can be 
+				 * found during the second call. */
+				
+				UserFilename soughtFileEntry = new UserFilename(patientId, file.getName());
+				FileEntry cachedFileEntry = cachedFileEntries.getIfPresent(soughtFileEntry);
 				
 				FileEntry fileEntry = (foundEntries.size() > 0)
 					? foundEntries.get(0)
-					: new FileEntry();
+					: (cachedFileEntry != null)
+						? cachedFileEntry
+						: new FileEntry();
 					
-				fileEntry.setName(file.getOriginalFilename());
+				fileEntry.setName(file.getName());
 				fileEntry.setUploadTime(
 						Timestamp.valueOf(
 								LocalDateTime.now()));
@@ -202,20 +223,15 @@ public class PatientAccountController {
 				 * we need to update its URL */
 				
 				if (foundEntries.size() == 0) {
-					System.out.println("ALREADY IN REPO");
 					fileEntry.setUrl(fileUrl + fileEntry.getId());
 					fileRepository.save(fileEntry);
 				}
 				
+				cachedFileEntries.put(soughtFileEntry, fileEntry);
+				
 				File fileToWrite = Paths.get(filePath).toAbsolutePath().toFile();
 				fileToWrite.getParentFile().mkdirs();
 				fileToWrite.createNewFile();
-				
-				logger.info("Saved new file");
-				logger.info("File name: " + file.getName());
-				logger.info("File original name: " + file.getOriginalFilename());
-				logger.info("File path  " + filePath);
-				logger.info(fileToWrite.getAbsolutePath());
 				
 				try (FileOutputStream out = new FileOutputStream(fileToWrite)) {
 					Files.deleteIfExists(fileToWrite.toPath());
@@ -226,7 +242,6 @@ public class PatientAccountController {
 			}
 		}
 	}
-	
 	
 	@GetMapping(value="{id}/files/{fileId}")
 	public void getFile(
@@ -253,6 +268,8 @@ public class PatientAccountController {
 			}
 		}
 	}
+	
+	
     
     @GetMapping(value = "{id}/current-reservations")
     @ResponseBody
@@ -294,13 +311,13 @@ public class PatientAccountController {
 	/* A utility method checking if a user waith the given ID is entitled to
      * obtain access to a resource */
 
-    private boolean isEntitled(Long patientId) throws UnauthorizedUserException {
+    private boolean isEntitled(Long userId) throws UnauthorizedUserException {
         Object principal = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();
 
-        if (!(principal instanceof Patient)
-                || (!((Patient) principal).getId().equals(patientId))) {
+        if (!(principal instanceof BasicUser)
+                || (!((BasicUser) principal).getId().equals(userId))) {
 
             logger.warn("An attempt to upload a file without authorization detected - " + principal.toString());
             throw new UnauthorizedUserException();
