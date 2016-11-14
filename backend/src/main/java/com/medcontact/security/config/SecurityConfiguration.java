@@ -171,4 +171,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 		return filter;
 	}
+	
+	@Bean 
+	public EntitlementValidator getEntitlementValidator() {
+		return new BasicUserEntitlementValidator();
+	}
 }

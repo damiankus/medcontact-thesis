@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.medcontact.data.model.domain.BasicUser;
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Patient;
@@ -52,6 +50,7 @@ import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
 import com.medcontact.data.repository.ScheduleRepository;
 import com.medcontact.exception.UnauthorizedUserException;
+import com.medcontact.security.config.EntitlementValidator;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -87,6 +86,9 @@ public class PatientAccountController {
 
     @Autowired
     private ScheduleRepository scheduleRepository;
+    
+    @Autowired
+    private EntitlementValidator entitlementValidator;
 
     @Value("${webrtc.turn.api-endpoint}")
     private String turnApiEndpoint;
@@ -164,7 +166,7 @@ public class PatientAccountController {
             @RequestParam("files") List<MultipartFile> files)
             throws UnauthorizedUserException, SerialException, SQLException, IOException {
 
-        if (isEntitled(patientId)) {
+        if (entitlementValidator.isEntitled(patientId, Patient.class)) {
         	
         	/* We have to load patient from the repository
              * because using principal object from the
@@ -249,7 +251,7 @@ public class PatientAccountController {
 			HttpServletResponse response) 
 					throws UnauthorizedUserException, IOException {
 		
-		if (isEntitled(patientId)) {
+		if (entitlementValidator.isEntitled(patientId, Patient.class)) {
 			FileEntry fileEntry = fileRepository.findOne(fileId);
 			
 			if (fileEntry != null) {
@@ -305,23 +307,5 @@ public class PatientAccountController {
         Patient patient = patientRepository.findOne(patientId);
         patient.changePersonalData(personalDataPassword);
         patientRepository.save(patient);
-    }
-
-	/* A utility method checking if a user waith the given ID is entitled to
-     * obtain access to a resource */
-
-    private boolean isEntitled(Long userId) throws UnauthorizedUserException {
-        Object principal = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        if (!(principal instanceof BasicUser)
-                || (!((BasicUser) principal).getId().equals(userId))) {
-
-            logger.warning("An attempt to upload a file without authorization detected - " + principal.toString());
-            throw new UnauthorizedUserException();
-        }
-
-        return true;
     }
 }

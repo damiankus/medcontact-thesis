@@ -30,11 +30,14 @@ import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.ScheduleTimeSlot;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
 import com.medcontact.data.model.dto.BasicUserDetails;
+import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.ScheduleShortData;
 import com.medcontact.data.repository.BasicUserRepository;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.validation.DoctorValidator;
 import com.medcontact.data.validation.ValidationResult;
+import com.medcontact.exception.UnauthorizedUserException;
+import com.medcontact.security.config.EntitlementValidator;
 
 @RestController
 @RequestMapping("doctors")
@@ -51,10 +54,13 @@ public class DoctorDataController {
 	@Autowired 
 	DoctorRepository doctorRepository;
 	
+    @Autowired
+    private EntitlementValidator entitlementValidator;
+	
 	/* Bind the configuration data from the properties file. */
 	
 	@Value("${webrtc.turn.api-endpoint}")
-	private String turnServerAddress;
+	private String turnApiEndpoint;
 	
 	@Value("${webrtc.turn.ident}")
 	private String turnIdent;
@@ -70,6 +76,35 @@ public class DoctorDataController {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	
+	@GetMapping("{doctorId}/connection")
+    public ResponseEntity<ConnectionData> getConnectionData(
+            @PathVariable("doctorId") Long doctorId) throws UnauthorizedUserException {
+
+        ConnectionData body = null;
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        if (!entitlementValidator.isEntitled(doctorId, Doctor.class)) {
+        	status = HttpStatus.BAD_REQUEST;
+        	
+        } else {
+        	Doctor doctor = doctorRepository.findOne(doctorId);
+        	
+        	body = new ConnectionData();
+        	body.setIceEndpoint(turnApiEndpoint + "ice");
+        	body.setIdent(turnIdent);
+        	body.setDomain(turnDomain);
+        	body.setApplication(turnApplicationName);
+        	body.setSecret(turnSecret);
+        	body.setRoom(doctor.getRoomId());
+        	
+        	status = HttpStatus.OK;
+        	logger.info("[CONNECTION DATA]: Loaded data");
+        }
+        
+        return new ResponseEntity<>(body, status);
+    }
 
 	@PostMapping("")
 	public ResponseEntity<Map<String, Object>> addDoctor(
@@ -95,7 +130,7 @@ public class DoctorDataController {
 				 * in the audio-video communication in order to create 
 				 * a new room for the doctor. */
 				
-				HttpResponse<JsonNode> jsonResponse = Unirest.post(turnServerAddress + "room")
+				HttpResponse<JsonNode> jsonResponse = Unirest.post(turnApiEndpoint + "room")
 						.field("ident", turnIdent)
 						.field("secret", turnSecret)
 						.field("domain", turnDomain)
@@ -162,6 +197,24 @@ public class DoctorDataController {
 			doctor.toggleAvailability();
 			doctorRepository.save(doctor);
 			boolean isAvailable = doctor.isAvailable();
+			logger.info("Doctor [" + id + "] availability status has changed to: " 
+					+ ("" + doctor.isAvailable()).toUpperCase());
+			brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/available", "" + isAvailable);
+		}
+		
+		return (doctor != null) ? doctor.isAvailable() : false;
+	}
+	
+	@PostMapping("{id}/available/set/{isAvailable}")
+	@ResponseBody
+	public boolean setDoctorAvailable(@PathVariable("id") Long id,
+			@PathVariable("isAvailable") boolean isAvailable) {
+		
+		Doctor doctor = doctorRepository.findOne(id);
+		
+		if (doctor != null) {
+			doctor.setAvailable(isAvailable);
+			doctorRepository.save(doctor);
 			logger.info("Doctor [" + id + "] availability status has changed to: " 
 					+ ("" + doctor.isAvailable()).toUpperCase());
 			brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/available", "" + isAvailable);
