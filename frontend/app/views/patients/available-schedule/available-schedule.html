@@ -5,6 +5,11 @@
             <span class="col-md-4"></span>
             <h2 class="col-md-8">Lista terminów</h2>
         </div>
+
+        <div ng-show="emptySchedule" class="col-md-8 alert alert-warning">
+            Lekarz nie posiada wolnych terminów
+        </div>
+
         <div class="form-group">
             <span class="col-md-4"></span>
             <h3 class="col-md-8">{{schedules[0].doctor.firstName}} {{schedules[0].doctor.lastName}}</h3>
@@ -17,7 +22,7 @@
             </tr>
             </thead>
             <tbody ng-repeat-end="item in items">
-            <tr >
+            <tr>
                 <td>{{schedule.startDateTime | date:'HH:mm'}} - {{schedule.endDateTime | date:'HH:mm'}}</td>
                 <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Rezerwuj"
                            ng-click="bookTerm(schedule.id)"/></td>

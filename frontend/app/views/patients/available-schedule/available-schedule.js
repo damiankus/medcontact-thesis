@@ -9,8 +9,9 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 myApp.controller('AvailableScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService', '$routeParams',
     function (REST_API, $rootScope, $scope, $http, $location, UserService, $routeParams) {
-	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
+        $rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
         getSchedule();
+        $scope.emptySchedule = false;
 
         function getSchedule() {
             $http.get(REST_API + "doctors/" + $routeParams.doctorId + "/schedules")
@@ -20,15 +21,22 @@ myApp.controller('AvailableScheduleCtrl', ['REST_API', "$rootScope", '$scope', '
                             schedule.startDateTime = new Date(schedule.startDateTime);
                             schedule.endDateTime = new Date(schedule.endDateTime);
                         });
-                        console.log($scope.schedules, $scope.schedules[0]);
-                    }, function errorCallback(response) {
+
+                        if (!(typeof $scope.schedules !== 'undefined' && $scope.schedules.length > 0)) {
+                            $scope.emptySchedule = true;
+                        }
+                    },
+                    function errorCallback(response) {
                         console.log("[ERROR]: " + response.data.message);
                     }
                 )
         }
 
         $scope.bookTerm = function (scheduleId) {
-            $http.post(REST_API + "patients/" + $rootScope.userDetails.id + "/current-reservations", {scheduleId: scheduleId, doctorId: $routeParams.doctorId})
+            $http.post(REST_API + "patients/" + $rootScope.userDetails.id + "/current-reservations", {
+                scheduleId: scheduleId,
+                doctorId: $routeParams.doctorId
+            })
                 .then(function successCallback(response) {
                         console.log("success");
                     }, function errorCallback(response) {

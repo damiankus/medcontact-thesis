@@ -154,6 +154,7 @@ public class DoctorDataController {
 	}
 	
 	@GetMapping("{id}/available/toggle")
+	@ResponseBody
 	public boolean toggleDoctorAvailable(@PathVariable("id") Long id) {
 		Doctor doctor = doctorRepository.findOne(id);
 		

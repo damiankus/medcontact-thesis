@@ -85,7 +85,7 @@ public class Doctor extends BasicUser {
 	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<Note> notes;
-	
+
 	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	private List<SharedFile> sharedFiles;
 	
