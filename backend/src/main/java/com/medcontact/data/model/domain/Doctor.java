@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.medcontact.data.model.dto.DoctorCreateData;
 import com.medcontact.data.model.enums.ApplicationRole;
 
 import lombok.Data;
@@ -107,7 +108,17 @@ public class Doctor extends BasicUser {
 		this.role = ApplicationRole.DOCTOR;
 	}
 
-	public void addSchedule(ScheduleTimeSlot scheduleTimeSlot) {
+	public Doctor(DoctorCreateData doctor, String encodedPassword) {
+		this();
+		this.email = doctor.getEmail();
+		this.username = doctor.getEmail();
+		this.firstName = doctor.getFirstName();
+		this.lastName = doctor.getLastName();
+		this.setPassword(encodedPassword);
+		this.role = ApplicationRole.DOCTOR;
+	}
+
+    public void addSchedule(ScheduleTimeSlot scheduleTimeSlot) {
 		weeklySchedule.add(scheduleTimeSlot);
 	}
 

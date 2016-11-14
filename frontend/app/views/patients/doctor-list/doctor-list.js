@@ -22,4 +22,9 @@ myApp.controller('DoctorListCtrl', ['REST_API', "$rootScope", '$scope', '$http',
                     }
                 )
         }
+
+        $scope.showTerm = function(doctor){
+            $rootScope.fullDoctorName = doctor.firstName + " " + doctor.lastName;
+            $location.url("/available-schedule/" + doctor.id);
+        }
     }]);

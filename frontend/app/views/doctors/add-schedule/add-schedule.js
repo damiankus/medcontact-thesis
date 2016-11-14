@@ -27,7 +27,7 @@ var isValidDate = function (date) {
 
 myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
-        $rootScope.userDetails = UserService.getUser();
+        $rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
 
         $scope.addSchedule = function () {
             moment.locale('pl');
