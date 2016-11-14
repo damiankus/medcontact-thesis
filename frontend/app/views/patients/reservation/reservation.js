@@ -24,7 +24,7 @@ myApp.controller('ReservationCtrl', ['REST_API', 'WS_ENDPOINT', '$rootScope', '$
 			var startTimeWithOffset = new Date(reservation.startDateTime).getTime() 
 				+ (timezoneOffset * 60 * 1000);
 			
-			var isAllowed = (doctorAvailable === "true")
+			var isAllowed = doctorAvailable
 				&& (startTimeWithOffset <= now.getTime());
 
 			var callBtn = $("#call-btn-" + reservation.id);
@@ -61,11 +61,13 @@ myApp.controller('ReservationCtrl', ['REST_API', 'WS_ENDPOINT', '$rootScope', '$
 	                		if (timeDelta <= 1) {
 	                			var socket = new SockJS(REST_API + "ws")
 	                			var stompClient = Stomp.over(socket);
+	                			
 	                			checkIfPatientAllowed(reservation.doctorAvailable, reservation);
 	                			
 	                			stompClient.connect({}, function (frame) {
 	                				stompClient.subscribe("/topic/doctors/" + reservation.doctorId + "/available", function (availabilityStatus) {
-	                					var patientAllowed = checkIfPatientAllowed(availabilityStatus.body, reservation);
+	                					var patientAllowed = checkIfPatientAllowed(
+	                							(availabilityStatus.body === "true"), reservation);
 	                					
 	                					console.log("Doctor [" + reservation.doctorName 
 	                							+ "]'s availability status has changed to: " 

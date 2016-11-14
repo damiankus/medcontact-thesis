@@ -12,12 +12,12 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.rowset.serial.SerialException;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -89,10 +89,10 @@ public class PatientAccountController {
     private ScheduleRepository scheduleRepository;
 
     @Value("${webrtc.turn.api-endpoint}")
-    private String turnEndpoint;
+    private String turnApiEndpoint;
 
-    @Value("${webrtc.turn.username}")
-    private String turnUsername;
+    @Value("${webrtc.turn.ident}")
+    private String turnIdent;
 
     @Value("${webrtc.turn.domain}")
     private String turnDomain;
@@ -125,37 +125,36 @@ public class PatientAccountController {
 
             if (reservation == null) {
                 status = HttpStatus.BAD_REQUEST;
-                logger.warn("No reservation with specified ID found");
+                logger.warning("[CONNECTION DATA]: No reservation with specified ID found");
 
             } else {
                 Doctor doctor = reservation.getDoctor();
 
                 if (!patientId.equals(reservation.getPatient().getId())) {
                     status = HttpStatus.BAD_REQUEST;
-                    logger.warn("Invalid patient ID for the specified reservation");
+                    logger.warning("[CONNECTION DATA]: Invalid patient ID for the specified reservation");
 
-                } else if (currentDateTime.isAfter(reservation.getStartDateTime())
-                        && currentDateTime.isBefore(reservation.getEndDateTime())) {
+                } else if (currentDateTime.isBefore(reservation.getStartDateTime())
+                        || currentDateTime.isAfter(reservation.getEndDateTime())) {
 
                     status = HttpStatus.BAD_REQUEST;
-                    logger.warn("Invalid date or time of the reservation");
-
-                } else if (!doctor.isAvailable()) {
-                    status = HttpStatus.BAD_REQUEST;
-                    logger.warn("Doctor is currently busy");
+                    logger.warning("[CONNECTION DATA]: Invalid date or time of the reservation");
 
                 } else {
                     body = new ConnectionData();
-                    body.setEndpoint(turnEndpoint);
-                    body.setUsername(turnUsername);
+                    body.setIceEndpoint(turnApiEndpoint + "ice");
+                    body.setIdent(turnIdent);
                     body.setDomain(turnDomain);
                     body.setApplication(turnApplicationName);
                     body.setSecret(turnSecret);
-                    body.setRoomId(doctor.getRoomId());
+                    body.setRoom(doctor.getRoomId());
+                    status = HttpStatus.OK;
+                    logger.info("[CONNECTION DATA]: Loaded data");
                 }
             }
         }
 
+        
         return new ResponseEntity<>(body, status);
     }
 
@@ -319,7 +318,7 @@ public class PatientAccountController {
         if (!(principal instanceof BasicUser)
                 || (!((BasicUser) principal).getId().equals(userId))) {
 
-            logger.warn("An attempt to upload a file without authorization detected - " + principal.toString());
+            logger.warning("An attempt to upload a file without authorization detected - " + principal.toString());
             throw new UnauthorizedUserException();
         }
 

@@ -29,6 +29,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.ScheduleTimeSlot;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
+import com.medcontact.data.model.dto.BasicUserDetails;
 import com.medcontact.data.model.dto.ScheduleShortData;
 import com.medcontact.data.repository.BasicUserRepository;
 import com.medcontact.data.repository.DoctorRepository;
@@ -55,8 +56,8 @@ public class DoctorDataController {
 	@Value("${webrtc.turn.api-endpoint}")
 	private String turnServerAddress;
 	
-	@Value("${webrtc.turn.username}")
-	private String turnUsername;
+	@Value("${webrtc.turn.ident}")
+	private String turnIdent;
 
 	@Value("${webrtc.turn.domain}")
 	private String turnDomain;
@@ -95,7 +96,7 @@ public class DoctorDataController {
 				 * a new room for the doctor. */
 				
 				HttpResponse<JsonNode> jsonResponse = Unirest.post(turnServerAddress + "room")
-						.field("ident", turnUsername)
+						.field("ident", turnIdent)
 						.field("secret", turnSecret)
 						.field("domain", turnDomain)
 						.field("application", turnApplicationName)
@@ -122,7 +123,6 @@ public class DoctorDataController {
 					status = HttpStatus.CREATED;
 					logger.warning("A new room created successfully");
 				}
-				
 			}
 		}
 		
@@ -165,6 +165,34 @@ public class DoctorDataController {
 			logger.info("Doctor [" + id + "] availability status has changed to: " 
 					+ ("" + doctor.isAvailable()).toUpperCase());
 			brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/available", "" + isAvailable);
+		}
+		
+		return (doctor != null) ? doctor.isAvailable() : false;
+	}
+	
+	@GetMapping("{id}/calling")
+	@ResponseBody
+	public void notifyDoctorAboutCalling(@PathVariable("id") Long id, 
+			@RequestBody BasicUserDetails patientDetails) {
+		Doctor doctor = doctorRepository.findOne(id);
+		
+		if (doctor != null) {
+			logger.info("Doctor [" + id + "] availability status has changed to: " 
+					+ ("" + doctor.isAvailable()).toUpperCase());
+			brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/calling", patientDetails);
+		}
+	}
+	
+	@GetMapping("{id}/disconnected")
+	@ResponseBody
+	public boolean notifyDoctorAboutDisconnection(@PathVariable("id") Long id,
+			@RequestBody BasicUserDetails patientDetails) {
+		Doctor doctor = doctorRepository.findOne(id);
+		
+		if (doctor != null) {
+			logger.info("Doctor [" + id + "] availability status has changed to: " 
+					+ ("" + doctor.isAvailable()).toUpperCase());
+			brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/calling", patientDetails);
 		}
 		
 		return (doctor != null) ? doctor.isAvailable() : false;

@@ -9,30 +9,36 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
   function (REST_API, $rootScope, $scope, $http, $location, UserService) {
-	console.log($rootScope.reservation);
 	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/reservation");
+
+	$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/connection/" + $rootScope.reservation.id)
+	    .then(function successCallback(response) { 
+	    	$scope.connectionDetails = response.data;
+	    	startConsutation();
+	    	
+	    }, function errorCallback(response) {
+	    	console.log("[ERROR]: Couldn't load connection data");
+	    });
+	
+	var app = {
+		initialized: false
+	};
 	
     var webrtc = {};
-    var app = {
-        initialized: false
-    };
-
-    $(document).ready(function () {
-        var peerConnectionConfig;
-        var roomId = $("meta[name=roomId]").attr("content");
-
-        console.log(roomId);
-
-        if (roomId === null) {
-            console.log("No room ID found");
+    var peerConnectionConfig;
+    
+    function startConsutation() {
+    	if ($scope.connectionDetails === undefined
+        		|| $scope.connectionDetails === null) {
+            console.log("Invalid connection data");
             return;
 
         } else {
-            peerConnectionConfig = getCredentials(roomId, initConnection);
+            peerConnectionConfig = getCredentials($scope.connectionDetails, initConnection);
         }
-    });
+    }
 
-    function initConnection(roomId, peerConnectionConfig) {
+    function initConnection(connectionDetails, peerConnectionConfig) {
 
         /* list of available STUN/TURN servers has been obtained
          * now we will create a SimpleWebRTC instantion based on
@@ -55,7 +61,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         });
 
         webrtc.on("readyToCall", function () {
-            console.log("Connected to [" + roomId + "]");
+            console.log("Connected to [" + connectionDetails.room + "]");
         });
 
         webrtc.on("videoAdded", function (video, peer) {
@@ -70,13 +76,13 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 
         webrtc.on("localScreenRemoved", function (video) {
             $("#localVideo").css("background-color", "white");
-            disconnect(webrtc, roomId);
+            disconnect(webrtc, connectionDetails);
         });
 
         $("#call-btn").click(function () {
 
             if (!app.initialized) {
-                webrtc.joinRoom(roomId);
+                webrtc.joinRoom(connectionDetails.room);
                 app.initialized = true;
             }
 
@@ -95,7 +101,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         $("#disconnect-btn").click(function () {
             $("#disconnect-btn").prop("disabled", true);
             $("#hang-btn").prop("disabled", true);
-            disconnect(webrtc, roomId);
+            disconnect(webrtc, connectionDetails);
         });
 
         $("#mute-btn").click(function () {
@@ -162,34 +168,33 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         });
     }
 
-    function getCredentials(roomId, callback) {
+    function getCredentials(connectionDetails, callback) {
         var peerConnectionConfig;
         console.log("Attempting to connect to the room with ID: ["
-            + roomId + "]...");
-
+            + connectionDetails.room + "]...");
+      
+        console.log(connectionDetails);
+        
         $.ajax({
-            url: "https://service.xirsys.com/ice",
-            data: {
-                ident: "medcontact",
-                secret: "3c68aea0-2db0-11e6-b5a7-1017d1173ceb",
-                domain: "www.medcontact.com",
-                application: "medcontact",
-                room: roomId,
-                secure: 1
-            },
+            url: connectionDetails.iceEndpoint,
+            data: connectionDetails,
             success: function (data, status) {
+            	console.log(data);
                 peerConnectionConfig = data.d;
 
                 /* data.d is where the iceServers object lives */
 
                 if (!peerConnectionConfig) {
-                    console.log("Connection attempt has failed");
-                    alert("Invalid room id");
+                    alert("[ERROR]: Connection attempt has failed");
+                    
                 } else {
                     console.log(peerConnectionConfig);
-                    callback(roomId, peerConnectionConfig);
+                    callback(connectionDetails, peerConnectionConfig);
                 }
             },
+            error: function () {
+            	console.log("[Error]: TURN server error");
+            }
         });
     }
 
@@ -237,12 +242,12 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         }
     }
 
-    function disconnect(webrtc, roomId) {
+    function disconnect(webrtc, connectionDetails) {
         if (webrtc !== "undefined") {
             stopTransmission(webrtc);
             webrtc.leaveRoom();
 
-            console.log("Disconnected from: [" + roomId + "]");
+            console.log("Disconnected from: [" + connectionDetails.room + "]");
         }
     }
 }]);

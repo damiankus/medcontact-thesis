@@ -12,6 +12,7 @@
     "bootstrap": "~3.3.7",
     "eonasdan-bootstrap-datetimepicker": "latest",
     "sockjs-client": "^1.1.1",
-    "stomp-websocket": "^2.3.3"
+    "stomp-websocket": "^2.3.3",
+    "simpleWebRTC": "~2.1.0"
   }
 }

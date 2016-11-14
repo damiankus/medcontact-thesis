@@ -105,12 +105,12 @@ public class Application implements CommandLineRunner {
 		for (int i = 0; i < 5; i++) {
 			Reservation reservation = new Reservation();
 			reservation.setStartDateTime(currentTime);
-			reservation.setEndDateTime(currentTime.plusMinutes(5));
+			reservation.setEndDateTime(currentTime.plusMinutes(15));
 			reservation.setPatient(patient);
 			reservation.setDoctor(doctor);
 			doctor.getReservations().add(reservation);
 			
-			currentTime = currentTime.plusMinutes(5);
+			currentTime = currentTime.plusMinutes(15);
 		}
 		
 
@@ -119,6 +119,7 @@ public class Application implements CommandLineRunner {
 						LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 0))));
 
 		schedule.forEach(ts -> ts.setDoctor(doctor));
+		doctor.setRoomId("default");
 		doctorRepository.save(doctor);
 	}
 }

@@ -7,10 +7,10 @@ import lombok.NonNull;
 public class ConnectionData {
 	
 	@NonNull
-	private String endpoint;
+	private String iceEndpoint;
 	
 	@NonNull
-	private String username;
+	private String ident;
 	
 	@NonNull
 	private String domain;
@@ -22,16 +22,16 @@ public class ConnectionData {
 	private String secret;
 	
 	@NonNull
-	private String roomId;
+	private String room;
 	
 	private final int secure = 1;
 	
 	public ConnectionData() {
-		this.endpoint = "";
-		this.username = "";
+		this.iceEndpoint = "";
+		this.ident = "";
 		this.domain = "";
 		this.application = "";
 		this.secret = "";
-		this.roomId = "";
+		this.room = "";
 	}
 }
