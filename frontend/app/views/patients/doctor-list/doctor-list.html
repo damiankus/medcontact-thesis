@@ -22,7 +22,7 @@
                 <td ng-repeat="specialization in doctor.specialties">{{ specialization.name }} {{$last ? '' : ', '}} </td>
                 <td>{{ doctor.firstName + " " + doctor.lastName}}</td>
                 <td><a ng-href="{{ doctor }}">
-                    <a href="#!/available-schedule/{{doctor.id}}" class="btn btn-sm btn-success">Pokaż terminy</a>
+                    <a ng-click="showTerm(doctor)" class="btn btn-sm btn-success">Pokaż terminy</a>
                 </a></td>
             </tr>
 
