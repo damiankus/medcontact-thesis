@@ -83,9 +83,9 @@ myApp.controller('ReservationCtrl', ['REST_API', 'WS_ENDPOINT', '$rootScope', '$
 	            });
 	    }
 		
-	    $scope.call = function (reservationId) {
-	        console.log("Reservation Id: "+ reservationId);
-	        //TODO
+	    $scope.call = function (reservation) {
+	    	$rootScope.reservation = reservation;
+	    	$location.url("/patient-consultation");
 	    }
 	    
 	    $scope.getCurrentReservation();

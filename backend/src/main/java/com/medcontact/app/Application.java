@@ -7,7 +7,6 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
-import com.medcontact.data.model.builders.DoctorBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -15,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.medcontact.data.model.builders.DoctorBuilder;
 import com.medcontact.data.model.domain.Admin;
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.Note;
@@ -100,23 +100,17 @@ public class Application implements CommandLineRunner {
 		
 		note.setDoctor(doctor);
 		doctor.getNotes().add(note);
-		int currentHour = LocalTime.now().getHour() - 1;
-		LocalDate currentDate = LocalDate.now();
+		LocalDateTime currentTime = LocalDateTime.now();
 		
 		for (int i = 0; i < 5; i++) {
-			if (currentHour + i > 23) {
-				currentHour = 0;
-				currentDate = currentDate.plusDays(1);
-			}
-			
 			Reservation reservation = new Reservation();
-			reservation.setStartDateTime(LocalDateTime.of(currentDate, LocalTime.of(currentHour, 0)));
-			reservation.setEndDateTime(LocalDateTime.of(currentDate, LocalTime.of((currentHour + 1) % 24, 0)));
+			reservation.setStartDateTime(currentTime);
+			reservation.setEndDateTime(currentTime.plusMinutes(5));
 			reservation.setPatient(patient);
 			reservation.setDoctor(doctor);
 			doctor.getReservations().add(reservation);
 			
-			currentHour++;
+			currentTime = currentTime.plusMinutes(5);
 		}
 		
 
