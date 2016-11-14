@@ -35,11 +35,19 @@ myApp.controller('LoginCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$lo
                         $rootScope.userDetails = UserService.getUser();
                         $scope.loginError = false;
                         $scope.loggedIn = true;
-                        if ($rootScope.userDetails.role == 'DOCTOR'){
-                            $location.url('/add-schedule');
-                        }
-                        else {
-                            $location.url('/reservation');
+                        switch ($rootScope.userDetails.role){
+                            case 'DOCTOR':
+                                $location.url('/add-schedule');
+                                break;
+                            case 'ADMIN':
+                                console.log("a");
+                                $location.url('/add-doctor');
+                                break;
+                            case 'PATIENT':
+                                $location.url('/reservation');
+                                break;
+                            default:
+                                console.error("Unknown user role: ", $rootScope.userDetails.role)
                         }
                     }, function errorCallback(response) {
                         console.log("[ERROR]: " + response.data.message);

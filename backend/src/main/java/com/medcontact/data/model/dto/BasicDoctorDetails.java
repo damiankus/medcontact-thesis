@@ -30,5 +30,6 @@ public class BasicDoctorDetails {
         this.biography = doctor.getBiography();
         this.title = doctor.getTitle();
         this.specialties = doctor.getSpecialties();
+
     }
 }

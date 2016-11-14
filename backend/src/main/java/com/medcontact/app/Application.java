@@ -56,7 +56,7 @@ public class Application implements CommandLineRunner {
 		Admin admin = (Admin) Admin.getBuilder()
 				.setFirstName("Admin")
 				.setLastName("Adminowski")
-				.setEmail("damian.kus.main@gmail.com")
+				.setEmail("admin@gmail")
 				.setPassword(passwordEncoder.encode("haslo"))
 				.build();
 		
@@ -108,7 +108,7 @@ public class Application implements CommandLineRunner {
 			reservation.setEndDateTime(currentTime.plusMinutes(5));
 			reservation.setPatient(patient);
 			reservation.setDoctor(doctor);
-			doctor.getReservations().add(reservation);
+			doctor.addReservation(reservation);
 			
 			currentTime = currentTime.plusMinutes(5);
 		}
