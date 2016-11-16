@@ -88,12 +88,10 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
             $("#disconnect-btn").prop("disabled", false);
             
             webrtc.joinRoom(connectionDetails.room);
-            
-            webrt.sendToAll("calling", {
+            webrt.sendToAll("chat", {
             	patient: $rootScope.userDetails,
             	reservation: $rootScope.reservation
             });
-            
             startTransmission(webrtc);
         });
 
@@ -234,8 +232,8 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     
     function updateVolumeLevel() {
     	var muteBtn = $("#mute-btn");
-        remotes.volume = $(this).val() / 100.0;
-        console.log("Volume changed to: " + remotes.volume);
+    	remotes.volume = $("#volume-level-range").val() / 100.0;
+
         setRemoteVolumeLevel(remotes.volume);
         
         if (remotes.volume > 0
@@ -253,6 +251,8 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     }
     
     function setRemoteVolumeLevel(volume) {
+        console.log("Volume changed to: " + remotes.volume);
+        
     	$("#remoteVideos video").each(function (index, element) {
     		$(element).attr("volume", volume);
     	});

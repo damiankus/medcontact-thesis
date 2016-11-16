@@ -86,12 +86,14 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         	console.log("MESSAGE!");
         	console.log(message);
         });
-        
-        webrtc.on("calling", function(message) {
-        	console.log("somebody's calling!");
-        	console.log(message);
-        });
 
+        webrtc.connection.on('message', function(data){
+            if(data.type === 'chat') {
+              console.log('chat received',data);
+              $('#messages').append('<br>' + data.payload.nick + ':<br>' + data.payload.message);
+            }
+        });
+        
         $("#call-btn").click(function () {
             $(this).prop("disabled", true);
             $("#disconnect-btn").prop("disabled", false);
@@ -250,8 +252,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     
     function updateVolumeLevel() {
     	var muteBtn = $("#mute-btn");
-        remotes.volume = $(this).val() / 100.0;
-        console.log("Volume changed to: " + remotes.volume);
+        remotes.volume = $("#volume-level-range").val() / 100.0;
         setRemoteVolumeLevel(remotes.volume);
         
         if (remotes.volume > 0
@@ -269,6 +270,8 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     }
     
     function setRemoteVolumeLevel(volume) {
+    	console.log("Volume changed to: " + remotes.volume);
+    	
     	$("#remoteVideos video").each(function (index, element) {
     		$(element).attr("volume", volume);
     	});
