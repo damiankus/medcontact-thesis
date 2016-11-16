@@ -20,11 +20,10 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 	    	console.log("[ERROR]: Couldn't load connection data");
 	    });
 	
-	var app = {
-		initialized: false
-	};
-	
     var webrtc = {};
+    var remotes = {
+    	 volume: 0.5
+    };
     var peerConnectionConfig;
     
     function startConsutation() {
@@ -80,66 +79,57 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         });
 
         $("#call-btn").click(function () {
-
-            if (!app.initialized) {
-                webrtc.joinRoom(connectionDetails.room);
-                app.initialized = true;
-            }
-
             $(this).prop("disabled", true);
-            $("#hang-btn").prop("disabled", false);
             $("#disconnect-btn").prop("disabled", false);
+            
+            webrtc.joinRoom(connectionDetails.room);
             startTransmission(webrtc);
-        });
-
-        $("#hang-btn").click(function () {
-            $("#call-btn").prop("disabled", false);
-            $(this).prop("disabled", true);
-            stopTransmission(webrtc);
         });
 
         $("#disconnect-btn").click(function () {
             $("#disconnect-btn").prop("disabled", true);
-            $("#hang-btn").prop("disabled", true);
             disconnect(webrtc, connectionDetails);
         });
-
+        
         $("#mute-btn").click(function () {
-            var video = document.getElementById("localVideo");
 
-            if (video.volume === 0) {
-                video.volume = 0.5;
+            if (remotes.volume === 0) {
+            	remotes.volume = 0.5;
+            	
                 webrtc.unmute();
                 $(this).removeClass("glyphicon-volume-off");
                 $(this).addClass("glyphicon-volume-up");
-                $("#volume-level-range").val(video.volume * 100);
+                $("#volume-level-range").val(remotes.volume * 100);
 
             } else {
-                video.volume = 0;
+            	remotes.volume = 0.5;
                 webrtc.mute();
                 $(this).removeClass("glyphicon-volume-up");
                 $(this).addClass("glyphicon-volume-off");
                 $("#volume-level-range").val(0);
             }
+            
+            setRemoteVolumeLevel(remotes.volume);
         });
 
         /* Note that the input of the slider is an integer
          * between 0 and 100. */
 
         $("#volume-level-range").change(function () {
-            var video = document.getElementById("localVideo");
-            video.volume = $(this).val() / 100.0;
-            console.log("Volume changed to: " + video.volume);
-            var muteBtn = $("#mute-btn");
-
-            if (video.volume > 0
-                && muteBtn.hasClass("glyphicon-volume-off")) {
+        	var muteBtn = $("#mute-btn");
+            remotes.volume = $(this).val() / 100.0;
+            console.log("Volume changed to: " + remotes.volume);
+            setRemoteVolumeLevel(remotes.volume);
+            
+            
+            if (remotes.volume > 0
+            		&& muteBtn.hasClass("glyphicon-volume-off")) {
                 webrtc.unmute();
                 muteBtn.removeClass("glyphicon-volume-off");
                 muteBtn.addClass("glyphicon-volume-up");
 
-            } else if (video.volume == 0
-                && muteBtn.hasClass("glyphicon-volume-up")) {
+            } else if (remotes.volume == 0
+            		&& muteBtn.hasClass("glyphicon-volume-up")) {
                 webrtc.mute();
                 muteBtn.removeClass("glyphicon-volume-up");
                 muteBtn.addClass("glyphicon-volume-off");
@@ -156,7 +146,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
              * element this way if we want to call the
              * *-RequestFullScreen function. */
 
-            var video = document.getElementById("localVideo");
+        	var video = document.getElementById("remoteVideos").children[0];
             var resizeFunction = video.requestFullscreen
                 || video.webkitRequestFullScreen
                 || video.mozRequestFullScreen
@@ -249,5 +239,11 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 
             console.log("Disconnected from: [" + connectionDetails.room + "]");
         }
+    }
+    
+    function setRemoteVolumeLevel(volume) {
+    	$("#remoteVideos video").each(function (index, element) {
+    		element.attr("volume", volume);
+    	});
     }
 }]);
