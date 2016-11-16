@@ -72,6 +72,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
                 .css("width", "auto")
                 .css("height", "auto");
             console.log("" + peer + " has joined the room");
+            updateVolumeLevel()
         });
 
         /* disconnect and leave the room */
@@ -79,6 +80,16 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         webrtc.on("localScreenRemoved", function (video) {
             $("#localVideo").css("background-color", "white");
             disconnect(webrtc, connectionDetails);
+        });
+        
+        webrtc.on("message", function(message) {
+        	console.log("MESSAGE!");
+        	console.log(message);
+        });
+        
+        webrtc.on("calling", function(message) {
+        	console.log("somebody's calling!");
+        	console.log(message);
         });
 
         $("#call-btn").click(function () {
@@ -96,7 +107,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 
         $("#mute-btn").click(function () {
 
-            if (remotes.volume === 0) {
+            if (remotes.volume == 0.0) {
             	remotes.volume = 0.5;
             	
                 webrtc.unmute();
@@ -105,8 +116,8 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
                 $("#volume-level-range").val(remotes.volume * 100);
 
             } else {
-            	remotes.volume = 0.5;
-                webrtc.mute();
+            	webrtc.mute();
+            	remotes.volume = 0.0;
                 $(this).removeClass("glyphicon-volume-up");
                 $(this).addClass("glyphicon-volume-off");
                 $("#volume-level-range").val(0);
@@ -118,26 +129,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         /* Note that the input of the slider is an integer
          * between 0 and 100. */
 
-        $("#volume-level-range").change(function () {
-        	var muteBtn = $("#mute-btn");
-            remotes.volume = $(this).val() / 100.0;
-            console.log("Volume changed to: " + remotes.volume);
-            setRemoteVolumeLevel(remotes.volume);
-            
-            
-            if (remotes.volume > 0
-            		&& muteBtn.hasClass("glyphicon-volume-off")) {
-                webrtc.unmute();
-                muteBtn.removeClass("glyphicon-volume-off");
-                muteBtn.addClass("glyphicon-volume-up");
-
-            } else if (remotes.volume == 0
-            		&& muteBtn.hasClass("glyphicon-volume-up")) {
-                webrtc.mute();
-                muteBtn.removeClass("glyphicon-volume-up");
-                muteBtn.addClass("glyphicon-volume-off");
-            }
-        });
+        $("#volume-level-range").change(updateVolumeLevel);
 
         $("#screenshot-btn").click(function () {
         });
@@ -253,6 +245,26 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
             setAvailability(false);
             
             console.log("Disconnected from: [" + connectionDetails.room + "]");
+        }
+    }
+    
+    function updateVolumeLevel() {
+    	var muteBtn = $("#mute-btn");
+        remotes.volume = $(this).val() / 100.0;
+        console.log("Volume changed to: " + remotes.volume);
+        setRemoteVolumeLevel(remotes.volume);
+        
+        if (remotes.volume > 0
+        		&& muteBtn.hasClass("glyphicon-volume-off")) {
+            webrtc.unmute();
+            muteBtn.removeClass("glyphicon-volume-off");
+            muteBtn.addClass("glyphicon-volume-up");
+
+        } else if (remotes.volume == 0
+        		&& muteBtn.hasClass("glyphicon-volume-up")) {
+            webrtc.mute();
+            muteBtn.removeClass("glyphicon-volume-up");
+            muteBtn.addClass("glyphicon-volume-off");
         }
     }
     

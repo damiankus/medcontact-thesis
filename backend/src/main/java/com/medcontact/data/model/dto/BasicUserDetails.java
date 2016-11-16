@@ -12,7 +12,6 @@ public class BasicUserDetails {
 	protected String firstName;
 	protected String lastName;
 	protected ApplicationRole role;
-	protected boolean calling;
 	
 	public BasicUserDetails() {
 		this.id = 0L;
@@ -20,7 +19,6 @@ public class BasicUserDetails {
 		this.firstName = "";
 		this.lastName = "";
 		this.role = ApplicationRole.PATIENT;
-		this.calling = false;
 	}
 	
 	public BasicUserDetails(BasicUser user) {
@@ -29,6 +27,5 @@ public class BasicUserDetails {
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
 		this.role = user.getRole();
-		this.calling = false;
 	}
 }

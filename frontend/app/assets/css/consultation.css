@@ -9,8 +9,31 @@
 	height: auto;
 }
 
+#videosSection {
+	display: flex;
+}
+
+#localVideoWrapper {
+	bottom: 0;
+	right: 0;
+	width: 30%;
+	height: auto;
+}
+
 #localVideo {
-	width: 800px;
+	width: 100%;
+	height: auto;
+	border-radius: 5px;
+	margin-left: 2%;
+}
+
+#remoteVideos {
+	width 90%;
+	height: auto;
+}
+
+#remoteVideos video {
+	width: 100%;
 	height: auto;
 	border-radius: 5px;
 }

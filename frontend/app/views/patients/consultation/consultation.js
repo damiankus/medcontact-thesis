@@ -69,6 +69,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
                 .css("width", "auto")
                 .css("height", "auto");
             console.log("" + peer + " has joined the room");
+            updateVolumeLevel();
         });
 
         /* disconnect and leave the room */
@@ -77,12 +78,22 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
             $("#localVideo").css("background-color", "white");
             disconnect(webrtc, connectionDetails);
         });
+        
+        webrtc.on("message", function(message) {
+        	console.log(message);
+        });
 
         $("#call-btn").click(function () {
             $(this).prop("disabled", true);
             $("#disconnect-btn").prop("disabled", false);
             
             webrtc.joinRoom(connectionDetails.room);
+            
+            webrt.sendToAll("calling", {
+            	patient: $rootScope.userDetails,
+            	reservation: $rootScope.reservation
+            });
+            
             startTransmission(webrtc);
         });
 
@@ -93,16 +104,15 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         
         $("#mute-btn").click(function () {
 
-            if (remotes.volume === 0) {
+            if (remotes.volume == 0.0) {
             	remotes.volume = 0.5;
-            	
                 webrtc.unmute();
                 $(this).removeClass("glyphicon-volume-off");
                 $(this).addClass("glyphicon-volume-up");
                 $("#volume-level-range").val(remotes.volume * 100);
 
             } else {
-            	remotes.volume = 0.5;
+            	remotes.volume = 0.0;
                 webrtc.mute();
                 $(this).removeClass("glyphicon-volume-up");
                 $(this).addClass("glyphicon-volume-off");
@@ -115,26 +125,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         /* Note that the input of the slider is an integer
          * between 0 and 100. */
 
-        $("#volume-level-range").change(function () {
-        	var muteBtn = $("#mute-btn");
-            remotes.volume = $(this).val() / 100.0;
-            console.log("Volume changed to: " + remotes.volume);
-            setRemoteVolumeLevel(remotes.volume);
-            
-            
-            if (remotes.volume > 0
-            		&& muteBtn.hasClass("glyphicon-volume-off")) {
-                webrtc.unmute();
-                muteBtn.removeClass("glyphicon-volume-off");
-                muteBtn.addClass("glyphicon-volume-up");
-
-            } else if (remotes.volume == 0
-            		&& muteBtn.hasClass("glyphicon-volume-up")) {
-                webrtc.mute();
-                muteBtn.removeClass("glyphicon-volume-up");
-                muteBtn.addClass("glyphicon-volume-off");
-            }
-        });
+        $("#volume-level-range").change(updateVolumeLevel);
 
         $("#screenshot-btn").click(function () {
         });
@@ -241,9 +232,29 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         }
     }
     
+    function updateVolumeLevel() {
+    	var muteBtn = $("#mute-btn");
+        remotes.volume = $(this).val() / 100.0;
+        console.log("Volume changed to: " + remotes.volume);
+        setRemoteVolumeLevel(remotes.volume);
+        
+        if (remotes.volume > 0
+        		&& muteBtn.hasClass("glyphicon-volume-off")) {
+            webrtc.unmute();
+            muteBtn.removeClass("glyphicon-volume-off");
+            muteBtn.addClass("glyphicon-volume-up");
+
+        } else if (remotes.volume == 0
+        		&& muteBtn.hasClass("glyphicon-volume-up")) {
+            webrtc.mute();
+            muteBtn.removeClass("glyphicon-volume-up");
+            muteBtn.addClass("glyphicon-volume-off");
+        }
+    }
+    
     function setRemoteVolumeLevel(volume) {
     	$("#remoteVideos video").each(function (index, element) {
-    		element.attr("volume", volume);
+    		$(element).attr("volume", volume);
     	});
     }
 }]);

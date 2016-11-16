@@ -55,10 +55,10 @@
         </li>
         <!--DOCTOR-->
         <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item">
-            <a href="#!/add-schedule" class="btn btn-default navbar-btn">dodaje termin</a>
+            <a href="#!/doctor-consultation" class="btn btn-default navbar-btn">Pokój rozmów</a>
         </li>
         <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item">
-            <a href="#!/doctor-consultation" class="btn btn-default navbar-btn">Konsultacja</a>
+            <a href="#!/add-schedule" class="btn btn-default navbar-btn">Terminy konsultacji</a>
         </li>
         <!--ALL-->
         <li ng-show="userDetails.id" class="nav-item">
