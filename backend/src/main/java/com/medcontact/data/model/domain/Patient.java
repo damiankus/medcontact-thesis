@@ -3,11 +3,7 @@ package com.medcontact.data.model.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.medcontact.data.model.dto.PersonalDataPassword;
@@ -16,6 +12,8 @@ import com.medcontact.data.model.enums.ApplicationRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name="patients")
@@ -57,14 +55,14 @@ public class Patient extends BasicUser {
 		return new PatientBuilder();
 	}
 
-public void changePersonalData(PersonalDataPassword personalDataPassword) {
+	public void changePersonalData(PersonalDataPassword personalDataPassword, PasswordEncoder passwordEncoder) {
 		this.firstName = personalDataPassword.getFirstName();
 		this.lastName = personalDataPassword.getLastName();
 		this.email = personalDataPassword.getEmail();
-		
-		if(this.password.equals(personalDataPassword.getOldPassword()) &&
+
+		if(passwordEncoder.matches(personalDataPassword.getOldPassword(), this.password) &&
 				personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2()))
-			this.password = personalDataPassword.getNewPassword1();
+			this.password = passwordEncoder.encode(personalDataPassword.getNewPassword1());
 	}
 
 	public void addReservatin(Reservation reservation) {

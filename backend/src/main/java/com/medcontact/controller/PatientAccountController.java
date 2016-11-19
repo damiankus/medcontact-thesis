@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -89,6 +90,9 @@ public class PatientAccountController {
     
     @Autowired
     private EntitlementValidator entitlementValidator;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Value("${webrtc.turn.api-endpoint}")
     private String turnApiEndpoint;
@@ -305,7 +309,7 @@ public class PatientAccountController {
             @PathVariable("id") Long patientId,
             @RequestBody PersonalDataPassword personalDataPassword) {
         Patient patient = patientRepository.findOne(patientId);
-        patient.changePersonalData(personalDataPassword);
+        patient.changePersonalData(personalDataPassword, passwordEncoder);
         patientRepository.save(patient);
     }
 }
