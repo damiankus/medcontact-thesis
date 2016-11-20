@@ -22,7 +22,7 @@ import com.medcontact.mail.MailUtility;
 
 
 @Controller
-@RequestMapping("password")
+@RequestMapping("reset-password")
 public class PasswordRefreshingController {
 	private MailUtility mailHelper = new MailUtility();
 
