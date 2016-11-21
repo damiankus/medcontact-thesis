@@ -1,7 +1,31 @@
-<body>
 <div class="container">
     <div class="jumbotron">
+        <div class="form-group">
+            <span class="col-md-4"></span>
+            <h2 class="col-md-8">{{userDetails.firstName + " " + userDetails.lastName}}</h2>
+        </div>
+        <div ng-show="emptySchedule" class="col-md-8 alert alert-warning">
+            Lekarz nie posiada wolnych terminów
+        </div>
 
+        <table class="table">
+            <thead ng-repeat-start="schedule in schedules">
+            <tr>
+                <th>{{schedule.key | date:'EEEE: dd MMMM yyyy'}}</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody ng-repeat-end>
+            <tr ng-repeat="value in schedule.values">
+                <td>{{value.startDateTime | date:'HH:mm'}} - {{value.endDateTime | date:'HH:mm'}}</td>
+                <!--<td><input name="submit-btn" class="btn btn-sm btn-warning" type="submit" value="Usuń termin"-->
+                           <!--ng-click="bookTerm(value.id)"/></td>-->
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="jumbotron">
         <form name="scheduleForm" class="form-horizontal">
             <div class="form-group">
                 <span class="col-md-4"></span>
@@ -11,7 +35,7 @@
             <div class="form-group">
                 <label class="col-md-4 control-label">Data: </label>
                 <div class='col-md-6 input-group date' id="datePickerDiv">
-                    <input id='datePicker' type='text' class="form-control" />
+                    <input id='datePicker' type='text' class="form-control" required/>
                     <span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar">
                     </span>
@@ -20,7 +44,7 @@
 
                 <label class="col-md-4 control-label">Początek terminu: </label>
                 <div class='col-md-6 input-group date' id='startTimePickerDiv'>
-                    <input id="startTimePicker"  type='text' class="form-control" />
+                    <input id="startTimePicker"  type='text' class="form-control" required/>
                     <span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar">
                     </span>
@@ -29,7 +53,7 @@
 
                 <label class="col-md-4 control-label">Koniec terminu: </label>
                 <div class='col-md-6 input-group date' id='endTimePickerDiv'>
-                    <input id="endTimePicker" ng-model="endTime" type='text' class="form-control" />
+                    <input id="endTimePicker" ng-model="endTime" type='text' class="form-control" required/>
                     <span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar">
                     </span>
