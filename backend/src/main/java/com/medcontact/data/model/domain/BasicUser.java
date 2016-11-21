@@ -16,8 +16,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.medcontact.data.model.enums.ApplicationRole;
-import com.medcontact.data.model.enums.Sex;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +23,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.medcontact.data.model.enums.ApplicationRole;
+import com.medcontact.data.model.enums.Sex;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -96,6 +97,14 @@ public class BasicUser implements UserDetails {
 	@Transient
 	@JsonIgnore
 	protected Sex sex;
+	
+	/* We serialize references to objects of supertype 
+	 * BasicUser in other objects as IDs */
+	
+	@JsonValue
+	public Long getId() {
+		return this.id;
+	}
 	
 	/* Default constructor. We're setting default values for 
 	 * the class members. */

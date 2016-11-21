@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -163,6 +164,19 @@ public class PatientAccountController {
         
         return new ResponseEntity<>(body, status);
     }
+    
+    @GetMapping(value="{id}/fileEntries")
+    public List<FileEntry> getFileEntries(
+    		@PathVariable("id") Long patientId) throws UnauthorizedUserException {
+    	
+    	if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+    		return patientRepository.findOne(patientId)
+	    		.getFileEntries();
+    				
+    	} else {
+    		return new ArrayList<>();
+    	}
+    }
 
     @PostMapping(value = "{id}/files")
     public void handleFileUpload(
@@ -185,7 +199,7 @@ public class PatientAccountController {
 						"%s/%d/%s", 
 						patientFilesPathRoot,
 						patientId,
-						file.getName());
+						file.getOriginalFilename());
 				
 				String fileUrl = String.format(
 						"%s%s/%d/files/", 
@@ -273,26 +287,31 @@ public class PatientAccountController {
 			}
 		}
 	}
-	
-	
     
     @GetMapping(value = "{id}/current-reservations")
     @ResponseBody
     public List<BasicReservationData> getCurrentReservations(
-    		@PathVariable("id") Long patientId) {
+    		@PathVariable("id") Long patientId) throws UnauthorizedUserException {
     	
-        return patientRepository.findOne(patientId)
-        		.getReservations()
-                .stream()
-                .filter(r -> !r.getEndDateTime().isBefore(LocalDateTime.now()))
-                .map(BasicReservationData::new)
-                .collect(Collectors.toList());
+    	if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+    		return patientRepository.findOne(patientId)
+	    		.getReservations()
+	    		.stream()
+	    		.filter(r -> !r.getEndDateTime().isBefore(LocalDateTime.now()))
+	    		.map(BasicReservationData::new)
+	    		.collect(Collectors.toList());
+    		
+    	} else {
+    		return new ArrayList<>();
+    	}
     }
 
     @PostMapping(value = "{id}/current-reservations")
     @ResponseBody
     public void addNewReservations(
-            @PathVariable("id") Long patientId, @RequestBody NewReservation newReservation) {
+            @PathVariable("id") Long patientId, 
+            @RequestBody NewReservation newReservation) {
+    	
         Doctor doctor = doctorRepository.findOne(newReservation.getDoctorId());
         Patient patient = patientRepository.findOne(patientId);
         ScheduleTimeSlot scheduleTimeSlot = scheduleRepository.findOne(newReservation.getScheduleId());
@@ -308,6 +327,7 @@ public class PatientAccountController {
     public void postChangePersonalData (
             @PathVariable("id") Long patientId,
             @RequestBody PersonalDataPassword personalDataPassword) {
+    	
         Patient patient = patientRepository.findOne(patientId);
         patient.changePersonalData(personalDataPassword, passwordEncoder);
         patientRepository.save(patient);

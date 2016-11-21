@@ -59,7 +59,6 @@ public class FileEntry {
 	
 	@ManyToOne
 	@JoinColumn(name="file_owner_id")
-	@JsonIgnore
 	private Patient fileOwner;
 	
 	@OneToMany(mappedBy="fileEntry", fetch=FetchType.LAZY)

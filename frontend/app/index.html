@@ -32,10 +32,10 @@
     <ul id="home-login-btns" class="nav navbar-nav pull-right">
         <!--GUEST-->
         <li ng-show="!userDetails.id" class="nav-item">
-            <a href="#!/login" class="btn btn-success navbar-btn">Logowanie</a>
+            <a href="#!/signUp" class="btn btn-default navbar-btn">Rejestracja</a>
         </li>
         <li ng-show="!userDetails.id" class="nav-item">
-            <a href="#!/signUp" class="btn btn-default navbar-btn">Rejestracja</a>
+            <a href="#!/login" class="btn btn-success navbar-btn">Logowanie</a>
         </li>
         <!--PATIENT-->
         <li ng-if="userDetails.id && userDetails.role === 'PATIENT' && userDetails.consultation" class="nav-item">

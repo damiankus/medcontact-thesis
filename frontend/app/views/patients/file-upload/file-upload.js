@@ -14,16 +14,65 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 		
 		$rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
 		
-		if ($rootScope.userDetails.id !== undefined
-				&& $rootScope.userDetails.id !== null) {
+		if ($scope.reservations === undefined
+				|| $scope.reservations == null) {
 			
-			$scope.fileServiceUrl = REST_API + "patients/" + $rootScope.userDetails.id + "/files";
+			$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/current-reservations")
+				.then(function successCallback(response) {
+					$scope.reservations	 = response.data;
+					console.log($scope.reservations);
+					
+				}, function errorCallback(response) {
+		            	console.log("[ERROR]: " + response.data.message);
+	            });
+		}
+		
+//		$scope.sortField = "uploadTime";
+		$scope.sortReversed = true;
+		$scope.fileServiceUrl = REST_API + "patients/" + $rootScope.userDetails.id + "/files";
+	
+		/* Load file info from the server */
+		
+		$scope.getFiles = function() {
+			$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/fileEntries")
+			.then(function successCallback(response) {
+				$scope.files = response.data;
+				$scope.files.forEach(function (item) {
+					item.uploadTime = new Date(item.uploadTime);
+				});
+				
+			}, function errorCallback(response) {
+				console.log("[ERROR]: " + response);
+			});
+		}
+		
+		$scope.showBriefly = function (parent, child) {
+			$(parent).append($(child));
 			
+			child.fadeIn()
+				.delay(500)
+				.fadeOut()
+				.delay(500);
+			
+			$(parent).remove($(child));
+		}
+		
+		$scope.indicateSuccess = function (selector) {
+			var successLabel = $("<label class='collapse btn btn-success glyphicon glyphicon-ok'></label>");
+			$scope.showBriefly($(selector), successLabel);
+		};
+		
+		$scope.indicateFailure = function (selector) {
+			var successLabel = $("<label class='collapse btn btn-danger glyphicon glyphicon-remove'></label>");
+			$scope.showBriefly($(selector), successLabel);
+		};
+		
+		$scope.initListeners = function () {
+		
 			var fileInput = $("#uploaded-file");
 			var cancelBtn = $("#file-cancel-btn");
 			var filenameArea = $("#filename-area");
 			var uploadBtn = $("#file-upload-btn");
-			var successIcon = $("#file-upload-success");
 			var defaultTextWidth = 20;
 			
 			filenameArea.css("resize", "none");
@@ -66,8 +115,6 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 				event.preventDefault();
 				
 				var formData = new FormData($(this)[0]);
-				var submittedFiles = [];
-				var fileEntries = [];
 				
 				$.ajax({
 					url: $scope.fileServiceUrl,
@@ -80,12 +127,12 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 					success: function (data) {
 						setControlsToDefault(fileInput, uploadBtn, cancelBtn, filenameArea);
 						cancelBtn.addClass("hidden");
-						successIcon.fadeIn()
-							.delay(500)
-							.fadeOut()
-							.delay(500);
+						$scope.indicateSuccess("#file-upload-controls");
+						
+						$scope.getFiles();
 					},
 					error: function(jq, status, message) {
+						$scope.indicateFailure("#file-upload-controls");
 				        alert("[ERROR]: Files upload failure");
 				    },
 					
@@ -94,22 +141,35 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 					processData: false,
 					crossDomain: true
 				});
-		});
+			});
 			
-		} else {
-			console.log("No user data has been found");
-			$location.url("/");
+			$scope.shareFile = function (fileId, reservationId) {
+				console.log("File: " + fileId);
+				console.log("reservation: " + reservationId);
+				
+				$http({
+					method: "POST",
+					url: REST_API + "patients/" + $rootScope.userDetails.id + "/sharedFiles",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					data: {
+						fileId: fileId,
+						reservationId: reservationId
+					}
+				})
+				.then(function successCallback(response) {
+					$scope.indicateSuccess("#toolbar-" + fileId);
+					
+				}, function errorCallback(response) {
+						$scope.indicateFailure("#toolbar-" + fileId);
+		            	console.log("[ERROR]: Couldn't share a file");
+	            });
+			};
 		}
 		
-		/* Load file info from the server */
-		
-		$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/fileEntries")
-			.then(function successCallback(response) {
-				$scope.files = response.data._embedded.fileEntries;
-				
-			}, function errorCallback(response) {
-				console.log("[ERROR]: " + response);
-			});
+		$scope.getFiles();
+		$scope.initListeners();
 	}]);
 
 function setControlsToDefault(fileInput, uploadBtn, cancelBtn, filenameArea) {

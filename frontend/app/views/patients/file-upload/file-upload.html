@@ -4,7 +4,7 @@
 			<form id="file-upload-form" class="form-inline" method="post" 
 					action="http://localhost:8080/patients/3/files" enctype="multipart/form-data">
 				<h4>Udostępnianie plików</h4>
-				<fieldset>
+				<fieldset id="file-upload-controls">
 					<textarea id="filename-area" class="form-control" placeholder="Nazwa pliku" readonly></textarea>
 					<label class="btn btn-default btn-file">
    						<input id="uploaded-file" type="file" name="files" class="hidden" multiple/>
@@ -12,29 +12,67 @@
 					</label>
 					<button  id="file-cancel-btn" type="button" class="hidden btn btn-danger">Anuluj</button>
 					<button id="file-upload-btn" type="submit" class="btn btn-success" disabled>Prześlij</button>
-					<label id="file-upload-success" class="collapse label label-md label-success glyphicon glyphicon-ok"></label>
 				</fieldset>
 			</form>
-			<iframe class="hidden" name="hidden-frame"></iframe>
-		</div>
+			</div>
 		
 		<div class="well">
 			<h4>Przesłane pliki</h4>
 			<table id="files-table" class="table table-hover">
 				<thead>
 					<tr>
-						<th>Nazwa pliku</th>
-						<th>Data przesłania</th>
-						<th>Typ pliku</th>
-						<th></th>
+					
+						<th ng-click="sortField = 'name'; sortReversed = !sortReversed">
+							Nazwa pliku 
+							<span ng-show="sortField == 'name' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
+							<span ng-show="sortField == 'name' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
+						</th>
+						
+						<th ng-click="sortField = 'uploadTime'; sortReversed = !sortReversed">
+							Data przesłania
+							<span ng-show="sortField == 'uploadTime' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
+							<span ng-show="sortField == 'uploadTime' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
+						</th>
+						
+						<th ng-click="sortField = 'contentType'; sortReversed = !sortReversed">
+							 Typ pliku
+							<span ng-show="sortField == 'contentType' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
+							<span ng-show="sortField == 'contentType' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
+						</th>
+						
+						<th>Opcje</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="file in files">
+					<tr ng-repeat="file in files | orderBy:sortField:sortReversed">
 						<td>{{ file.name }}</td>
-						<td>{{ file.uploadTime | date : 'dd-MM-yyyy HH:mm:ss	' }}</td>
+						<td>{{ file.uploadTime | date : 'dd-MM-yyyy HH:mm:ss' }}</td>
 						<td>{{ file.contentType }}</td>
-						<td><a ng-href="{{ file.url }}"><button class="btn btn-sm btn-success"> Pobierz</button></a></td>
+						
+						<td ng-attr-id="toolbar-{{ file.id }}" class="btn-toolbar">
+							<a ng-href="{{ file.url }}"><button class="btn btn-md btn-success"> Pobierz</button></a>
+						
+							<div class="dropdown">
+								<button class="btn btn-md btn-default dropdown-toggle" 
+										type="button" id="reservations" 
+										data-toggle="dropdown" 
+										aria-haspopup="true" 
+										aria-expanded="true">
+									Udostępnij
+									<span class="caret"></span>
+								</button>
+
+								<ul class="dropdown-menu" aria-labelledby="reservations">
+									<li class="dropdown-item" ng-repeat="reservation in reservations">
+										<div ng-click="shareFile(file.id, reservation.id)">
+											<div> {{ reservation.doctorName }} </div>
+											<div> {{ ' (' + (reservation.startDateTime | date : 'dd-MM-yyyy HH:mm') + ')' }} </div>
+										</div>
+									</li>
+								</ul>
+							</div>
+							
+						</td>
 					</tr>
 				</tbody>
 			</table>

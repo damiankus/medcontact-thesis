@@ -3,7 +3,13 @@ package com.medcontact.data.model.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.medcontact.data.model.dto.PersonalDataPassword;
@@ -12,8 +18,6 @@ import com.medcontact.data.model.enums.ApplicationRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name="patients")
@@ -35,6 +39,7 @@ public class Patient extends BasicUser {
 	private List<FileEntry> fileEntries;
 
 	@OneToMany(mappedBy="patient", fetch=FetchType.EAGER)
+	@JsonIgnore
 	private List<Reservation> reservations;
 
 	@OneToMany(mappedBy="ratingPatient", fetch=FetchType.LAZY)
