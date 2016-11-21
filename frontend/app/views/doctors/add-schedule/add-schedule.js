@@ -72,6 +72,7 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
                     end: end
                 })
                     .then(function successCallback(response) {
+                        getSchedule()
                         console.log("Success")
                     }, function errorCallback(response) {
                         console.log("[ERROR]: " + response.data.message);
@@ -88,24 +89,28 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
             $('#datePickerDiv').datetimepicker({
                 locale: 'pl',
                 format: 'D MMMM YYYY',
-                minDate:Date.now()
+                minDate:Date.now(),
             }).on("dp.change", function () {
                 $scope.date = $("#datePicker").val();
             });
 
             $('#startTimePickerDiv').datetimepicker({
                 locale: 'pl',
-                format: 'H:mm'
-            }).on("dp.change", function () {
+                format: 'H:mm',
+                maxDate:(new Date()).setHours(23, 59, 59, 0)
+            }).on("dp.change", function (e) {
                 $scope.startTime = $("#startTimePicker").val();
+                $('#endTimePickerDiv').data("DateTimePicker").minDate(e.date)
             });
 
             $('#endTimePickerDiv').datetimepicker({
                 locale: 'pl',
                 format: 'H:mm',
-                minDate:Date.now()
-            }).on("dp.change", function () {
+                minDate:Date.now(),
+                maxDate:(new Date()).setHours(23, 59, 59, 0)
+            }).on("dp.change", function (e) {
                 $scope.endTime = $("#endTimePicker").val();
+                $('#startTimePickerDiv').data("DateTimePicker").maxDate(e.date);
             });
         });
     }]);

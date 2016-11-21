@@ -267,7 +267,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     }
 
     function disconnect() {
-        if ($scope.webrtc !== "undefined") {
+        if ($scope.subscription && $scope.webrtc !== "undefined") {
         	$scope.subscription.unsubscribe();
         	$scope.stompClient.disconnect();
             stopTransmission();
