@@ -13,17 +13,18 @@
         <table class="table">
             <thead ng-repeat-start="schedule in schedules">
             <tr>
-                <th>{{schedule.startDateTime | date:'EEEE dd-mm-yyyy'}}</th>
+                <th>{{schedule.key | date:'EEEE: dd MMMM yyyy'}}</th>
                 <th></th>
             </tr>
             </thead>
-            <tbody ng-repeat-end="item in items">
-            <tr>
-                <td>{{schedule.startDateTime | date:'HH:mm'}} - {{schedule.endDateTime | date:'HH:mm'}}</td>
+            <tbody ng-repeat-end>
+            <tr ng-repeat="value in schedule.values">
+                <td>{{value.startDateTime | date:'HH:mm'}} - {{value.endDateTime | date:'HH:mm'}}</td>
                 <td><input name="submit-btn" class="btn btn-sm btn-success" type="submit" value="Rezerwuj"
-                           ng-click="bookTerm(schedule.id)"/></td>
+                           ng-click="bookTerm(value.id)"/></td>
             </tr>
             </tbody>
         </table>
+
     </div>
 </div>

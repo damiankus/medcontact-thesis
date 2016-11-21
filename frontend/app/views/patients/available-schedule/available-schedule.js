@@ -16,11 +16,22 @@ myApp.controller('AvailableScheduleCtrl', ['REST_API', "$rootScope", '$scope', '
         function getSchedule() {
             $http.get(REST_API + "doctors/" + $routeParams.doctorId + "/schedules")
                 .then(function successCallback(response) {
-                        $scope.schedules = response.data;
-                        $scope.schedules.forEach(function (schedule) {
+
+                        response.data.forEach(function (schedule) {
                             schedule.startDateTime = new Date(schedule.startDateTime);
                             schedule.endDateTime = new Date(schedule.endDateTime);
+                            schedule.day = moment(schedule.startDateTime).format("DD MM YYYY");
                         });
+                        response.data = _.groupBy(response.data, function (schedule) {
+                            return schedule.day;
+                        });
+
+                        $scope.schedules = [];
+                        for (var key in response.data) {
+                            if (response.data.hasOwnProperty(key)) {
+                                $scope.schedules.push({key:new Date(moment(key, "DD MM YYYY")), values:response.data[key]})
+                            }
+                        }
 
                         if (!(typeof $scope.schedules !== 'undefined' && $scope.schedules.length > 0)) {
                             $scope.emptySchedule = true;
