@@ -12,10 +12,12 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Check;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Table(name="opinions")
 @Check(constraints="rating > 0 AND rating <= 5")
+@ToString(exclude={"ratedDoctor", "ratingPatient"})
 @Data
 public class Opinion {
 	

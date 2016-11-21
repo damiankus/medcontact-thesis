@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +30,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.ScheduleTimeSlot;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
-import com.medcontact.data.model.dto.BasicUserDetails;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.ScheduleShortData;
 import com.medcontact.data.repository.BasicUserRepository;
@@ -190,10 +190,13 @@ public class DoctorDataController {
 	
 	@GetMapping("{id}/available/toggle")
 	@ResponseBody
-	public boolean toggleDoctorAvailable(@PathVariable("id") Long id) {
+	public boolean toggleDoctorAvailable(@PathVariable("id") Long id) throws MessagingException, UnauthorizedUserException {
 		Doctor doctor = doctorRepository.findOne(id);
 		
-		if (doctor != null) {
+		if (doctor != null 
+				&& entitlementValidator.isEntitled(id, Doctor.class)) {
+			
+			doctor = doctorRepository.findOne(id);
 			doctor.toggleAvailability();
 			doctorRepository.save(doctor);
 			boolean isAvailable = doctor.isAvailable();
@@ -208,44 +211,18 @@ public class DoctorDataController {
 	@PostMapping("{id}/available/set/{isAvailable}")
 	@ResponseBody
 	public boolean setDoctorAvailable(@PathVariable("id") Long id,
-			@PathVariable("isAvailable") boolean isAvailable) {
+			@PathVariable("isAvailable") boolean isAvailable) throws MessagingException, UnauthorizedUserException {
 		
 		Doctor doctor = doctorRepository.findOne(id);
 		
-		if (doctor != null) {
+		if (doctor != null 
+				&& entitlementValidator.isEntitled(id, Doctor.class)) {
+			
 			doctor.setAvailable(isAvailable);
 			doctorRepository.save(doctor);
 			logger.info("Doctor [" + id + "] availability status has changed to: " 
 					+ ("" + doctor.isAvailable()).toUpperCase());
 			brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/available", "" + isAvailable);
-		}
-		
-		return (doctor != null) ? doctor.isAvailable() : false;
-	}
-	
-	@GetMapping("{id}/calling")
-	@ResponseBody
-	public void notifyDoctorAboutCalling(@PathVariable("id") Long id, 
-			@RequestBody BasicUserDetails patientDetails) {
-		Doctor doctor = doctorRepository.findOne(id);
-		
-		if (doctor != null) {
-			logger.info("Doctor [" + id + "] availability status has changed to: " 
-					+ ("" + doctor.isAvailable()).toUpperCase());
-			brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/calling", patientDetails);
-		}
-	}
-	
-	@GetMapping("{id}/disconnected")
-	@ResponseBody
-	public boolean notifyDoctorAboutDisconnection(@PathVariable("id") Long id,
-			@RequestBody BasicUserDetails patientDetails) {
-		Doctor doctor = doctorRepository.findOne(id);
-		
-		if (doctor != null) {
-			logger.info("Doctor [" + id + "] availability status has changed to: " 
-					+ ("" + doctor.isAvailable()).toUpperCase());
-			brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/calling", patientDetails);
 		}
 		
 		return (doctor != null) ? doctor.isAvailable() : false;

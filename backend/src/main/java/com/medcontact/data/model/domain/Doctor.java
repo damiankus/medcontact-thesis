@@ -24,11 +24,13 @@ import com.medcontact.data.model.enums.ApplicationRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 
 @Entity
 @Table(name="doctors")
 @DiscriminatorValue("DOCTOR")
 @Data
+@ToString(exclude={"opinions", "reservations", "weeklySchedule", "notes", "sharedFiles"})
 
 /* This annotations prevents the lombok library
  * from calling the superclass' equals and hashCode 

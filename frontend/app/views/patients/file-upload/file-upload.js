@@ -115,6 +115,7 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 function setControlsToDefault(fileInput, uploadBtn, cancelBtn, filenameArea) {
 	fileInput.val("");
 	uploadBtn.attr("disabled", true);
+	cancelBtn.addClass("hidden");
 	filenameArea.val("");
 	filenameArea.attr("rows", 1);
 	filenameArea.attr("cols", 20);

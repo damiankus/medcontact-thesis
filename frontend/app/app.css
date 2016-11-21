@@ -4,31 +4,6 @@
 @import url('/assets/css/signup.css');
 @import url('/assets/css/file-upload.css');
 
-
-.menu {
-  list-style: none;
-  border-bottom: 0.1em solid black;
-  margin-bottom: 2em;
-  padding: 0 0 0.5em;
-}
-
-.menu:before {
-  content: "[";
-}
-
-.menu:after {
-  content: "]";
-}
-
-.menu > li {
-  display: inline;
-}
-
-.menu > li + li:before {
-  content: "|";
-  padding-right: 0.3em;
-}
-
 .nav > .nav-item {
 	margin-right: 5px;
 }
@@ -37,11 +12,41 @@
 	color: white;
 }
 
-.btn-xlg {
-    padding: 18px 28px;
-    font-size: 30px;
-    line-height: normal;
-    -webkit-border-radius: 8px;
-       -moz-border-radius: 8px;
-            border-radius: 8px;
+.center {
+	float: none;
+	margin: auto;
+}
+
+.modal-body {
+	padding: 5%;
+}
+
+#tab-chat {
+	margin: 1%;
+}
+
+.message {
+	border-radius: 5px;
+	padding: 2% 1% 0 1%;
+	margin-top: 1%;
+}
+
+#chat-messages {
+	height: 240px;
+	overflow: auto;
+}
+
+.msg-content {
+	margin-top: 1%;
+	padding: 1%;
+	overflow-wrap: break-word;
+	font-size: 18px;
+}
+
+.msg-label {
+	border: solid white 1px;
+	border-radius: 5px;
+	padding: 1%;
+	margin-top: 1%;
+	font-size: 14px;
 }

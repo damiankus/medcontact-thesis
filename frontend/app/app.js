@@ -14,11 +14,13 @@ var myApp = angular.module('myApp', ['ngRoute'])
     )
     .factory('UserService', function () {
         var user = {};
+        var reservation = {};
         var accessor = {};
 
         if (window.sessionStorage) {
             accessor = {
                 setUser: function (details) {
+                	details.name = details.firstName + " " + details.lastName;
                     window.sessionStorage.setItem("userDetails", JSON.stringify(details));
                 },
 
@@ -30,6 +32,7 @@ var myApp = angular.module('myApp', ['ngRoute'])
             accessor = {
                 setUser: function (details) {
                     user = details;
+                    user.name = details.firstName + " " + details.lastName;
                 },
 
                 getUser: function () {
@@ -55,6 +58,6 @@ var myApp = angular.module('myApp', ['ngRoute'])
         	
         	return user;
         };
-
+        
         return accessor;
     });

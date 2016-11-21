@@ -54,6 +54,8 @@ myApp.controller('ReservationCtrl', ['REST_API', 'WS_ENDPOINT', '$rootScope', '$
 	                 * */
 	                
 	                setTimeout(function () {
+	                	$scope.stompClients = []
+	                	
 	                	for (var reservation of response.data) {
 	                		var startDate = new Date(reservation.startDateTime);
 	                		var timeDelta = Math.abs(now.getTime() - startDate.getTime()) / millisPerDay;
@@ -61,6 +63,7 @@ myApp.controller('ReservationCtrl', ['REST_API', 'WS_ENDPOINT', '$rootScope', '$
 	                		if (timeDelta <= 1) {
 	                			var socket = new SockJS(REST_API + "ws")
 	                			var stompClient = Stomp.over(socket);
+	                			$scope.stompClients.push(stompClient);
 	                			
 	                			checkIfPatientAllowed(reservation.doctorAvailable, reservation);
 	                			
@@ -86,6 +89,12 @@ myApp.controller('ReservationCtrl', ['REST_API', 'WS_ENDPOINT', '$rootScope', '$
 	    }
 		
 	    $scope.call = function (reservation) {
+	    	for (var client of $scope.stompClients) {
+	    		client.disconnect(function () {
+	    			console.log("Socket closed");
+	    		});
+	    	}
+	    	
 	    	$rootScope.reservation = reservation;
 	    	$location.url("/patient-consultation");
 	    }

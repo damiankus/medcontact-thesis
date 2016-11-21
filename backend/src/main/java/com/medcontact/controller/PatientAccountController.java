@@ -190,7 +190,7 @@ public class PatientAccountController {
 						patientId);
 				
 				List<FileEntry> foundEntries = fileRepository.findByFilenameAndOwnerId(
-						file.getName(), patientId);
+						file.getOriginalFilename(), patientId);
 				
 				/* We use file entries cache because it's possible that 
 				 * file upload is divided into 2 or more subsequent method calls.
@@ -198,7 +198,7 @@ public class PatientAccountController {
 				 * save the file entry quickly enough so that it can be 
 				 * found during the second call. */
 				
-				UserFilename soughtFileEntry = new UserFilename(patientId, file.getName());
+				UserFilename soughtFileEntry = new UserFilename(patientId, file.getOriginalFilename());
 				FileEntry cachedFileEntry = cachedFileEntries.getIfPresent(soughtFileEntry);
 				
 				FileEntry fileEntry = (foundEntries.size() > 0)
@@ -207,7 +207,7 @@ public class PatientAccountController {
 						? cachedFileEntry
 						: new FileEntry();
 					
-				fileEntry.setName(file.getName());
+				fileEntry.setName(file.getOriginalFilename());
 				fileEntry.setUploadTime(
 						Timestamp.valueOf(
 								LocalDateTime.now()));

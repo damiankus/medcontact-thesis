@@ -13,7 +13,7 @@
 			        	<button id="call-btn" class="glyphicon glyphicon-earphone btn-lg btn-success" 
 			        		title="Zadzwoń" type="button" value="call"></button>
 						<button id="disconnect-btn" class="glyphicon glyphicon-phone-alt btn-lg btn-danger" 
-							title="Zakończ rozmowę" type="button" value="disconnect"></button>
+							title="Zakończ rozmowę" type="button" value="disconnect" disabled></button>
 				        
 			        	<div id="utilityControls" class="pull-right">
 							<button id="mute-btn" class="glyphicon glyphicon-volume-up btn-lg btn-default" 
@@ -29,47 +29,52 @@
 			</div>
 		</div>
 		
-		<div class="row">
-			<div class="media well">
-				<div class="media-left">
-					<img class="media-object profile-image" src="http://jennstrends.com/wp-content/uploads/2013/10/bad-profile-pic-2.jpeg" title="Zdjęcie rozmówcy" alt="Zdjęcie rozmówcy"/>
+				<div class="row well">
+				<div class="btn-group col-md-4 col-md-offset-4">
+				  <button id="tab-chat-btn" type="button" class="btn btn-success col-md-4" ng-click="showTab('tab-chat')">
+				  	<h5>
+								<span class="glyphicon glyphicon-envelope"></span>
+								Chat
+						</h5>
+				  </button>
+	 				<button id="tab-files-btn" type="button" class="btn btn-default col-md-4" ng-click="showTab('tab-files')">
+	 					<h5>
+								<span class="glyphicon glyphicon-file"></span>
+								Pliki
+						</h5>
+	 				</button>
+					<button id="tab-notes-btn" type="button" class="btn btn-default col-md-4" ng-click="showTab('tab-notes')">
+						<h5>
+								<span class="glyphicon glyphicon-pencil"></span>
+								Notatki
+						</h5>
+					</button>
 				</div>
-				<div class="media-body">
-					<div class="input-group">
-						<label class="">Rozmówca:</label>
-						<span class="" th:text="${user.name}"> Jan Kowalski</span>
+				
+				<div id="tabs" class="col-md-12">
+					<div id="tab-chat">
+						<div id="chat-messages" class="row well col-md-8 col-md-offset-2 pre-scrollable">
+						
+						</div>
+						
+						<div id="chat-input" class="row col-md-8 col-md-offset-2">
+							<div class="input-group">
+								<textarea id="chat-input-text" rows="1" class="form-control" placeholder="wiadomość"></textarea>
+								<span class="input-group-btn">
+									<button id="chat-input-submit" class="btn btn btn-success"> Wyślij</button>
+								</span>
+							</div>
+						</div>
 					</div>
-					<div class="input-group">
-						<label class="">Czas trwania rozmowy:</label>
-						<span id="consultation-duration" class=""> 0:00</span>
+					
+					<div id="tab-files" class="collapse">
+						files
+					</div>
+					<div id="tab-notes" class="collapse">
+						notes
 					</div>
 				</div>
-			</div>	
 		</div>
 		
-		<div class="row">
-			<div class="well">
-				<ul class="nav nav-tabs" role="tablist">
-					<li class="active">
-						<a href="#chat">
-							<span class="glyphicon glyphicon-envelope"></span>
-							Chat
-						</a>
-					</li>
-					<li>
-						<a href="#chat">
-							<span class="glyphicon glyphicon-file"></span>
-							Pliki
-						</a>
-					</li>
-					<li>
-						<a href="#chat">
-							<span class="glyphicon glyphicon-info-sign"></span>
-							Informacje
-						</a>
-					</li>
-				</ul>
-			</div>
-		</div>
 	</div>
 </body>
