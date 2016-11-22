@@ -9,33 +9,16 @@
 	height: auto;
 }
 
-#videosSection {
-	display: flex;
-}
-
-#localVideoWrapper {
-	bottom: 0;
-	right: 0;
-	width: 30%;
-	height: auto;
-}
-
 #localVideo {
-	width: 100%;
-	height: auto;
 	border-radius: 5px;
-	margin-left: 2%;
-}
-
-#remoteVideos {
-	width 90%;
+	width: 100%;
 	height: auto;
 }
 
 #remoteVideos video {
+	border-radius: 5px;
 	width: 100%;
 	height: auto;
-	border-radius: 5px;
 }
 
 #volume-level-range {

@@ -225,7 +225,7 @@ public class DoctorDataController {
 			HttpServletResponse response) 
 					throws UnauthorizedUserException, IOException {
 		
-//		if (entitlementValidator.isEntitled(doctorId, Doctor.class)) {
+		if (entitlementValidator.isEntitled(doctorId, Doctor.class)) {
 			SharedFile sharedFile = sharedFileRepository.findOne(sharedFileId);
 			System.out.println("\n\n\n" + sharedFileId + "\n\n\n");
 			
@@ -263,15 +263,15 @@ public class DoctorDataController {
 					}
 				}
 			}
-//		}
+		}
 	}
 	
 	@GetMapping(value="{id}/reservations/{reservationId}/sharedFiles")
-	public List<FileEntry> shareFile(
+	public List<FileEntry> getSharedFiles(
 			@PathVariable("id") Long doctorId,
 			@PathVariable("reservationId") Long reservationId) throws UnauthorizedUserException {
 		
-//		if (entitlementValidator.isEntitled(doctorId, Doctor.class)) {
+		if (entitlementValidator.isEntitled(doctorId, Doctor.class)) {
 			Reservation reservation = reservationRepository.findOne(reservationId);
 			
 			if (reservation == null) {
@@ -296,13 +296,13 @@ public class DoctorDataController {
 						})
 						.collect(Collectors.toList());
 			}
-//		} 
+		} 
 
 		/* This line should never be reached but 
 		 * the IDE complains about no return statement so
 		 * it has to be here anyway. */
 		
-//		return new ArrayList<>();
+		return new ArrayList<>();
 	}
 	
 	@PostMapping("{id}/available/set/{isAvailable}")

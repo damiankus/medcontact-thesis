@@ -2,28 +2,28 @@
 
 	<div class="container">
 		<div class="row">
-			<div class="well">
-					<div id="videosSection">
-				        <div id="remoteVideos"></div>
-				        <div id="localVideoWrapper">
-					        <video id="localVideo" class="videoWindow"></video>
+			<div class="well clearfix">
+					<div id="videosSection" class="row col-md-12 col-lg-12">
+				        <div id="remoteVideos" class="col-md-6 col-lg-6"></div>
+				        <div id="localVideoWrapper" class="col-md-6 col-lg-6">
+					        <video id="localVideo" volume="0.3" class="videoWindow"></video>
 				        </div>
 			    	</div>
-			        <div id="controlButtons">
+			        <div id="controlButtons" class="col-md-12 col-lg-12">
 			        	<button id="call-btn" class="glyphicon glyphicon-earphone btn-lg btn-success" 
 			        		title="Zadzwoń" type="button" value="call"></button>
-						<button id="disconnect-btn" class="glyphicon glyphicon-phone-alt btn-lg btn-danger" 
-							title="Zakończ rozmowę" type="button" value="disconnect" disabled></button>
-			        
+								<button id="disconnect-btn" class="glyphicon glyphicon-phone-alt btn-lg btn-danger" 
+									title="Zakończ rozmowę" type="button" value="disconnect" disabled></button>
+					        
 			        	<div id="utilityControls" class="pull-right">
-							<button id="mute-btn" class="glyphicon glyphicon-volume-up btn-lg btn-default" 
-								title="Poziom głośności" type="button"></button>
-						    <input id="volume-level-range" type="range" min="0" step="1" max="100" value="50"/>
-					        		
-							<button id="screenshot-btn" class="glyphicon glyphicon-camera btn-lg btn-default" 
-								title="Przechwyć obraz" type="button"></button>
-							<button id="fullscreen-btn" class="glyphicon glyphicon-fullscreen btn-lg btn-default" 
-								title="Otwórz w pełnym oknie" type="button"></button>
+									<button id="mute-btn" class="glyphicon glyphicon-volume-up btn-lg btn-default" 
+										title="Poziom głośności" type="button"></button>
+								    <input id="volume-level-range" type="range" min="0" step="1" max="100" value="50"/>
+							        		
+									<button id="screenshot-btn" class="glyphicon glyphicon-camera btn-lg btn-default" 
+										title="Przechwyć obraz" type="button"></button>
+									<button id="fullscreen-btn" class="glyphicon glyphicon-fullscreen btn-lg btn-default" 
+										title="Otwórz w pełnym oknie" type="button"></button>
 			        	</div>
 			        </div>
 			</div>
@@ -52,10 +52,8 @@
 				</div>
 				
 				<div id="tabs" class="col-md-12">
-					<div id="tab-chat">
-						<div id="chat-messages" class="row well col-md-8 col-md-offset-2 pre-scrollable">
-						
-						</div>
+					<div id="tab-chat" class="tab">
+						<div id="chat-messages" class="row well col-md-8 col-md-offset-2 pre-scrollable"></div>
 						
 						<div id="chat-input" class="row col-md-8 col-md-offset-2">
 							<div class="input-group">
@@ -67,8 +65,41 @@
 						</div>
 					</div>
 					
-					<div id="tab-files" class="collapse">
-						files
+					<div id="tab-files" class="collapse tab">
+						<div id="files-table-wrapper" class="well col-md-8 col-md-offset-2 pre-scrollable"">
+							<h4>Udostępnione pliki</h4>
+							<table id="files-table" class="table table-hover">
+								<thead>
+									<tr>
+									
+										<th ng-click="sortField = 'name'; sortReversed = !sortReversed" class="col-md-4">
+											Nazwa pliku 
+											<span ng-show="sortField == 'name' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
+											<span ng-show="sortField == 'name' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
+										</th>
+										
+										<th ng-click="sortField = 'contentType'; sortReversed = !sortReversed" class="col-md-2">
+											 Typ pliku
+											<span ng-show="sortField == 'contentType' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
+											<span ng-show="sortField == 'contentType' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
+										</th>
+										
+										<th class="col-md-3">Opcje</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="file in files | orderBy:sortField:sortReversed">
+										<td>{{ file.name }}</td>
+										<td>{{ file.contentType }}</td>
+										
+										<td ng-attr-id="toolbar-{{ file.id }}" class="btn-toolbar">
+											<a ng-href="{{ file.url }}"><button class="btn btn-md btn-success"> Pobierz</button></a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						
 					</div>
 					<div id="tab-notes" class="collapse">
 						notes

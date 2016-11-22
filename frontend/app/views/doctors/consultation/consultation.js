@@ -33,8 +33,37 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     $scope.webrtc = {};
     var remotes = {
        	 volume: 0.5
-   };
+    };
     var peerConnectionConfig;
+    
+    /*
+     * Rendering shared files
+     * */
+    
+	$scope.sortField = "name";
+	$scope.sortReversed = true;
+
+	/* Load file info from the server */
+	
+	$scope.getSharedFiles = function() {
+		$http.get(REST_API + "doctors/" + $rootScope.userDetails.id 
+				+ "/reservations/" + $scope.callingPatient.reservation.id 
+				+ "/sharedFiles")
+				
+		.then(function successCallback(response) {
+			$scope.files = response.data;
+			$scope.files.forEach(function (item) {
+				item.uploadTime = new Date(item.uploadTime);
+			});
+			
+		}, function errorCallback(response) {
+			console.log("[ERROR]: " + response);
+		});
+	}
+	
+	/* 
+	 * Connection logic
+	 * */
     
     function connect() {
     	$scope.webrtc.joinRoom($scope.connectionDetails.room);
@@ -63,13 +92,15 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 				$("#calling-patient-id").text($scope.callingPatient.id);
 				$("#calling-patient-name").text($scope.callingPatient.name);
 				
-				var startTime = new Date($scope.callingPatient.startTime);
+				var startTime = new Date($scope.callingPatient.reservation.startDateTime);
 				startTime = "" + ((startTime.getHours() > 9) ? startTime.getHours() : "0" + startTime.getHours()) 
 					+ ":" + ((startTime.getMinutes() > 9) ? startTime.getMinutes() : "0" + startTime.getMinutes());
+				
 				$("#calling-patient-start").text(startTime);
 				
 				$("#accept-btn").click(function () {
 					sendCallRequestResponse("ACCEPTED");
+					$scope.getSharedFiles();
 					dialog.modal("hide");
 //					ringTone.pause();
 				});
@@ -88,7 +119,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     
     function initListeners(peerConnectionConfig) {
 
-        /* list of available STUN/TURN servers has been obtained
+        /* A list of available STUN/TURN servers has been obtained
          * now we will create a Simple$scope.webrtc instantion based on
          * the received configuration data. */
 
@@ -165,7 +196,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
                 $("#volume-level-range").val(0);
             }
             
-            setRemoteVolumeLevel(remotes.volume);
+            $scope.webrtc.setVolumeForAll(remotes.volume);
         });
 
         /* Note that the input of the slider is an integer
@@ -268,11 +299,11 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 
     function disconnect() {
         if ($scope.subscription && $scope.webrtc !== "undefined") {
+        	setAvailability(false);
         	$scope.subscription.unsubscribe();
         	$scope.stompClient.disconnect();
             stopTransmission();
             $scope.webrtc.leaveRoom();
-            setAvailability(false);
             
             console.log("Disconnected from: [" + $scope.connectionDetails.room + "]");
         }
@@ -281,7 +312,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     function updateVolumeLevel() {
     	var muteBtn = $("#mute-btn");
         remotes.volume = $("#volume-level-range").val() / 100.0;
-        setRemoteVolumeLevel(remotes.volume);
+        $scope.webrtc.setVolumeForAll(remotes.volume);
         
         if (remotes.volume > 0
         		&& muteBtn.hasClass("glyphicon-volume-off")) {
@@ -295,14 +326,6 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
             muteBtn.removeClass("glyphicon-volume-up");
             muteBtn.addClass("glyphicon-volume-off");
         }
-    }
-    
-    function setRemoteVolumeLevel(volume) {
-    	console.log("Volume changed to: " + remotes.volume);
-    	
-    	$("#remoteVideos video").each(function (index, element) {
-    		$(element).attr("volume", volume);
-    	});
     }
     
     function addMessage(sender, content, bgClass) {
@@ -365,4 +388,5 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     	
     	$("#chat-input-submit").click(sendTextMessage);
     }
+    
 }]);

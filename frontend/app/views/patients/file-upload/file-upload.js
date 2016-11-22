@@ -27,7 +27,7 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 	            });
 		}
 		
-//		$scope.sortField = "uploadTime";
+		$scope.sortField = "uploadTime";
 		$scope.sortReversed = true;
 		$scope.fileServiceUrl = REST_API + "patients/" + $rootScope.userDetails.id + "/files";
 	

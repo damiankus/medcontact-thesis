@@ -9,6 +9,9 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
   function (REST_API, $rootScope, $scope, $http, $location, UserService) {
+	
+	console.log($rootScope.reservation);
+	
 	if ($rootScope.reservation == undefined
 			|| $rootScope.reservation == null) {
 		$location.url("/reservation");
@@ -62,7 +65,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         		{}, JSON.stringify({
         			id: $rootScope.userDetails.id,
         			name: $rootScope.userDetails.firstName + " " + $rootScope.userDetails.lastName,
-        			startTime: $rootScope.reservation.startDateTime
+        			reservation: $rootScope.reservation
         		}));
     }
     
@@ -162,7 +165,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
                 $("#volume-level-range").val(0);
             }
             
-            setRemoteVolumeLevel(remotes.volume);
+            $scope.webrtc.setVolumeForAll(remotes.volume);
         });
 
         /* Note that the input of the slider is an integer
@@ -268,8 +271,8 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     	var muteBtn = $("#mute-btn");
     	remotes.volume = $("#volume-level-range").val() / 100.0;
 
-        setRemoteVolumeLevel(remotes.volume);
-        
+    	$scope.webrtc.setVolumeForAll(remotes.volume);
+    	
         if (remotes.volume > 0
         		&& muteBtn.hasClass("glyphicon-volume-off")) {
             $scope.webrtc.unmute();
@@ -282,14 +285,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
             muteBtn.removeClass("glyphicon-volume-up");
             muteBtn.addClass("glyphicon-volume-off");
         }
-    }
-    
-    function setRemoteVolumeLevel(volume) {
-        console.log("Volume changed to: " + remotes.volume);
-        
-    	$("#remoteVideos video").each(function (index, element) {
-    		$(element).attr("volume", volume);
-    	});
     }
     
     function addMessage(sender, content, bgClass) {

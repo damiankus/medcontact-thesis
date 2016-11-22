@@ -18,10 +18,12 @@ public class BasicUserEntitlementValidator implements EntitlementValidator {
                 .getAuthentication()
                 .getPrincipal();
 		
-        if (!(userType.isInstance(principal))
-                || (!((BasicUser) principal).getId().equals(userId))) {
+        if (!userType.isInstance(principal)) {
 
-            logger.warning("An attempt to upload a file without authorization detected - " + principal.toString());
+            logger.warning("Invalid role: " + principal.toString());
+            throw new UnauthorizedUserException();
+        } else if (!((BasicUser) principal).getId().equals(userId)) {
+            logger.warning("Invalid ID: " + principal.toString());
             throw new UnauthorizedUserException();
         }
 

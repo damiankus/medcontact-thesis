@@ -21,7 +21,7 @@
 	padding: 5%;
 }
 
-#tab-chat {
+.tab {
 	margin: 1%;
 }
 
@@ -79,4 +79,9 @@ th:hover {
 
 .btn-toolbar button {
 	margin-right: 2px;
+}
+
+#files-table-wrapper {
+	overflow: auto;
+	min-height: 274px;
 }

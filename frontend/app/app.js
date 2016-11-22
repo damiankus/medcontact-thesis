@@ -41,12 +41,6 @@ var myApp = angular.module('myApp', ['ngRoute'])
             }
         }
 
-        accessor.updateScope = function (scope) {
-            for (var prop in user) {
-                scope.user[prop] = user[prop];
-            }
-        };
-        
         accessor.getUserOrRedirect = function (location, url) {
         	var user = accessor.getUser();
         	
