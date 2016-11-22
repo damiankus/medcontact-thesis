@@ -23,7 +23,34 @@
 
 #volume-level-range {
 	display:inline-block;
-    vertical-align:middle;
+  vertical-align:middle;
 	width: auto;
 }
 
+ul {
+  list-style-type: none;
+}
+
+.tab {
+	margin: 1%;
+}
+
+.tab-panel {
+	padding: 2% 3% 2% 3%;
+	font-size: 16px;
+}
+
+
+
+.tab-panel-row {
+	margin-top: 2%;
+}
+
+.tab-panel-label {
+	font-size: 16px;
+	font-weight: normal !important;
+}
+
+#tab-doctor-info {
+	overflow: auto;
+}

@@ -7,8 +7,8 @@ myApp.config(['$routeProvider', function ($routeProvider) {
     });
 }]);
 
-myApp.controller('ReservationCtrl', ['REST_API', 'WS_ENDPOINT', '$rootScope', '$scope', '$http', '$location', 'UserService',
-    function (REST_API, WS_ENDPOINT, $rootScope, $scope, $http, $location, UserService) {
+myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService',
+    function (REST_API, $rootScope, $scope, $http, $location, UserService) {
 		$rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
 	
 		/* Warning: 

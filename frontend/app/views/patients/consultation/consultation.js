@@ -10,49 +10,40 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
   function (REST_API, $rootScope, $scope, $http, $location, UserService) {
 	
-	console.log($rootScope.reservation);
-	
+	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/reservation");
+
 	if ($rootScope.reservation == undefined
 			|| $rootScope.reservation == null) {
 		$location.url("/reservation");
 	}
 	
-	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/reservation");
-	initControlls();
-	
-	$scope.showTab = function (tabId) {
-		$("#" + tabId).removeClass("btn-default").addClass("btn-success")
-			.siblings()
-				.removeClass("btn-success")
-				.addClass("btn-default");
-	};
-	
 	$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/connection/" + $rootScope.reservation.id)
-	    .then(function successCallback(response) {
-	    	$scope.connectionDetails = response.data;
-	    	
-	    	if ($scope.connectionDetails === undefined
-	        		|| $scope.connectionDetails === null) {
-	            alert("[ERROR]: Invalid connection data");
-	            $location.url("/login");
-
-	        } else {
-	        	$("#call-btn").click(function () {
-        			$(this).prop("disabled", true);
+		.then(function successCallback(response) {
+			$scope.connectionDetails = response.data;
+			
+			if ($scope.connectionDetails === undefined
+					|| $scope.connectionDetails === null) {
+				alert("[ERROR]: Invalid connection data");
+				$location.url("/login");
+				
+			} else {
+				$("#call-btn").click(function () {
+					$(this).prop("disabled", true);
 					
 					setTimeout(function () {
 						$(this).prop("disabled", false);
 					}, 5000);
-	        		subscribe(notifyDoctor);
-	        	});
-	            peerConnectionConfig = getCredentials(initListeners);
-	        }
-	    	
-	    }, function errorCallback(response) {
-	    	alert("[ERROR]: Couldn't load connection data");
-	    	$location.url("/login");
-	    });
-	    	
+					subscribe(notifyDoctor);
+				});
+				peerConnectionConfig = getCredentials(initListeners);
+			}
+			
+		}, function errorCallback(response) {
+			alert("[ERROR]: Couldn't load connection data");
+			$location.url("/login");
+		});
+	
+	initTabControls();
 	
     $scope.webrtc = {};
     var remotes = {
@@ -138,7 +129,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         
         $scope.webrtc.connection.on("message", function(message){
     		if (message.type === "chat") {
-    			addMessage(message.payload.sender, message.payload.content, "bg-primary");
+    			addMessage(message.payload.sender, message.payload.content, "btn-success");
     		}
         });
         
@@ -320,11 +311,11 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 				content: content
 			})
 			textInput.val("");
-			addMessage($rootScope.userDetails.name, content, "btn-success");
+			addMessage($rootScope.userDetails.name, content, "btn-default");
 		}
 	}
     
-    function initControlls() {
+    function initTabControls() {
     	$scope.showTab = function (tabId) {
     		$("#" + tabId + "-btn").removeClass("btn-default").addClass("btn-success")
     			.siblings()
@@ -346,6 +337,20 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     	});
     	
     	$("#chat-input-submit").click(sendTextMessage);
+    	
+    	/* 
+    	 * Load doctor info
+    	 *  */
+    	
+    	$http.get(REST_API + "doctors/" + $rootScope.reservation.doctorId + "/info")
+			.then(function successCallback(response) {
+				$scope.doctorInfo = response.data;
+				console.log(response.data);
+				
+			}, function errorCallback(response) {
+				alert("[ERROR]: Couldn't load doctor info");
+				$location.url("/login");
+			});
     }
     
 }]);

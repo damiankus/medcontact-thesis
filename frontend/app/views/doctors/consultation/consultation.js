@@ -160,7 +160,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         
         $scope.webrtc.connection.on("message", function(message){
     		if (message.type === "chat") {
-    			addMessage(message.payload.sender, message.payload.content, "bg-primary");
+    			addMessage(message.payload.sender, message.payload.content, "btn-success");
     		}
         });
         
@@ -360,7 +360,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 				sender: $rootScope.userDetails.firstName + " " + $rootScope.userDetails.lastName,
 				content: content
 			})
-			addMessage($rootScope.userDetails.name, content, "btn-success");
+			addMessage($rootScope.userDetails.name, content, "btn-default");
 			textInput.val("");
 		}
 	}

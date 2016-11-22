@@ -105,6 +105,20 @@ public class DoctorDataController {
 	private PasswordEncoder passwordEncoder;
 	
 	
+	@GetMapping("{id}/info")
+	public BasicDoctorDetails getDoctorInfo(
+			@PathVariable("id") Long doctorId) throws IllegalArgumentException {
+		
+		Doctor doctor = doctorRepository.findOne(doctorId);
+		
+		if (doctor == null) {
+			throw new IllegalArgumentException();
+			
+		} else {
+			return new BasicDoctorDetails(doctor);
+		}
+	}
+	
 	@GetMapping("{doctorId}/connection")
     public ResponseEntity<ConnectionData> getConnectionData(
             @PathVariable("doctorId") Long doctorId) throws UnauthorizedUserException {
