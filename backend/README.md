@@ -86,7 +86,7 @@ repozytorium git i dodajmy zdalne repozytorium heroku
    
 ```
 git init
-heroku git:remote -a medcontact
+heroku git:remote -a medcontact-api <- nazwa aplikacji
 ```
 
 * dodajemy pliki projektu do repozytorium
