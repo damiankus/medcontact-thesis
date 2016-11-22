@@ -1,11 +1,19 @@
 package com.medcontact.controller;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,16 +36,24 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.domain.FileEntry;
+import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.domain.ScheduleTimeSlot;
+import com.medcontact.data.model.domain.SharedFile;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.ScheduleShortData;
 import com.medcontact.data.repository.BasicUserRepository;
 import com.medcontact.data.repository.DoctorRepository;
+import com.medcontact.data.repository.ReservationRepository;
+import com.medcontact.data.repository.SharedFileRepository;
 import com.medcontact.data.validation.DoctorValidator;
 import com.medcontact.data.validation.ValidationResult;
 import com.medcontact.exception.UnauthorizedUserException;
 import com.medcontact.security.config.EntitlementValidator;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @RestController
 @RequestMapping("doctors")
@@ -45,6 +61,11 @@ public class DoctorDataController {
 	private Logger logger = Logger.getLogger(DoctorDataController.class.getName());
 	private DoctorValidator doctorValidator = new DoctorValidator();
 
+    @Getter
+    @Setter
+    @Value("${general.host}")
+    private String host;
+	
 	@Autowired
 	private SimpMessagingTemplate brokerMessagingTemplate;
 	
@@ -53,6 +74,12 @@ public class DoctorDataController {
 	
 	@Autowired 
 	DoctorRepository doctorRepository;
+	
+    @Autowired
+    private ReservationRepository reservationRepository;
+    
+    @Autowired
+    private SharedFileRepository sharedFileRepository;
 	
     @Autowired
     private EntitlementValidator entitlementValidator;
@@ -175,7 +202,10 @@ public class DoctorDataController {
 
 	@PostMapping(value = "{id}/schedules")
 	@ResponseStatus(value = HttpStatus.CREATED, reason = "Schedule added.")
-	public void saveDoctorSchedule(@RequestBody ScheduleShortData schedule, @PathVariable("id") Long id) {
+	public void saveDoctorSchedule(
+			@RequestBody ScheduleShortData schedule,
+			@PathVariable("id") Long id) {
+		
 		Doctor doctor = doctorRepository.findOne(id);
 		ScheduleTimeSlot scheduleTimeSlot = new ScheduleTimeSlot(doctor, schedule.getStart(), schedule.getEnd());
 		doctor.addSchedule(scheduleTimeSlot);
@@ -188,24 +218,91 @@ public class DoctorDataController {
 		return doctorRepository.findOne(id).getWeeklySchedule();
 	}
 	
-	@GetMapping("{id}/available/toggle")
-	@ResponseBody
-	public boolean toggleDoctorAvailable(@PathVariable("id") Long id) throws MessagingException, UnauthorizedUserException {
-		Doctor doctor = doctorRepository.findOne(id);
+	@GetMapping(value="{id}/sharedFiles/{sharedFileId}")
+	public void getSharedFile(
+			@PathVariable("id") Long doctorId,
+			@PathVariable("sharedFileId") Long sharedFileId,
+			HttpServletResponse response) 
+					throws UnauthorizedUserException, IOException {
 		
-		if (doctor != null 
-				&& entitlementValidator.isEntitled(id, Doctor.class)) {
+//		if (entitlementValidator.isEntitled(doctorId, Doctor.class)) {
+			SharedFile sharedFile = sharedFileRepository.findOne(sharedFileId);
+			System.out.println("\n\n\n" + sharedFileId + "\n\n\n");
 			
-			doctor = doctorRepository.findOne(id);
-			doctor.toggleAvailability();
-			doctorRepository.save(doctor);
-			boolean isAvailable = doctor.isAvailable();
-			logger.info("Doctor [" + id + "] availability status has changed to: " 
-					+ ("" + doctor.isAvailable()).toUpperCase());
-			brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/available", "" + isAvailable);
-		}
+			if (sharedFile == null) {
+				throw new UnauthorizedUserException();
+				
+			} else {
+				Reservation reservation = sharedFile.getReservation();
+				LocalDateTime now = LocalDateTime.now();
+				
+				if (!doctorId.equals(reservation.getDoctor().getId())) {
+					throw new UnauthorizedUserException();
+					
+				} else if (now.isBefore(reservation.getStartDateTime())
+						|| now.isAfter(reservation.getEndDateTime())) {
+					
+					throw new UnauthorizedUserException();
+					
+				} else {
+					
+					FileEntry fileEntry = sharedFile.getFileEntry();
+					
+					if (fileEntry != null) {
+						response.setContentType(fileEntry.getContentType());
+						response.setContentLengthLong(fileEntry.getContentLength());
+						response.setHeader(
+								"Content-Disposition",
+							     String.format("attachment; filename=\"%s\"",
+							                fileEntry.getName()));
+								
+						try (OutputStream out = response.getOutputStream();) {
+							Files.copy(
+									Paths.get(fileEntry.getPath()),out);
+						}
+					}
+				}
+			}
+//		}
+	}
+	
+	@GetMapping(value="{id}/reservations/{reservationId}/sharedFiles")
+	public List<FileEntry> shareFile(
+			@PathVariable("id") Long doctorId,
+			@PathVariable("reservationId") Long reservationId) throws UnauthorizedUserException {
 		
-		return (doctor != null) ? doctor.isAvailable() : false;
+//		if (entitlementValidator.isEntitled(doctorId, Doctor.class)) {
+			Reservation reservation = reservationRepository.findOne(reservationId);
+			
+			if (reservation == null) {
+				throw new UnauthorizedUserException();
+				
+			} else if (!doctorId.equals(reservation.getDoctor().getId())) {
+				throw new UnauthorizedUserException();
+				
+			}else {
+				
+				/* Note that we replace the original 
+				 * fileEntry ID and URL with ID of the SharedFile
+				 * object. We will use it in the /sharedFiles/{sharedFileId} 
+				 * endpoint. */
+				
+				return sharedFileRepository.findByReservationId(reservationId)
+						.stream()
+						.map(s -> {
+							s.getFileEntry().setId(s.getId());
+							s.getFileEntry().setUrl(host + "doctors/" + doctorId + "/sharedFiles/" + s.getId());
+							return s.getFileEntry();
+						})
+						.collect(Collectors.toList());
+			}
+//		} 
+
+		/* This line should never be reached but 
+		 * the IDE complains about no return statement so
+		 * it has to be here anyway. */
+		
+//		return new ArrayList<>();
 	}
 	
 	@PostMapping("{id}/available/set/{isAvailable}")

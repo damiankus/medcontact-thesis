@@ -22,25 +22,25 @@
 				<thead>
 					<tr>
 					
-						<th ng-click="sortField = 'name'; sortReversed = !sortReversed">
+						<th ng-click="sortField = 'name'; sortReversed = !sortReversed" class="col-md-4">
 							Nazwa pliku 
 							<span ng-show="sortField == 'name' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 							<span ng-show="sortField == 'name' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 						</th>
 						
-						<th ng-click="sortField = 'uploadTime'; sortReversed = !sortReversed">
+						<th ng-click="sortField = 'uploadTime'; sortReversed = !sortReversed" class="col-md-3">
 							Data przesłania
 							<span ng-show="sortField == 'uploadTime' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 							<span ng-show="sortField == 'uploadTime' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 						</th>
 						
-						<th ng-click="sortField = 'contentType'; sortReversed = !sortReversed">
+						<th ng-click="sortField = 'contentType'; sortReversed = !sortReversed" class="col-md-2">
 							 Typ pliku
 							<span ng-show="sortField == 'contentType' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 							<span ng-show="sortField == 'contentType' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 						</th>
 						
-						<th>Opcje</th>
+						<th class="col-md-3">Opcje</th>
 					</tr>
 				</thead>
 				<tbody>

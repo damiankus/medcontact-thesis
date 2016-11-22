@@ -26,7 +26,7 @@ import lombok.ToString;
 @Entity
 @Table(name="files")
 @Data
-@ToString(exclude="fileOwner")
+@ToString(exclude={"fileOwner", "sharedFiles"})
 
 public class FileEntry {
 	

@@ -30,7 +30,7 @@ import lombok.ToString;
 @Table(name="doctors")
 @DiscriminatorValue("DOCTOR")
 @Data
-@ToString(exclude={"opinions", "reservations", "weeklySchedule", "notes", "sharedFiles"})
+@ToString(exclude={"opinions", "reservations", "weeklySchedule", "notes"})
 
 /* This annotations prevents the lombok library
  * from calling the superclass' equals and hashCode 
@@ -89,9 +89,6 @@ public class Doctor extends BasicUser {
 	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<Note> notes;
 
-	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	private List<SharedFile> sharedFiles;
-	
 	/* Setting default values. */
 	
 	public Doctor() {

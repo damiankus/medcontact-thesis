@@ -76,3 +76,7 @@
 th:hover {
 	cursor: pointer;
 }
+
+.btn-toolbar button {
+	margin-right: 2px;
+}

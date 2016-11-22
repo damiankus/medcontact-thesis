@@ -41,16 +41,19 @@ import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.domain.ScheduleTimeSlot;
+import com.medcontact.data.model.domain.SharedFile;
 import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.NewReservation;
 import com.medcontact.data.model.dto.PersonalDataPassword;
+import com.medcontact.data.model.dto.SharedFileDetails;
 import com.medcontact.data.model.dto.UserFilename;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
 import com.medcontact.data.repository.ScheduleRepository;
+import com.medcontact.data.repository.SharedFileRepository;
 import com.medcontact.exception.UnauthorizedUserException;
 import com.medcontact.security.config.EntitlementValidator;
 
@@ -90,8 +93,12 @@ public class PatientAccountController {
     private ScheduleRepository scheduleRepository;
     
     @Autowired
+    private SharedFileRepository sharedFileRepository;
+    
+    @Autowired
     private EntitlementValidator entitlementValidator;
 
+    
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -283,6 +290,40 @@ public class PatientAccountController {
 				try (OutputStream out = response.getOutputStream();) {
 					Files.copy(
 							Paths.get(fileEntry.getPath()),out);
+				}
+			}
+		}
+	}
+	
+	@PostMapping(value="{id}/sharedFiles")
+	public void shareFile(
+			@PathVariable("id") Long patientId,
+			@RequestBody SharedFileDetails sharedFileDetails) throws UnauthorizedUserException {
+		
+		if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+			Reservation reservation = reservationRepository.findOne(sharedFileDetails.getReservationId());
+			
+			if (reservation == null) {
+				throw new UnauthorizedUserException();
+				
+			} else if (!patientId.equals(reservation.getPatient().getId())) {
+				throw new UnauthorizedUserException();
+				
+			} else {
+				
+				FileEntry fileEntry = fileRepository.findOne(sharedFileDetails.getFileEntryId());
+				
+				if (fileEntry == null) {
+					throw new UnauthorizedUserException();
+					
+				} else {
+					SharedFile sharedFile = new SharedFile();
+					sharedFile.setReservation(reservation);
+					sharedFile.setFileEntry(fileEntry);
+					
+					reservation.getSharedFiles().add(sharedFile);
+					sharedFileRepository.save(sharedFile);
+					reservationRepository.save(reservation);
 				}
 			}
 		}

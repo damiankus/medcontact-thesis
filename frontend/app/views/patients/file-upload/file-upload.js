@@ -54,7 +54,9 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 				.fadeOut()
 				.delay(500);
 			
-			$(parent).remove($(child));
+			setTimeout(function () {
+				child.remove();
+			}, 1500);
 		}
 		
 		$scope.indicateSuccess = function (selector) {
@@ -154,7 +156,7 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 						"Content-Type": "application/json"
 					},
 					data: {
-						fileId: fileId,
+						fileEntryId: fileId,
 						reservationId: reservationId
 					}
 				})
