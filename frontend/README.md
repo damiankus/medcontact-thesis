@@ -24,7 +24,7 @@ backendowa (np. https://medcontact-api.herokuapp.com).
 Kolejnym krokiem jest utworzenie aplikacji Heroku. W linii poleceń wykonujmy polecenie:
 
 ```
-heroku create medcontact-api
+heroku create medcontact
 ```
 
 Od tej chwili aplikacja będzie widoczna w [panelu użytkownika](https://id.heroku.com/login).
