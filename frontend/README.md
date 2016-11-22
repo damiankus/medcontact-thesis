@@ -20,6 +20,18 @@ przy każdym zdalnym uruchomieniu aplikacji.
 Dodatkowo należy w pliku __app/app.js__ przypisać do stałej __REST_API__ adres, pod którym dostępna jest część  
 backendowa (np. https://medcontact-api.herokuapp.com). 
 
+```
+var myApp = angular.module('myApp', ['ngRoute'])
+    .constant('REST_API', "https://medcontact-api.herokuapp.com/")
+    .config(['$locationProvider', '$routeProvider', '$httpProvider',
+        function ($locationProvider, $routeProvider, $httpProvider) {
+            $locationProvider.hashPrefix('!');
+            $routeProvider.otherwise({redirectTo: '/login'});
+            $httpProvider.defaults.withCredentials = true;
+        }]
+    )
+```
+
 ### Utworzenie aplikacji Heroku
 Kolejnym krokiem jest utworzenie aplikacji Heroku. W linii poleceń wykonujmy polecenie:
 
