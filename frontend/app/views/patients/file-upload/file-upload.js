@@ -17,7 +17,7 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 		if ($scope.reservations === undefined
 				|| $scope.reservations == null) {
 			
-			$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/current-reservations")
+			$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations")
 				.then(function successCallback(response) {
 					$scope.reservations	 = response.data;
 					console.log($scope.reservations);

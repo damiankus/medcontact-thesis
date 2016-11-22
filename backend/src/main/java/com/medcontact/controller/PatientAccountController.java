@@ -1,5 +1,25 @@
 package com.medcontact.controller;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.medcontact.data.model.domain.*;
+import com.medcontact.data.model.dto.*;
+import com.medcontact.data.model.enums.ReservationState;
+import com.medcontact.data.repository.*;
+import com.medcontact.exception.UnauthorizedUserException;
+import com.medcontact.security.config.EntitlementValidator;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.rowset.serial.SerialException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,59 +36,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.rowset.serial.SerialException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.medcontact.data.model.domain.Doctor;
-import com.medcontact.data.model.domain.FileEntry;
-import com.medcontact.data.model.domain.Patient;
-import com.medcontact.data.model.domain.Reservation;
-import com.medcontact.data.model.domain.ScheduleTimeSlot;
-import com.medcontact.data.model.domain.SharedFile;
-import com.medcontact.data.model.dto.BasicReservationData;
-import com.medcontact.data.model.dto.ConnectionData;
-import com.medcontact.data.model.dto.NewReservation;
-import com.medcontact.data.model.dto.PersonalDataPassword;
-import com.medcontact.data.model.dto.SharedFileDetails;
-import com.medcontact.data.model.dto.UserFilename;
-import com.medcontact.data.repository.DoctorRepository;
-import com.medcontact.data.repository.FileRepository;
-import com.medcontact.data.repository.PatientRepository;
-import com.medcontact.data.repository.ReservationRepository;
-import com.medcontact.data.repository.ScheduleRepository;
-import com.medcontact.data.repository.SharedFileRepository;
-import com.medcontact.exception.UnauthorizedUserException;
-import com.medcontact.security.config.EntitlementValidator;
-
-import lombok.Getter;
-import lombok.Setter;
-
 @RestController
 @RequestMapping(value = "patients")
 public class PatientAccountController {
     private Logger logger = Logger.getLogger(this.getClass().getName());
-    
+
     private Cache<UserFilename, FileEntry> cachedFileEntries = CacheBuilder.newBuilder()
-			.expireAfterWrite(2, TimeUnit.MINUTES)
-			.concurrencyLevel(4)
-			.build();
+            .expireAfterWrite(2, TimeUnit.MINUTES)
+            .concurrencyLevel(4)
+            .build();
 
     @Getter
     @Setter
@@ -90,15 +66,12 @@ public class PatientAccountController {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private ScheduleRepository scheduleRepository;
-    
-    @Autowired
     private SharedFileRepository sharedFileRepository;
-    
+
     @Autowired
     private EntitlementValidator entitlementValidator;
 
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -116,10 +89,10 @@ public class PatientAccountController {
 
     @Value("${webrtc.turn.secret}")
     private String turnSecret;
-    
+
     @Autowired
     private DoctorRepository doctorRepository;
-    
+
 
     @GetMapping("{patientId}/connection/{consultationId}")
     public ResponseEntity<ConnectionData> getConnectionData(
@@ -168,21 +141,21 @@ public class PatientAccountController {
             }
         }
 
-        
+
         return new ResponseEntity<>(body, status);
     }
-    
-    @GetMapping(value="{id}/fileEntries")
+
+    @GetMapping(value = "{id}/fileEntries")
     public List<FileEntry> getFileEntries(
-    		@PathVariable("id") Long patientId) throws UnauthorizedUserException {
-    	
-    	if (entitlementValidator.isEntitled(patientId, Patient.class)) {
-    		return patientRepository.findOne(patientId)
-	    		.getFileEntries();
-    				
-    	} else {
-    		return new ArrayList<>();
-    	}
+            @PathVariable("id") Long patientId) throws UnauthorizedUserException {
+
+        if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+            return patientRepository.findOne(patientId)
+                    .getFileEntries();
+
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     @PostMapping(value = "{id}/files")
@@ -192,183 +165,181 @@ public class PatientAccountController {
             throws UnauthorizedUserException, SerialException, SQLException, IOException {
 
         if (entitlementValidator.isEntitled(patientId, Patient.class)) {
-        	
+
         	/* We have to load patient from the repository
              * because using principal object from the
 			 * authentication context causes throwing a lazy 
 			 * loading exception */
-    		
-    		Patient patient = patientRepository.findOne(patientId);
-        	
-			for (MultipartFile file : files) {
-				
-				String filePath = String.format(
-						"%s/%d/%s", 
-						patientFilesPathRoot,
-						patientId,
-						file.getOriginalFilename());
-				
-				String fileUrl = String.format(
-						"%s%s/%d/files/", 
-						host,
-						patientFilesPathRoot,
-						patientId);
-				
-				List<FileEntry> foundEntries = fileRepository.findByFilenameAndOwnerId(
-						file.getOriginalFilename(), patientId);
+
+            Patient patient = patientRepository.findOne(patientId);
+
+            for (MultipartFile file : files) {
+
+                String filePath = String.format(
+                        "%s/%d/%s",
+                        patientFilesPathRoot,
+                        patientId,
+                        file.getOriginalFilename());
+
+                String fileUrl = String.format(
+                        "%s%s/%d/files/",
+                        host,
+                        patientFilesPathRoot,
+                        patientId);
+
+                List<FileEntry> foundEntries = fileRepository.findByFilenameAndOwnerId(
+                        file.getOriginalFilename(), patientId);
 				
 				/* We use file entries cache because it's possible that 
 				 * file upload is divided into 2 or more subsequent method calls.
 				 * Because of that the file entry repository might not be able to 
 				 * save the file entry quickly enough so that it can be 
 				 * found during the second call. */
-				
-				UserFilename soughtFileEntry = new UserFilename(patientId, file.getOriginalFilename());
-				FileEntry cachedFileEntry = cachedFileEntries.getIfPresent(soughtFileEntry);
-				
-				FileEntry fileEntry = (foundEntries.size() > 0)
-					? foundEntries.get(0)
-					: (cachedFileEntry != null)
-						? cachedFileEntry
-						: new FileEntry();
-					
-				fileEntry.setName(file.getOriginalFilename());
-				fileEntry.setUploadTime(
-						Timestamp.valueOf(
-								LocalDateTime.now()));
-				fileEntry.setFileOwner(patient);
-				fileEntry.setContentType(file.getContentType());
-				fileEntry.setContentLength(file.getSize());
-				fileEntry.setPath(Paths.get(filePath).toAbsolutePath().toString());
-				patient.getFileEntries().add(fileEntry);
 
-				fileEntry.setUrl(fileUrl + fileEntry.getId());
-				fileEntry = fileRepository.save(fileEntry);
+                UserFilename soughtFileEntry = new UserFilename(patientId, file.getOriginalFilename());
+                FileEntry cachedFileEntry = cachedFileEntries.getIfPresent(soughtFileEntry);
+
+                FileEntry fileEntry = (foundEntries.size() > 0)
+                        ? foundEntries.get(0)
+                        : (cachedFileEntry != null)
+                        ? cachedFileEntry
+                        : new FileEntry();
+
+                fileEntry.setName(file.getOriginalFilename());
+                fileEntry.setUploadTime(
+                        Timestamp.valueOf(
+                                LocalDateTime.now()));
+                fileEntry.setFileOwner(patient);
+                fileEntry.setContentType(file.getContentType());
+                fileEntry.setContentLength(file.getSize());
+                fileEntry.setPath(Paths.get(filePath).toAbsolutePath().toString());
+                patient.getFileEntries().add(fileEntry);
+
+                fileEntry.setUrl(fileUrl + fileEntry.getId());
+                fileEntry = fileRepository.save(fileEntry);
 
 				/* If the entry is saved for the first time
 				 * we need to update its URL */
-				
-				if (foundEntries.size() == 0) {
-					fileEntry.setUrl(fileUrl + fileEntry.getId());
-					fileRepository.save(fileEntry);
-				}
-				
-				cachedFileEntries.put(soughtFileEntry, fileEntry);
-				
-				File fileToWrite = Paths.get(filePath).toAbsolutePath().toFile();
-				fileToWrite.getParentFile().mkdirs();
-				fileToWrite.createNewFile();
-				
-				try (FileOutputStream out = new FileOutputStream(fileToWrite)) {
-					Files.deleteIfExists(fileToWrite.toPath());
-					Files.copy(file.getInputStream(), fileToWrite.toPath(), StandardCopyOption.REPLACE_EXISTING);
-				}
-				
-				logger.info("File saved under: " + Paths.get(filePath).toAbsolutePath().toString());
-			}
-		}
-	}
-	
-	@GetMapping(value="{id}/files/{fileId}")
-	public void getFile(
-			@PathVariable("id") Long patientId,
-			@PathVariable("fileId") Long fileId,
-			HttpServletResponse response) 
-					throws UnauthorizedUserException, IOException {
-		
-		if (entitlementValidator.isEntitled(patientId, Patient.class)) {
-			FileEntry fileEntry = fileRepository.findOne(fileId);
-			
-			if (fileEntry != null) {
-				response.setContentType(fileEntry.getContentType());
-				response.setContentLengthLong(fileEntry.getContentLength());
-				response.setHeader(
-						"Content-Disposition",
-					     String.format("attachment; filename=\"%s\"",
-					                fileEntry.getName()));
-						
-				try (OutputStream out = response.getOutputStream();) {
-					Files.copy(
-							Paths.get(fileEntry.getPath()),out);
-				}
-			}
-		}
-	}
-	
-	@PostMapping(value="{id}/sharedFiles")
-	public void shareFile(
-			@PathVariable("id") Long patientId,
-			@RequestBody SharedFileDetails sharedFileDetails) throws UnauthorizedUserException {
-		
-		if (entitlementValidator.isEntitled(patientId, Patient.class)) {
-			Reservation reservation = reservationRepository.findOne(sharedFileDetails.getReservationId());
-			
-			if (reservation == null) {
-				throw new UnauthorizedUserException();
-				
-			} else if (!patientId.equals(reservation.getPatient().getId())) {
-				throw new UnauthorizedUserException();
-				
-			} else {
-				
-				FileEntry fileEntry = fileRepository.findOne(sharedFileDetails.getFileEntryId());
-				
-				if (fileEntry == null) {
-					throw new UnauthorizedUserException();
-					
-				} else {
-					SharedFile sharedFile = new SharedFile();
-					sharedFile.setReservation(reservation);
-					sharedFile.setFileEntry(fileEntry);
-					
-					reservation.getSharedFiles().add(sharedFile);
-					sharedFileRepository.save(sharedFile);
-					reservationRepository.save(reservation);
-				}
-			}
-		}
-	}
-    
-    @GetMapping(value = "{id}/current-reservations")
-    @ResponseBody
-    public List<BasicReservationData> getCurrentReservations(
-    		@PathVariable("id") Long patientId) throws UnauthorizedUserException {
-    	
-    	if (entitlementValidator.isEntitled(patientId, Patient.class)) {
-    		return patientRepository.findOne(patientId)
-	    		.getReservations()
-	    		.stream()
-	    		.filter(r -> !r.getEndDateTime().isBefore(LocalDateTime.now()))
-	    		.map(BasicReservationData::new)
-	    		.collect(Collectors.toList());
-    		
-    	} else {
-    		return new ArrayList<>();
-    	}
+
+                if (foundEntries.size() == 0) {
+                    fileEntry.setUrl(fileUrl + fileEntry.getId());
+                    fileRepository.save(fileEntry);
+                }
+
+                cachedFileEntries.put(soughtFileEntry, fileEntry);
+
+                File fileToWrite = Paths.get(filePath).toAbsolutePath().toFile();
+                fileToWrite.getParentFile().mkdirs();
+                fileToWrite.createNewFile();
+
+                try (FileOutputStream out = new FileOutputStream(fileToWrite)) {
+                    Files.deleteIfExists(fileToWrite.toPath());
+                    Files.copy(file.getInputStream(), fileToWrite.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                logger.info("File saved under: " + Paths.get(filePath).toAbsolutePath().toString());
+            }
+        }
     }
 
-    @PostMapping(value = "{id}/current-reservations")
+    @GetMapping(value = "{id}/files/{fileId}")
+    public void getFile(
+            @PathVariable("id") Long patientId,
+            @PathVariable("fileId") Long fileId,
+            HttpServletResponse response)
+            throws UnauthorizedUserException, IOException {
+
+        if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+            FileEntry fileEntry = fileRepository.findOne(fileId);
+
+            if (fileEntry != null) {
+                response.setContentType(fileEntry.getContentType());
+                response.setContentLengthLong(fileEntry.getContentLength());
+                response.setHeader(
+                        "Content-Disposition",
+                        String.format("attachment; filename=\"%s\"",
+                                fileEntry.getName()));
+
+                try (OutputStream out = response.getOutputStream();) {
+                    Files.copy(
+                            Paths.get(fileEntry.getPath()), out);
+                }
+            }
+        }
+    }
+
+    @PostMapping(value = "{id}/sharedFiles")
+    public void shareFile(
+            @PathVariable("id") Long patientId,
+            @RequestBody SharedFileDetails sharedFileDetails) throws UnauthorizedUserException {
+
+        if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+            Reservation reservation = reservationRepository.findOne(sharedFileDetails.getReservationId());
+
+            if (reservation == null) {
+                throw new UnauthorizedUserException();
+
+            } else if (!patientId.equals(reservation.getPatient().getId())) {
+                throw new UnauthorizedUserException();
+
+            } else {
+
+                FileEntry fileEntry = fileRepository.findOne(sharedFileDetails.getFileEntryId());
+
+                if (fileEntry == null) {
+                    throw new UnauthorizedUserException();
+
+                } else {
+                    SharedFile sharedFile = new SharedFile();
+                    sharedFile.setReservation(reservation);
+                    sharedFile.setFileEntry(fileEntry);
+
+                    reservation.getSharedFiles().add(sharedFile);
+                    sharedFileRepository.save(sharedFile);
+                    reservationRepository.save(reservation);
+                }
+            }
+        }
+    }
+
+    @GetMapping(value = "{id}/reservations")
     @ResponseBody
-    public void addNewReservations(
-            @PathVariable("id") Long patientId, 
-            @RequestBody NewReservation newReservation) {
-    	
-        Doctor doctor = doctorRepository.findOne(newReservation.getDoctorId());
+    public List<BasicReservationData> getCurrentReservations(
+            @PathVariable("id") Long patientId) throws UnauthorizedUserException {
+
+        if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+            return patientRepository.findOne(patientId)
+                    .getReservations()
+                    .stream()
+                    .filter(r -> !r.getEndDateTime().isBefore(LocalDateTime.now()))
+                    .map(BasicReservationData::new)
+                    .collect(Collectors.toList());
+
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    @PutMapping(value = "{id}/reservations/{reservation_id}")
+    @ResponseBody
+    public void reserv(
+            @PathVariable("id") Long patientId,
+            @PathVariable("reservation_id") Long reservationId) {
         Patient patient = patientRepository.findOne(patientId);
-        ScheduleTimeSlot scheduleTimeSlot = scheduleRepository.findOne(newReservation.getScheduleId());
-        Reservation reservation = new Reservation(patient, doctor, scheduleTimeSlot.getStartDateTime(), scheduleTimeSlot.getEndDateTime());
-        doctor.addReservation(reservation);
+        Reservation reservation = reservationRepository.findOne(reservationId);
+        reservation.setPatient(patient);
+        reservation.setReservationState(ReservationState.RESERVED);
         patient.addReservatin(reservation);
+
         patientRepository.save(patient);
-        doctorRepository.save(doctor);
     }
 
     @PostMapping(value = "{id}/personal-data")
     @ResponseBody
-    public void postChangePersonalData (
+    public void postChangePersonalData(
             @PathVariable("id") Long patientId,
             @RequestBody PersonalDataPassword personalDataPassword) {
-    	
+
         Patient patient = patientRepository.findOne(patientId);
         patient.changePersonalData(personalDataPassword, passwordEncoder);
         patientRepository.save(patient);

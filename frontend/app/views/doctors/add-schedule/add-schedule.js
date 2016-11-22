@@ -32,7 +32,7 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
         $scope.emptySchedule = false;
 
         function getSchedule() {
-            $http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/schedules")
+            $http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/reservations/UNRESERVED")
                 .then(function successCallback(response) {
                         response.data.forEach(function (schedule) {
                             schedule.startDateTime = new Date(schedule.startDateTime);
@@ -67,7 +67,7 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
             var end = new Date(moment($scope.date + " " + $scope.endTime, "D MMMM YYYY H:mm"));
 
             if (isValidDate(start) && isValidDate(end)) {
-                $http.post(REST_API + "doctors/" + $rootScope.userDetails.id + "/schedules", {
+                $http.post(REST_API + "doctors/" + $rootScope.userDetails.id + "/reservation", {
                     start: start,
                     end: end
                 })

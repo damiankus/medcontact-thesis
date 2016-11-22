@@ -20,7 +20,6 @@ import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.Note;
 import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
-import com.medcontact.data.model.domain.ScheduleTimeSlot;
 import com.medcontact.data.model.domain.Specialty;
 import com.medcontact.data.repository.AdministratorRepository;
 import com.medcontact.data.repository.DoctorRepository;
@@ -100,25 +99,7 @@ public class Application implements CommandLineRunner {
 		
 		note.setDoctor(doctor);
 		doctor.getNotes().add(note);
-		LocalDateTime currentTime = LocalDateTime.now();
-		
-		for (int i = 0; i < 5; i++) {
-			Reservation reservation = new Reservation();
-			reservation.setStartDateTime(currentTime);
-			reservation.setEndDateTime(currentTime.plusMinutes(15));
-			reservation.setPatient(patient);
-			reservation.setDoctor(doctor);
-			doctor.addReservation(reservation);
-			
-			currentTime = currentTime.plusMinutes(15);
-		}
-		
 
-		List<ScheduleTimeSlot> schedule = Arrays.asList(
-				new ScheduleTimeSlot(doctor, LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0)),
-						LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 0))));
-
-		schedule.forEach(ts -> ts.setDoctor(doctor));
 		doctor.setRoomId("default");
 		doctorRepository.save(doctor);
 	}

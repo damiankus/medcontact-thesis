@@ -14,7 +14,7 @@ myApp.controller('AvailableScheduleCtrl', ['REST_API', "$rootScope", '$scope', '
         $scope.emptySchedule = false;
 
         function getSchedule() {
-            $http.get(REST_API + "doctors/" + $routeParams.doctorId + "/schedules")
+            $http.get(REST_API + "doctors/" + $routeParams.doctorId + "/reservations/UNRESERVED")
                 .then(function successCallback(response) {
 
                         response.data.forEach(function (schedule) {
@@ -43,13 +43,11 @@ myApp.controller('AvailableScheduleCtrl', ['REST_API', "$rootScope", '$scope', '
                 )
         }
 
-        $scope.bookTerm = function (scheduleId) {
-            $http.post(REST_API + "patients/" + $rootScope.userDetails.id + "/current-reservations", {
-                scheduleId: scheduleId,
-                doctorId: $routeParams.doctorId
-            })
+        $scope.bookTerm = function (reservationId) {
+            $http.put(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations/" + reservationId)
                 .then(function successCallback(response) {
                         console.log("success");
+                        getSchedule();
                     }, function errorCallback(response) {
                         console.log("[ERROR]: " + response.data.message);
                     }
