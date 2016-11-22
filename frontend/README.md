@@ -22,7 +22,9 @@ backendowa (np. https://medcontact-api.herokuapp.com).
 
 ```
 var myApp = angular.module('myApp', ['ngRoute'])
-    .constant('REST_API', "https://medcontact-api.herokuapp.com/")
+
+    .constant('REST_API', "https://medcontact-api.herokuapp.com/") ← adres backend'u
+
     .config(['$locationProvider', '$routeProvider', '$httpProvider',
         function ($locationProvider, $routeProvider, $httpProvider) {
             $locationProvider.hashPrefix('!');
