@@ -2,22 +2,22 @@
 
 ### Instalacja narzędzia CLI
 W celu skonfigurowania serwera Heroku należy użyć narzędzia linii komend Heroku CLI. Jeśli jeszcze tego   
-nie zrobiliśmy, należy je zainstalować zgodnie z instrukcjami dostępnymi pod [tym adresem](https://devcenter.heroku.com/articles/heroku-command-line).
+nie zrobiliśmy, należy je zainstalować zgodnie z instrukcjami dostępnymi pod [tym adresem](https://devcenter.heroku.com/articles/heroku-command-line).  
 
 ### Przygotowanie projektu
-Zanim uruchomimy aplikację, musimy odpowiednio zmodyfikować plik __package.json__. W polu __"start"__
-zastępujemy numer poru zmienną __$PORT__. Nie należy podawać dowolnie wybranej wartości, ponieważ   
-Heroku samodzielnie wybiera port dla aplikacji.
+Zanim uruchomimy aplikację, musimy odpowiednio zmodyfikować plik __package.json__. W polu __"start"__  
+zastępujemy numer portu zmienną __$PORT__. Nie należy podawać dowolnie wybranej wartości, ponieważ    
+Heroku samodzielnie wybiera port dla aplikacji.  
 
 ```
 "start": "http-server -p $PORT -c-1 ./app",
 ```
 
-Jeśli wszystkie osoby pracujące nad projektem używają systemu operayjnego z rodziny UNIX, można w tym miejscu
-podać wartość __${PORT:-wartość portu}__ (uwaga na myślnik!). Dzięki temu nie będzie potrzeby zmiany numeru portu  
-przy każdym zdalnym uruchomieniu aplikacji.
+Jeśli wszystkie osoby pracujące nad projektem używają systemu operayjnego z rodziny UNIX, można w tym miejscu  
+podać wartość __${PORT:-wartość portu}__ (uwaga na myślnik!). Dzięki temu nie będzie potrzeby zmiany numeru portu    
+przy każdym zdalnym uruchomieniu aplikacji.  
 
-Dodatkowo należy w pliku __app/app.js__ przypisać do stałej __REST_API__ adres, pod którym dostępna jest część  
+Dodatkowo należy w pliku __app/app.js__ przypisać do stałej __REST_API__ adres, pod którym dostępna jest część    
 backendowa (np. https://medcontact-api.herokuapp.com). 
 
 ```
@@ -33,7 +33,7 @@ var myApp = angular.module('myApp', ['ngRoute'])
 ```
 
 ### Utworzenie aplikacji Heroku
-Kolejnym krokiem jest utworzenie aplikacji Heroku. W linii poleceń wykonujmy polecenie:
+Kolejnym krokiem jest utworzenie aplikacji Heroku. W linii poleceń wykonujmy polecenie:  
 
 ```
 heroku create medcontact
@@ -43,8 +43,8 @@ Od tej chwili aplikacja będzie widoczna w [panelu użytkownika](https://id.hero
 
 ### Deployment
 
-Po zainstalowaniu narzędzia CLI należy wykonać kilka kroków:
-* dodajemy do głównego katalogu projektu plik Procfile który zawiera następującą linijkę
+Po zainstalowaniu narzędzia CLI należy wykonać kilka kroków:  
+* dodajemy do głównego katalogu projektu plik Procfile który zawiera następującą linijkę  
   
 ```
 web: npm start
