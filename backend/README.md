@@ -15,9 +15,46 @@ general.host=https://medcontact-api.herokuapp.com/
 
 Poza tym, jeśli utworzyliśmy już bazę danych dla aplikacji, należy również podać w pliku konfiguracyjnym jej dane  
 dostępowe. Chodzi tutaj o następujące pola:
+* spring.datasource.url= {adres, pod którym dostępna jest baza danych}
+* spring.datasource.driverClassName={sterownik dla odpowiedniego dialektu}
+* spring.datasource.maxActive={maksymalna liczba aktywnych połączeń}
+* spring.datasource.maxIdle={maksymalna liczba połączeń nieaktywnych}
+* spring.datasource.minIdle={minimalna liczba połączeń nieaktywnych}
+* spring.datasource.initialSize={początkowy rozmiar puli połączeń}
+* spring.datasource.removeAbandoned={czy usuwać porzucone połączenia?}
+
+Jeśli przy uruchomieniu aplikacji pojawi się błąd mówiący o niemożności odczytania dialektu SQL bazy, 
+należy dodać pole __spring.jpa.properties.hibernate.dialect__
 
 ```
-# UWAGA: wartość ${JDBC_DATABASE_URL} jest zmienną wykorzystywaną przez Herokum
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQL9Dialect
+```
+
+### Utworzenie aplikacji Heroku
+Kolejnym krokiem jest utworzenie aplikacji Heroku. W linii poleceń wykonujmy polecenie:
+
+```
+heroku create medcontact-api
+```
+
+Od tej chwili aplikacja będzie widoczna w [panelu użytkownika](https://id.heroku.com/login).
+
+### Utworzenie bazy danych (Heroku)
+
+Należy mieć na uwadze, że aplikacja uruchomiona na zewnętrznym serwerze raczej nie będzie komunikowała  
+się z lokalną bazą danych. Dlatego należy także zmodyfikować stosowne dane dostępowe. W związku z tym, że  
+korzystamy z serwisu Heroku, wygodnym rozwiązaniem będzie wykorzystanie udostępnionej przez niego przez tego samego   
+dostawcę bazy danych PostgreSQL. Tworzymy ją wykonując polecenie
+
+```
+heroku addons:create heroku-postgresql:hobby-dev
+```
+
+Następnie modyfikujemy plik __application.properties__ w następujący sposób:
+
+```
+# UWAGA: 
+# wartość ${JDBC_DATABASE_URL} jest zmienną wykorzystywaną przez Heroku
 # należy podać jej nazwę dokładnie w takiej formie!
 
 spring.datasource.url=${JDBC_DATABASE_URL}
@@ -33,20 +70,6 @@ spring.datasource.removeAbandoned=true
 
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQL9Dialect
 ```
-
-### Utworzenie aplikacji Heroku
-Kolejnym krokiem jest utworzenie aplikacji Heroku. W linii poleceń wykonujmy polecenie:
-
-```
-heroku create medcontact-api
-```
-
-### Utworzenie bazy danych (Heroku)
-
-Należy mieć na uwadze, że aplikacja uruchomiona na zewnętrznym serwerze raczej nie będzie komunikowała  
-się z lokalną bazą danych. Dlatego należy także zmodyfikować stosowne dane dostępowe. W związku z tym, że  
-skorzystamy z serwisu Heroku, wygodnym rozwiązaniem będzie wykorzystanie udostępnionej przez niego przez tego samego   
-dostawcę bazy danych PostgreSQL. 
 
 ### Deployment
 
