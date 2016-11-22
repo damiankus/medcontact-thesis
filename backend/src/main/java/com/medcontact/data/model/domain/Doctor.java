@@ -30,7 +30,7 @@ import lombok.ToString;
 @Table(name="doctors")
 @DiscriminatorValue("DOCTOR")
 @Data
-@ToString(exclude={"opinions", "reservations", "weeklySchedule", "notes"})
+@ToString(exclude={"opinions", "reservations", "notes"})
 
 /* This annotations prevents the lombok library
  * from calling the superclass' equals and hashCode 
@@ -83,10 +83,6 @@ public class Doctor extends BasicUser {
 	
 	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JsonProperty(access=Access.WRITE_ONLY)
-	private List<ScheduleTimeSlot> weeklySchedule;
-	
-	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<Note> notes;
 
 	/* Setting default values. */
@@ -101,7 +97,6 @@ public class Doctor extends BasicUser {
 		
 		this.opinions = new ArrayList<>();
 		this.reservations = new ArrayList<>();
-		this.weeklySchedule = new ArrayList<>();
 		this.roomId = UUID.randomUUID().toString();
 		this.notes = new ArrayList<>();
 		this.role = ApplicationRole.DOCTOR;
@@ -115,10 +110,6 @@ public class Doctor extends BasicUser {
 		this.lastName = doctor.getLastName();
 		this.setPassword(encodedPassword);
 		this.role = ApplicationRole.DOCTOR;
-	}
-
-    public void addSchedule(ScheduleTimeSlot scheduleTimeSlot) {
-		weeklySchedule.add(scheduleTimeSlot);
 	}
 
 	public void addReservation(Reservation reservation) {

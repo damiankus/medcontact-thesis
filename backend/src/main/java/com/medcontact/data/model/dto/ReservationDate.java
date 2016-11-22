@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class ScheduleShortData {
+public class ReservationDate {
     private LocalDateTime start;
     private LocalDateTime end;
 }

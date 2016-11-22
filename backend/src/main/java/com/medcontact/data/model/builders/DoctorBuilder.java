@@ -43,11 +43,6 @@ public class DoctorBuilder extends BasicUser.BasicUserBuilder {
         return this;
     }
 
-    public DoctorBuilder setWeeklySchedule(List<ScheduleTimeSlot> schedule) {
-        ((Doctor) user).setWeeklySchedule(schedule);
-        return this;
-    }
-
     public DoctorBuilder setRoomId(String roomId) {
         ((Doctor) user).setRoomId(roomId);
         return this;

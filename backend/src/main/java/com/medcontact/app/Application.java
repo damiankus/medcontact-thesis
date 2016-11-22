@@ -1,11 +1,8 @@
 package com.medcontact.app;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -19,8 +16,6 @@ import com.medcontact.data.model.domain.Admin;
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.Note;
 import com.medcontact.data.model.domain.Patient;
-import com.medcontact.data.model.domain.Reservation;
-import com.medcontact.data.model.domain.ScheduleTimeSlot;
 import com.medcontact.data.model.domain.Specialty;
 import com.medcontact.data.repository.AdministratorRepository;
 import com.medcontact.data.repository.DoctorRepository;
@@ -84,14 +79,20 @@ public class Application implements CommandLineRunner {
 		note.setPatient(patient);
 		
 		
-		Specialty pulmonology = new Specialty();
-		pulmonology.setCategory("choroby płuc");
-		pulmonology.setName("pulmunologia");
+		Specialty infectious = new Specialty();
+		infectious.setName("choroby zakaźne");
+		Specialty nephrology = new Specialty();
+		nephrology.setName("nefrologia");
 		
 		Doctor doctor = (Doctor) DoctorBuilder.getBuilder()
-				.setSpecialties(Arrays.asList(pulmonology))
-				.setBiography("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-				.setUniversity("Uniwersytet Jagielloński")
+				.setSpecialties(Arrays.asList(infectious, nephrology))
+				.setBiography("Dr. Gregory House (Hugh Laurie), the title character, "
+						+ "heads the Department of Diagnostic Medicine. "
+						+ "House describes himself as"
+						+ " 'a board-certified diagnostician with a double specialty of"
+						+ " infectious disease and nephrology'.")
+				.setUniversity("Princeton University")
+				.setTitle("M.D.")
 				.setPassword(passwordEncoder.encode("haslo"))
 				.setFirstName("Gregory")
 				.setLastName("House")
@@ -100,25 +101,7 @@ public class Application implements CommandLineRunner {
 		
 		note.setDoctor(doctor);
 		doctor.getNotes().add(note);
-		LocalDateTime currentTime = LocalDateTime.now();
-		
-		for (int i = 0; i < 5; i++) {
-			Reservation reservation = new Reservation();
-			reservation.setStartDateTime(currentTime);
-			reservation.setEndDateTime(currentTime.plusMinutes(15));
-			reservation.setPatient(patient);
-			reservation.setDoctor(doctor);
-			doctor.addReservation(reservation);
-			
-			currentTime = currentTime.plusMinutes(15);
-		}
-		
 
-		List<ScheduleTimeSlot> schedule = Arrays.asList(
-				new ScheduleTimeSlot(doctor, LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0)),
-						LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 0))));
-
-		schedule.forEach(ts -> ts.setDoctor(doctor));
 		doctor.setRoomId("default");
 		doctorRepository.save(doctor);
 	}

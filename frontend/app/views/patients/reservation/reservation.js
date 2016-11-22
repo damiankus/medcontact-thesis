@@ -42,7 +42,7 @@ myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http'
 		}
 		
 		$scope.getCurrentReservation = function () {
-	        $http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/current-reservations")
+	        $http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations")
 	            .then(function successCallback(response) {
 	                $scope.reservations	 = response.data;
 	                
