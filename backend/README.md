@@ -117,3 +117,11 @@ Należy w katalogu głównym projektu wykonać komendę:
 ```
 heroku open
 ```
+
+### Źródła
+* https://devcenter.heroku.com/articles/creating-apps
+* https://devcenter.heroku.com/articles/deploying-spring-boot-apps-to-heroku  
+* https://devcenter.heroku.com/articles/heroku-postgresql#provisioning-the-add-on
+* https://elements.heroku.com/addons/heroku-postgresql
+
+
