@@ -14,7 +14,7 @@ Heroku samodzielnie wybiera port dla aplikacji.
 ```
 
 Jeśli wszystkie osoby pracujące nad projektem używają systemu operayjnego z rodziny UNIX, można w tym miejscu  
-podać wartość __${PORT:-wartość portu}__ (uwaga na myślnik!). Dzięki temu nie będzie potrzeby zmiany numeru portu    
+podać wartość __${PORT:-numer portu}__ (uwaga na myślnik!). Dzięki temu nie będzie potrzeby zmiany numeru portu    
 przy każdym zdalnym uruchomieniu aplikacji.  
 
 Dodatkowo należy w pliku __app/app.js__ przypisać do stałej __REST_API__ adres, pod którym dostępna jest część    
