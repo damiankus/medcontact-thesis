@@ -16,7 +16,9 @@ import com.medcontact.data.model.domain.Admin;
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.Note;
 import com.medcontact.data.model.domain.Patient;
+import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.domain.Specialty;
+import com.medcontact.data.model.enums.ReservationState;
 import com.medcontact.data.repository.AdministratorRepository;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.PatientRepository;
@@ -98,6 +100,20 @@ public class Application implements CommandLineRunner {
 				.setLastName("House")
 				.setEmail("house@gmail.com")
 				.build();
+		
+		LocalDateTime currentTime = LocalDateTime.now();
+		
+		for (int i = 0; i < 3; i++) {
+			Reservation reservation = new Reservation();
+			reservation.setReservationState(ReservationState.RESERVED);
+			reservation.setStartDateTime(currentTime);
+			reservation.setEndDateTime(currentTime.plusMinutes(15));
+			reservation.setPatient(patient);
+			reservation.setDoctor(doctor);
+			doctor.addReservation(reservation);
+			
+			currentTime = currentTime.plusMinutes(15);
+		}
 		
 		note.setDoctor(doctor);
 		doctor.getNotes().add(note);

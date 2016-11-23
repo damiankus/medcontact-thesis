@@ -12,17 +12,20 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 	
 	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/reservation");
 
-	if ($rootScope.reservation == undefined
+	if (typeof $rootScope.reservation === undefined
 			|| $rootScope.reservation == null) {
+		
 		$location.url("/reservation");
 	}
+	
+	console.log(typeof $rootScope.reservation);
 	
 	$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/connection/" + $rootScope.reservation.id)
 		.then(function successCallback(response) {
 			$scope.connectionDetails = response.data;
 			
-			if ($scope.connectionDetails === undefined
-					|| $scope.connectionDetails === null) {
+			if (typeof $scope.connectionDetails === "undefined"
+					|| $scope.connectionDetails == null) {
 				alert("[ERROR]: Invalid connection data");
 				$location.url("/login");
 				
@@ -32,7 +35,8 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 					
 					setTimeout(function () {
 						$(this).prop("disabled", false);
-					}, 5000);
+					}, 2000);
+					
 					subscribe(notifyDoctor);
 				});
 				peerConnectionConfig = getCredentials(initListeners);
@@ -68,17 +72,26 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     	stompClient.connect({}, function (frame) {
     		$scope.subscription = stompClient.subscribe("/queue/patients/" + $rootScope.userDetails.id + "/notifications", function (message) {
 				var response = JSON.parse(message.body);
+				$("#call-btn").prop("disabled", true);
     			
 				if (response.status == "ACCEPTED") {
-	                $("#call-btn").prop("disabled", true);
 	                $("#disconnect-btn").prop("disabled", false);
 	                
 	    			$scope.webrtc.joinRoom($scope.connectionDetails.room);
 	    			startTransmission();
 	    			
 				} else if (response.status == "REJECTED") {
-					console.log("[ERROR]: Call request has been rejected");
+					var dialog = $("#modal-call-status");
+					
+					$("#accept-btn").one("click", function () {
+						dialog.modal("hide");
+					});
+					
+					dialog.modal("show");
 				}
+    		}, 
+    		{
+    			id: $rootScope.userDetails.id
     		});
     		
     		callback();
@@ -113,7 +126,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 
         $scope.webrtc.on("videoAdded", function (video, peer) {
             $("#videosSection")
-                .css("border", "none")
                 .css("width", "auto")
                 .css("height", "auto");
             console.log("" + peer + " has joined the room");
@@ -123,7 +135,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         /* disconnect and leave the room */
 
         $scope.webrtc.on("localScreenRemoved", function (video) {
-            $("#localVideo").css("background-color", "white");
             disconnect($scope.webrtc, $scope.connectionDetails);
         });
         
@@ -165,6 +176,24 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         $("#volume-level-range").change(updateVolumeLevel);
 
         $("#screenshot-btn").click(function () {
+        	var remoteVideo = $("#remoteVideos video")[0];
+        	var canvas = document.createElement("canvas");
+        	
+        	canvas.width = remoteVideo.videoWidth;
+        	canvas.height = remoteVideo.videoHeight;
+        	
+        	var ctx = canvas.getContext("2d");
+        	ctx.drawImage(remoteVideo, 0, 0);
+        	var now = new Date();
+        	
+        	var link = $("<a></a>")
+	    		.attr("download", "screenshot_" + (formatDate(now) + "_" + formatTime(now)) + ".png")
+				.attr("href", canvas.toDataURL("image/png"));
+	
+        	link = link[0];
+        	document.body.appendChild(link);
+        	link.click();
+        	document.body.removeChild(link);
         });
 
         $("#fullscreen-btn").click(function () {
@@ -351,6 +380,17 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 				alert("[ERROR]: Couldn't load doctor info");
 				$location.url("/login");
 			});
+    }
+    
+    function formatDate(dateTime) {
+    	var date = new Date(dateTime);
+    	return  "" + date.getDate() + "-" + date.getMonth() + "-" + date.getYear();
+    }
+    
+    function formatTime(dateTime) {
+    	var time = new Date(dateTime);
+		return  "" + ((time.getHours() > 9) ? time.getHours() : "0" + time.getHours()) 
+			+ ":" + ((time.getMinutes() > 9) ? time.getMinutes() : "0" + time.getMinutes());
     }
     
 }]);

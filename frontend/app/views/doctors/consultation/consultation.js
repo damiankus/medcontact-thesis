@@ -15,6 +15,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 	$http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/connection")
 	    .then(function successCallback(response) {
 	    	$scope.connectionDetails = response.data;
+	    	$scope.ringTone = new Audio("assets/sounds/ring.mp3");
 	    	
 	    	if ($scope.connectionDetails === undefined
 	        		|| $scope.connectionDetails === null) {
@@ -87,34 +88,37 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     	stompClient.connect({}, function (frame) {
     		$scope.subscription = stompClient.subscribe("/queue/doctors/" + $rootScope.userDetails.id + "/calling", function (message) {
 				$scope.callingPatient = JSON.parse(message.body);
+				$scope.ringTone.play();
 				
-				var dialog = $("#calling-modal");
+				var dialog = $("#modal-calling");
 				$("#calling-patient-id").text($scope.callingPatient.id);
 				$("#calling-patient-name").text($scope.callingPatient.name);
 				
-				var startTime = new Date($scope.callingPatient.reservation.startDateTime);
-				startTime = "" + ((startTime.getHours() > 9) ? startTime.getHours() : "0" + startTime.getHours()) 
-					+ ":" + ((startTime.getMinutes() > 9) ? startTime.getMinutes() : "0" + startTime.getMinutes());
+				var startTime = formatTime(new Date($scope.callingPatient.reservation.startDateTime));
 				
 				$("#calling-patient-start").text(startTime);
-				
-				$("#accept-btn").click(function () {
+				$("#accept-btn").one("click", function () {
 					sendCallRequestResponse("ACCEPTED");
 					$scope.getSharedFiles();
 					dialog.modal("hide");
-//					ringTone.pause();
+					$scope.ringTone.pause();
+					$scope.ringTone.currentTime = 0;
 				});
-				$("#reject-btn").click(function () {
+				$("#reject-btn").one("click", function () {
 					sendCallRequestResponse("REJECTED");
 					dialog.modal("hide");
-//					ringTone.pause();
+					$scope.ringTone.pause();
+					$scope.ringTone.currentTime = 0;
 				});
 				
 				dialog.modal("show");
     		});
     		
     		callback();
-    	});
+    	}, 
+    	{
+			id: $rootScope.userDetails.id
+		});
     }
     
     function initListeners(peerConnectionConfig) {
@@ -205,6 +209,23 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         $("#volume-level-range").change(updateVolumeLevel);
 
         $("#screenshot-btn").click(function () {
+        	var remoteVideo = $("#remoteVideos video")[0];
+        	var canvas = document.createElement("canvas");
+        	canvas.width = remoteVideo.videoWidth;
+        	canvas.height = remoteVideo.videoHeight;
+        	
+        	var ctx = canvas.getContext("2d");
+        	ctx.drawImage(remoteVideo, 0, 0);
+        	var now = new Date();
+        	
+        	var link = $("<a></a>")
+   	    		.attr("download", "screenshot_" + (formatDate(now) + "_" + formatTime(now)) + ".png")
+    			.attr("href", canvas.toDataURL("image/png"));
+    	
+        	link = link[0];
+        	document.body.appendChild(link);
+        	link.click();
+        	document.body.removeChild(link);
         });
 
         $("#fullscreen-btn").click(function () {
@@ -274,7 +295,6 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
             $scope.webrtc.unmute();
             $scope.webrtc.startLocalVideo();
             setRemotePeerVideosEnabled(true);
-            setAvailability(true);
         }
     }
 
@@ -387,6 +407,17 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     	});
     	
     	$("#chat-input-submit").click(sendTextMessage);
+    }
+    
+    function formatDate(dateTime) {
+    	var date = new Date(dateTime);
+    	return  "" + date.getDate() + "-" + date.getMonth() + "-" + date.getYear();
+    }
+    
+    function formatTime(dateTime) {
+    	var time = new Date(dateTime);
+		return  "" + ((time.getHours() > 9) ? time.getHours() : "0" + time.getHours()) 
+			+ ":" + ((time.getMinutes() > 9) ? time.getMinutes() : "0" + time.getMinutes());
     }
     
 }]);

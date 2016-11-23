@@ -46,6 +46,8 @@ myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http'
 	            .then(function successCallback(response) {
 	                $scope.reservations	 = response.data;
 	                
+	                console.log($scope.reservations);
+	                
 	                var now = new Date();
 	                var millisPerDay = 24 * 60 * 60 * 1000;
 	                

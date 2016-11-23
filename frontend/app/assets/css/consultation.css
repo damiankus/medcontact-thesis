@@ -4,9 +4,34 @@
 	height: 100%;
 }
 
-.profile-image {
-	width: 96px;
-	height: auto;
+.modal-body {
+	padding: 5%;
+}
+
+.message {
+	border-radius: 5px;
+	padding: 2% 1% 0 1%;
+	margin-top: 1%;
+}
+
+#chat-messages {
+	height: 240px;
+	overflow: auto;
+}
+
+.msg-content {
+	margin-top: 1%;
+	padding: 1%;
+	overflow-wrap: break-word;
+	font-size: 18px;
+}
+
+.msg-label {
+	border: solid white 1px;
+	border-radius: 5px;
+	padding: 1%;
+	margin-top: 1%;
+	font-size: 14px;
 }
 
 #localVideo {
@@ -53,4 +78,9 @@ ul {
 
 #tab-doctor-info {
 	overflow: auto;
+}
+
+#files-table-wrapper {
+	overflow: auto;
+	min-height: 274px;
 }
