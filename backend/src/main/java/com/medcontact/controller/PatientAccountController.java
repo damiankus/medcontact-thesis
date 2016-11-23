@@ -329,7 +329,7 @@ public class PatientAccountController {
             return patientRepository.findOne(patientId)
                     .getReservations()
                     .stream()
-                    .filter(r -> !r.getEndDateTime().isBefore(LocalDateTime.now()))
+                    .filter(r -> r.getEndDateTime().isAfter(LocalDateTime.now()))
                     .map(BasicReservationData::new)
                     .collect(Collectors.toList());
 
@@ -343,14 +343,12 @@ public class PatientAccountController {
     public void reserv(
             @PathVariable("id") Long patientId,
             @PathVariable("reservation_id") Long reservationId) {
-    	
+
         Patient patient = patientRepository.findOne(patientId);
         Reservation reservation = reservationRepository.findOne(reservationId);
-        reservation.setPatient(patient);
         reservation.setReservationState(ReservationState.RESERVED);
-        patient.addReservatin(reservation);
-
-        patientRepository.save(patient);
+        reservation.setPatient(patient);
+        reservationRepository.save(reservation);
     }
 
     @PostMapping(value = "{id}/personal-data")

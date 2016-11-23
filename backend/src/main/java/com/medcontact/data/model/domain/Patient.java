@@ -3,15 +3,11 @@ package com.medcontact.data.model.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.medcontact.data.model.dto.PersonalDataPassword;
 import com.medcontact.data.model.enums.ApplicationRole;
 
@@ -34,16 +30,16 @@ import lombok.ToString;
 public class Patient extends BasicUser {
 	private static final long serialVersionUID = -6160436846217117334L;
 
-	@OneToMany(mappedBy="fileOwner", fetch=FetchType.LAZY)
-	@JsonIgnore
+	@OneToMany(mappedBy="fileOwner", fetch=FetchType.LAZY, cascade= CascadeType.ALL)
+	@JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
 	private List<FileEntry> fileEntries;
 
-	@OneToMany(mappedBy="patient", fetch=FetchType.EAGER)
-	@JsonIgnore
+	@OneToMany(mappedBy="patient", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
 	private List<Reservation> reservations;
 
-	@OneToMany(mappedBy="ratingPatient", fetch=FetchType.LAZY)
-	@JsonIgnore
+	@OneToMany(mappedBy="ratingPatient", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
 	private List<Opinion> opinions;
 
 	/* Setting default values for the members */

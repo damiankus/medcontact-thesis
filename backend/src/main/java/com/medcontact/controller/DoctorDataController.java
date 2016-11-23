@@ -211,7 +211,6 @@ public class DoctorDataController {
 	@GetMapping(value = "{id}/reservations/{type}")
 	@ResponseBody
 	public List<Reservation> getReservationBasedOnType(@PathVariable("id") Long id, @PathVariable("type") ReservationState reservationState) {
-        System.out.println("reservationState: " + reservationState);
         return doctorRepository.findOne(id).getReservations().stream().filter(reservation -> reservation.getReservationState() == reservationState).collect(Collectors.toList());
 	}
 
