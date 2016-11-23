@@ -26,7 +26,9 @@
 								<td>{{ reservation.endDateTime | date : 'HH:mm:ss' }}</td>
 								
 								<td><button ng-attr-id="{{ 'call-btn-' + reservation.id }}" 
-									ng-click="call(reservation)" class="btn btn-sm btn-danger" disabled> Zadzwoń</button></td>
+									ng-disabled="!reservationStarted(reservation)"
+									ng-class="reservationStarted(reservation) ? 'btn-success' : 'btn-danger'"
+									ng-click="call(reservation)" class="btn btn-sm"> Zadzwoń</button></td>
 							</tr>
             <tbody>
         </table>

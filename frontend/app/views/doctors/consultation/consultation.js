@@ -9,13 +9,13 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
   function (REST_API, $rootScope, $scope, $http, $location, UserService) {
-	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/reservation");
+	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/add-schedule");
 	initControlls();
 	
 	$http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/connection")
 	    .then(function successCallback(response) {
 	    	$scope.connectionDetails = response.data;
-	    	$scope.ringTone = new Audio("assets/sounds/ring.mp3");
+	    	$rootScope.ringTone = new Audio("assets/sounds/ring.mp3");
 	    	
 	    	if ($scope.connectionDetails === undefined
 	        		|| $scope.connectionDetails === null) {
@@ -23,7 +23,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 	            $location.url("/login");
 
 	        } else {
-	            peerConnectionConfig = getCredentials(initListeners);
+	            getCredentials();
 	        }
 	    	
 	    }, function errorCallback(response) {
@@ -35,7 +35,6 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     var remotes = {
        	 volume: 0.5
     };
-    var peerConnectionConfig;
     
     /*
      * Rendering shared files
@@ -44,27 +43,78 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 	$scope.sortField = "name";
 	$scope.sortReversed = true;
 
-	/* Load file info from the server */
-	
-	$scope.getSharedFiles = function() {
-		$http.get(REST_API + "doctors/" + $rootScope.userDetails.id 
-				+ "/reservations/" + $scope.callingPatient.reservation.id 
-				+ "/sharedFiles")
-				
-		.then(function successCallback(response) {
-			$scope.files = response.data;
-			$scope.files.forEach(function (item) {
-				item.uploadTime = new Date(item.uploadTime);
-			});
-			
-		}, function errorCallback(response) {
-			console.log("[ERROR]: " + response);
-		});
-	}
-	
 	/* 
 	 * Connection logic
 	 * */
+	
+	 function subscribeForNotifications() {
+	    	var socket = new SockJS(REST_API + "ws")
+			var stompClient = Stomp.over(socket);
+	    	$rootScope.stompClient = stompClient;
+	    	
+	    	stompClient.connect({}, function (frame) {
+	    		$rootScope.subscription = stompClient.subscribe("/queue/doctors/" + $rootScope.userDetails.id + "/calling", function (message) {
+	    			$rootScope.prevPatient = $rootScope.callingPatient;
+					$rootScope.callingPatient = JSON.parse(message.body);
+					$rootScope.ringTone.play();
+					
+					var dialog = $("#modal-calling");
+					$("#calling-patient-id").text($scope.callingPatient.id);
+					$("#calling-patient-name").text($scope.callingPatient.name);
+					
+					var startTime = formatTime(new Date($scope.callingPatient.reservation.startDateTime));
+					
+					$("#calling-patient-start").text(startTime);
+					$("#redirect-to-consultation-btn").one("click", function () {
+						dialog.modal("hide");
+						$rootScope.ringTone.pause();
+						$rootScope.ringTone.currentTime = 0;
+						
+						if ($location.url() !== "/doctor-consultation") {
+							$location.url("/doctor-consultation");
+							$scope.$apply();
+						} else {
+							getSharedFiles();
+						}
+					});
+					
+					dialog.modal("show");
+	    		});
+	    	}, 
+	    	{
+				id: $rootScope.userDetails.id
+			});
+	    }
+	
+    function getCredentials() {
+        var peerConnectionConfig;
+        console.log("Attempting to connect to the room with ID: ["
+            + $scope.connectionDetails.room + "]...");
+      
+        $.ajax({
+            url: $scope.connectionDetails.iceEndpoint,
+            data: $scope.connectionDetails,
+            success: function (data, status) {
+            	console.log(data);
+                peerConnectionConfig = data.d;
+
+                /* data.d is where the iceServers object lives */
+
+                if (!peerConnectionConfig) {
+                    alert("[ERROR]: Connection attempt has failed");
+                    
+                } else {
+                	subscribeForNotifications();
+                	initListeners(peerConnectionConfig);
+                	getSharedFiles();
+                	connect();
+                }
+            },
+            error: function () {
+            	console.log("[ERROR]: TURN server error");
+            }
+        });
+    }
     
     function connect() {
     	$scope.webrtc.joinRoom($scope.connectionDetails.room);
@@ -72,54 +122,46 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         startTransmission();
     }
 
-    function sendCallRequestResponse(status) {
-    	$scope.stompClient.send("/queue/patients/" + $scope.callingPatient.id + "/notifications",
+    function sendStatus(patientId, status) {
+    	$scope.stompClient.send("/queue/patients/" + patientId + "/notifications",
 			{},
 			JSON.stringify({
 				status: status
 			}));
     }
     
-    function subscribe(callback) {
-    	var socket = new SockJS(REST_API + "ws")
-		var stompClient = Stomp.over(socket);
-    	$scope.stompClient = stompClient;
+    function terminatePrevConsultation() {
+    	var patientId;
     	
-    	stompClient.connect({}, function (frame) {
-    		$scope.subscription = stompClient.subscribe("/queue/doctors/" + $rootScope.userDetails.id + "/calling", function (message) {
-				$scope.callingPatient = JSON.parse(message.body);
-				$scope.ringTone.play();
-				
-				var dialog = $("#modal-calling");
-				$("#calling-patient-id").text($scope.callingPatient.id);
-				$("#calling-patient-name").text($scope.callingPatient.name);
-				
-				var startTime = formatTime(new Date($scope.callingPatient.reservation.startDateTime));
-				
-				$("#calling-patient-start").text(startTime);
-				$("#accept-btn").one("click", function () {
-					sendCallRequestResponse("ACCEPTED");
-					$scope.getSharedFiles();
-					dialog.modal("hide");
-					$scope.ringTone.pause();
-					$scope.ringTone.currentTime = 0;
-				});
-				$("#reject-btn").one("click", function () {
-					sendCallRequestResponse("REJECTED");
-					dialog.modal("hide");
-					$scope.ringTone.pause();
-					$scope.ringTone.currentTime = 0;
-				});
-				
-				dialog.modal("show");
-    		});
+    	if (typeof $rootScope.prevPatient !== "undefined") {
+    		patientId = $rootScope.prevPatient.id;
     		
-    		callback();
-    	}, 
-    	{
-			id: $rootScope.userDetails.id
-		});
+    	} else if (typeof $rootScope.callingPatient !== "undefined") {
+    		patientId = $rootScope.callingPatient.id;
+    	}
+    	sendStatus(patientId, "TERMINATED");
     }
+    
+	/* Load file info from the server */
+	
+	function getSharedFiles() {
+		
+		if (typeof $rootScope.callingPatient !== "undefined") {
+			$http.get(REST_API + "doctors/" + $rootScope.userDetails.id 
+					+ "/reservations/" + $rootScope.callingPatient.reservation.id 
+					+ "/sharedFiles")
+					
+			.then(function successCallback(response) {
+				$scope.files = response.data;
+				$scope.files.forEach(function (item) {
+					item.uploadTime = new Date(item.uploadTime);
+				});
+				
+			}, function errorCallback(response) {
+				console.log("[ERROR]: Couldn't load shared files");
+			});
+		}
+	}
     
     function initListeners(peerConnectionConfig) {
 
@@ -149,10 +191,10 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 
         $scope.webrtc.on("videoAdded", function (video, peer) {
             $("#videosSection")
-                .css("border", "none")
                 .css("width", "auto")
                 .css("height", "auto");
-            console.log("" + peer + " has joined the room");
+            
+            console.log("A new user has joined the room");
             updateVolumeLevel()
         });
 
@@ -169,18 +211,17 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         });
         
         $("#call-btn").click(function () {
-            $(this).prop("disabled", true);
-            $(this).addClass("disabled");
-            $("#disconnect-btn").prop("disabled", false);
-            $("#disconnect-btn").removeClass("disabled");
-            
-            subscribe(connect);
+        	$("#disconnect-btn").attr("disabled", false);
+        	connect();
         });
 
         $("#disconnect-btn").click(function () {
             $(this).prop("disabled", true);
-            $("#call-btn").prop("disabled", false);
             disconnect();
+        });
+        
+        $("#terminate-consultation-btn").click(function () {
+        	terminatePrevConsultation();
         });
 
         $("#mute-btn").click(function () {
@@ -247,33 +288,6 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         });
     }
 
-    function getCredentials(callback) {
-        var peerConnectionConfig;
-        console.log("Attempting to connect to the room with ID: ["
-            + $scope.connectionDetails.room + "]...");
-      
-        $.ajax({
-            url: $scope.connectionDetails.iceEndpoint,
-            data: $scope.connectionDetails,
-            success: function (data, status) {
-            	console.log(data);
-                peerConnectionConfig = data.d;
-
-                /* data.d is where the iceServers object lives */
-
-                if (!peerConnectionConfig) {
-                    alert("[ERROR]: Connection attempt has failed");
-                    
-                } else {
-                    callback(peerConnectionConfig);
-                }
-            },
-            error: function () {
-            	console.log("[ERROR]: TURN server error");
-            }
-        });
-    }
-
     function setRemotePeerVideosEnabled(value) {
         var peers = $scope.webrtc.getPeers();
 
@@ -320,8 +334,6 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     function disconnect() {
         if ($scope.subscription && $scope.webrtc !== "undefined") {
         	setAvailability(false);
-        	$scope.subscription.unsubscribe();
-        	$scope.stompClient.disconnect();
             stopTransmission();
             $scope.webrtc.leaveRoom();
             

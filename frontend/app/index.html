@@ -75,6 +75,36 @@
 
 <div ng-view></div>
 
+<div id="modal-calling" class="modal fade" tabindex="-1" role="dialog"
+		data-backdrop="static" 
+		data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h3 class="modal-title"> 
+        	<span class="glyphicon glyphicon-bell"></span>
+        	Połączenie przychodzące
+        </h3>
+      </div>
+	      
+      <div class="modal-body">
+				<div class="row">
+					<h5>Pacjent: <span id="calling-patient-name"></span></h5>
+				</div>
+				<div class="row">
+					<h5>Godzina rezerwacji: <span id="calling-patient-start"></span></h5>
+				</div>
+	    </div>
+      
+      <div class="modal-footer">
+        <button id="redirect-to-consultation-btn" type="button" class="btn btn-lg btn-success">Przejdź do konsultacji</button>
+      </div>
+	  </div>
+	  
+	</div>
+</div>
+
 <!-- In production use:
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
 -->

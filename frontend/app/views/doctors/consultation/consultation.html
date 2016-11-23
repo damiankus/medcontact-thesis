@@ -13,8 +13,10 @@
 			        	<button id="call-btn" class="glyphicon glyphicon-earphone btn-lg btn-success" 
 			        		title="Zadzwoń" type="button" value="call"></button>
 								<button id="disconnect-btn" class="glyphicon glyphicon-phone-alt btn-lg btn-danger" 
-									title="Zakończ rozmowę" type="button" value="disconnect" disabled></button>
-					        
+									title="Zakończ rozmowę" type="button" value="disconnect"></button>
+					      <button id="terminate-consultation-btn" class="glyphicon glyphicon-remove btn-lg btn-default" 
+									title="Zakończ poprzednią konsultację" type="button" value="terminate"></button>
+									
 			        	<div id="utilityControls" class="pull-right">
 									<button id="mute-btn" class="glyphicon glyphicon-volume-up btn-lg btn-default" 
 										title="Poziom głośności" type="button"></button>
@@ -106,34 +108,6 @@
 					</div>
 				</div>
 		</div>
-			
-		<div id="modal-calling" class="modal fade" tabindex="-1" role="dialog">
-		  <div class="modal-dialog" role="document">
-		    <div class="modal-content">
-		    
-		      <div class="modal-header">
-		        <h3 class="modal-title"> 
-		        	<span class="glyphicon glyphicon-bell"></span>
-		        	Połączenie przychodzące
-		        </h3>
-		      </div>
-		      
-		      <div class="modal-body">
-						<div class="row">
-							<h5>Pacjent: <span id="calling-patient-name"></span></h5>
-						</div>
-						<div class="row">
-							<h5>Godzina rezerwacji: <span id="calling-patient-start"></span></h5>
-						</div>
-			    </div>
-		      
-		      <div class="modal-footer">
-		        <button id="accept-btn" type="button" class="btn btn-lg btn-success">Akceptuj</button>
-		        <button id="reject-btn" type="button" class="btn btn-lg btn-danger">Odrzuć</button>
-		      </div>
-		  </div>
-		</div>
 		
-	</div>
 	</div>
 </body>
