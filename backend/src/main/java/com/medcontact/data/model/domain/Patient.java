@@ -30,17 +30,17 @@ import lombok.ToString;
 public class Patient extends BasicUser {
 	private static final long serialVersionUID = -6160436846217117334L;
 
-	@OneToMany(mappedBy="fileOwner", fetch=FetchType.LAZY, cascade= CascadeType.ALL)
-	@JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
-	private List<FileEntry> fileEntries;
+    @OneToMany(mappedBy="fileOwner", fetch=FetchType.LAZY, cascade= CascadeType.ALL)
+    @JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
+    private List<FileEntry> fileEntries;
 
-	@OneToMany(mappedBy="patient", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
-	private List<Reservation> reservations;
+    @OneToMany(mappedBy="patient", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+    @JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
+    private List<Reservation> reservations;
 
-	@OneToMany(mappedBy="ratingPatient", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
-	private List<Opinion> opinions;
+    @OneToMany(mappedBy="ratingPatient", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+    @JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
+    private List<Opinion> opinions;
 
 	/* Setting default values for the members */
 
