@@ -30,7 +30,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 				$scope.$apply();
 				
 			} else {
-				getCredentialsAndConnect();
+				getCredentials();
 			}
 			
 		}, function errorCallback(response) {
@@ -56,8 +56,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     		$scope.subscription = stompClient.subscribe("/queue/patients/" + $rootScope.userDetails.id + "/notifications", function (message) {
 				var response = JSON.parse(message.body);
     			
-				console.log(response);
-				
 				if (response.status == "TERMINATED") {
 					var dialog = $("#modal-call-status");
 					disconnect();
@@ -82,7 +80,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     	});
     }
     
-    function getCredentialsAndConnect() {
+    function getCredentials() {
         var peerConnectionConfig;
         console.log("Attempting to connect to the room with ID: ["
             + $scope.connectionDetails.room + "]...");
@@ -91,7 +89,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
             url: $scope.connectionDetails.iceEndpoint,
             data: $scope.connectionDetails,
             success: function (data, status) {
-            	console.log(data);
                 peerConnectionConfig = data.d;
 
                 /* data.d is where the iceServers object lives */
@@ -102,18 +99,25 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
                 } else {
                     subscribeForNotifications(notifyDoctor);
                     initListeners(peerConnectionConfig);
-                    connect();
                 }
             },
             error: function () {
-            	console.log("[Error]: TURN server error");join
+            	console.log("[ERROR]: TURN server error");
             }
         });
     }
     
     function connect() {
-    	$scope.webrtc.joinRoom($scope.connectionDetails.room);
-        startTransmission();
+    	$scope.connected = true;
+    	console.log("Connecting to [" + $scope.connectionDetails.room + "]");
+    	startTransmission();
+    }
+    
+    function disconnect() {
+    	$scope.connected = false;
+        stopTransmission();
+        $scope.webrtc.leaveRoom();
+        console.log("Disconnected from: [" + $scope.connectionDetails.room + "]");
     }
     
     function notifyDoctor() {
@@ -134,11 +138,12 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         $scope.webrtc = new SimpleWebRTC({
             localVideoEl: "localVideo",
             remoteVideosEl: "remoteVideos",
-            autoRequestMedia: false,
+            autoRequestMedia: true,
             debug: false,
             detectSpeakingEvents: true,
             autoAdjustMic: false,
-
+            socketio: {'force new connection': true},
+            
             // Add the new peerConnectionConfig object
             peerConnectionConfig: peerConnectionConfig
         });
@@ -148,6 +153,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 		});
 
         $scope.webrtc.on("readyToCall", function () {
+        	$scope.webrtc.joinRoom($scope.connectionDetails.room);
         	$scope.connected = true;
             console.log("Connected to [" + $scope.connectionDetails.room + "]");
         });
@@ -158,6 +164,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
                 .css("height", "auto");
             console.log("A new user has joined the room");
             updateVolumeLevel();
+            
         });
 
         /* disconnect and leave the room */
@@ -270,7 +277,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
             console.log("Transmission started");
             $scope.webrtc.unmute();
             $scope.webrtc.startLocalVideo();
-            setRemotePeerVideosEnabled($scope.webrtc, true);
         }
     }
 
@@ -279,19 +285,9 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
             console.log("Transmission stopped");
             $scope.webrtc.mute();
             $scope.webrtc.stopLocalVideo();
-            setRemotePeerVideosEnabled($scope.webrtc, false);
         }
     }
 
-    function disconnect() {
-        if (typeof $scope.webrtc !== "undefined") {
-            stopTransmission();
-            $scope.webrtc.leaveRoom();
-        	$scope.connected = false;
-            console.log("Disconnected from: [" + $scope.connectionDetails.room + "]");
-        }
-    }
-    
     function updateVolumeLevel() {
     	var muteBtn = $("#mute-btn");
     	remotes.volume = $("#volume-level-range").val() / 100.0;
@@ -338,7 +334,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 		if (content.length > 0
 				&& typeof $scope.webrtc !== "undefined") {
 			
-			console.log(content);
 			$scope.webrtc.sendToAll("chat", {
 				senderId: $rootScope.userDetails.id,
 				sender: $rootScope.userDetails.firstName + " " + $rootScope.userDetails.lastName,
@@ -379,7 +374,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     	$http.get(REST_API + "doctors/" + $rootScope.reservation.doctorId + "/info")
 			.then(function successCallback(response) {
 				$scope.doctorInfo = response.data;
-				console.log(response.data);
 				
 			}, function errorCallback(response) {
 				alert("[ERROR]: Couldn't load doctor info");
