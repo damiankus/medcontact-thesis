@@ -1,29 +1,9 @@
 package com.medcontact.controller.services;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.medcontact.data.model.domain.*;
-import com.medcontact.data.model.dto.*;
-import com.medcontact.data.model.enums.ReservationState;
-import com.medcontact.data.repository.FileRepository;
-import com.medcontact.data.repository.PatientRepository;
-import com.medcontact.data.repository.ReservationRepository;
-import com.medcontact.data.repository.SharedFileRepository;
-import com.medcontact.exception.UnauthorizedUserException;
-import com.medcontact.security.config.EntitlementValidator;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -35,6 +15,39 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.domain.FileEntry;
+import com.medcontact.data.model.domain.Patient;
+import com.medcontact.data.model.domain.Reservation;
+import com.medcontact.data.model.domain.SharedFile;
+import com.medcontact.data.model.dto.BasicReservationData;
+import com.medcontact.data.model.dto.ConnectionData;
+import com.medcontact.data.model.dto.PersonalDataPassword;
+import com.medcontact.data.model.dto.SharedFileDetails;
+import com.medcontact.data.model.dto.UserFilename;
+import com.medcontact.data.model.enums.ReservationState;
+import com.medcontact.data.repository.FileRepository;
+import com.medcontact.data.repository.PatientRepository;
+import com.medcontact.data.repository.ReservationRepository;
+import com.medcontact.data.repository.SharedFileRepository;
+import com.medcontact.exception.UnauthorizedUserException;
+import com.medcontact.security.config.EntitlementValidator;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Service
 public class PatientService {
@@ -144,6 +157,28 @@ public class PatientService {
         }
     }
 
+    public void getFile(Long patientId, Long fileId,
+            HttpServletResponse response)
+            		throws UnauthorizedUserException, IOException {
+
+        if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+            FileEntry fileEntry = fileRepository.findOne(fileId);
+
+            if (fileEntry != null) {
+                response.setContentType(fileEntry.getContentType());
+                response.setContentLengthLong(fileEntry.getContentLength());
+                response.setHeader(
+                        "Content-Disposition",
+                        String.format("attachment; filename=\"%s\"",
+                                fileEntry.getName()));
+
+                try (OutputStream out = response.getOutputStream();) {
+                    Files.copy(
+                            Paths.get(fileEntry.getPath()), out);
+                }
+            }
+        }
+    }
 
     public void handleFileUpload(Long patientId, List<MultipartFile> files) throws IOException, UnauthorizedUserException, SQLException {
 
