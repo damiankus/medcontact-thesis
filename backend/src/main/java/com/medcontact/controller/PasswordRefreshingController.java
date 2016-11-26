@@ -24,7 +24,7 @@ import com.medcontact.mail.MailUtility;
 @Controller
 @RequestMapping("reset-password")
 public class PasswordRefreshingController {
-	private MailUtility mailHelper = new MailUtility();
+	private MailUtility mailUtility = new MailUtility();
 
 	@Value("${general.host}")
 	private String hostname;
@@ -36,7 +36,7 @@ public class PasswordRefreshingController {
 
 	@Autowired
 	private BasicUserRepository userRepository;
-
+	
 	@PostMapping(value="send-link", produces="application/json")
 	public ResponseEntity<String> sendRefreshMessage(
 			@RequestParam("email") String email) throws MessagingException {
@@ -52,12 +52,12 @@ public class PasswordRefreshingController {
 			String refreshToken = "" + UUID.randomUUID() + "-"  + UUID.randomUUID();
 			refreshTokens.put(email, refreshToken);
 
-			MimeMessage message = new MimeMessage(mailHelper.getSession());
+			MimeMessage message = new MimeMessage(mailUtility.getSession());
 			message.setSubject("Zmiana hasła");
 			message.setContent("Link do zmiany hasła: <a href=\""
 					+ hostname + "password/refresh/" + refreshToken + "\">Zmiana hasła</a>",
 					"text/html; charset=utf-8");
-			mailHelper.sendMessage(message, email);
+			mailUtility.sendMessage(message, email);
 
 			status = HttpStatus.OK;
 			body = "{\"status\": \"Message sent\"}";

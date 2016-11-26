@@ -20,7 +20,7 @@ public class MailUtility {
 	private String mailHost = "smtp.gmail.com";
 	private String mailPort = "465";
 	private String mailUsername = "medcontact.project@gmail.com";
-	private String mailPassword = "med-contac";
+	private String mailPassword = "!contac-med@";
 	
 	private Session session;
 	private Address senderAddress;
