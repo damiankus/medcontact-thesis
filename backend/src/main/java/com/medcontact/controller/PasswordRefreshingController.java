@@ -37,7 +37,7 @@ public class PasswordRefreshingController {
 	@Autowired
 	private BasicUserRepository userRepository;
 
-	@PostMapping("send-link")
+	@PostMapping(value="send-link", produces="application/json")
 	public ResponseEntity<String> sendRefreshMessage(
 			@RequestParam("email") String email) throws MessagingException {
 
@@ -45,7 +45,7 @@ public class PasswordRefreshingController {
 		HttpStatus status;
 
 		if (!userRepository.findByEmail(email).isPresent()) {
-			body = "Email not found";
+			body = "{\"status\": \"Email not found\"}";;
 			status = HttpStatus.BAD_REQUEST;
 
 		} else {
@@ -60,7 +60,7 @@ public class PasswordRefreshingController {
 			mailHelper.sendMessage(message, email);
 
 			status = HttpStatus.OK;
-			body = "Message sent";
+			body = "{\"status\": \"Message sent\"}";
 		}
 
 		return new ResponseEntity<String>(body, status);

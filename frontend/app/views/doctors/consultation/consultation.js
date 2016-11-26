@@ -72,7 +72,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 						
 						if ($location.url() !== "/doctor-consultation") {
 							
-//							$location.url("/doctor-consultation");
+							$location.path("/doctor-consultation");
 //							setTimeout(function () {
 //								$scope.$apply();
 //							}, 2000);
@@ -131,7 +131,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     	$scope.webrtc.leaveRoom();
     	stopTransmission();
     	$scope.connected = false;
-        console.log("Disconnected from: [" + $scope.connectionDetails.room + "]");
+		console.log("Disconnected from: [" + $scope.connectionDetails.room + "]");
     }
     
     function sendStatus(patientId, status) {
@@ -194,9 +194,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
             peerConnectionConfig: peerConnectionConfig
         });
 
-        console.error("LISTENERS OK");
-        
-    	$scope.$on('$routeChangeStart', function(next, current) { 
+    	$scope.$on('$locationChangeStart', function(event, oldUrl, newUrl) {
     		disconnect();
 		});
         

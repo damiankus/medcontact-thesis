@@ -64,7 +64,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 						dialog.modal("hide");
 						
 						setTimeout(function () {
-							$location.url("/reservation");
+							$location.path("/reservation");
 							$scope.$apply();
 						}, 1000);
 					});

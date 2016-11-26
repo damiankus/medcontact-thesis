@@ -8,6 +8,7 @@ mvnw.cmd
 .springBeans
 target
 .idea/
-.patients/
+patients/
+src/main/resources/application.properties
 
 

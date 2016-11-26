@@ -31,7 +31,8 @@ myApp.controller('ResetPasswordCtrl', ['REST_API', "$rootScope", '$scope', '$htt
                 .then(function successCallback(response) {
                     console.log("Success")
                 }, function errorCallback(response) {
-                    console.log("[ERROR]: " + response.data.message);
+                    console.error("[ERROR]: ");
+                    console.error(response);
                 })
         }
     }]);
