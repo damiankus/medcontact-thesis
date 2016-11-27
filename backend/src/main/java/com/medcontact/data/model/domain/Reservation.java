@@ -48,7 +48,7 @@ public class Reservation {
 	private Doctor doctor;
 
 	public Reservation(){
-		reservationState = ReservationState.UNRESERVED;
+		this.reservationState = ReservationState.UNRESERVED;
 	}
 	
 	public Reservation(Doctor doctor, LocalDateTime startDateTime, LocalDateTime endDateTime) {

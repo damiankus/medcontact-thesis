@@ -18,19 +18,26 @@ myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http'
 		 * comparing the two dates.
 		 **/
 		
+		$scope.sortField = "startDateTime";
+		$scope.sortReversed = false;
+		
 		$scope.reservationStarted = function (reservation) {
-			var now = new Date();
-			var timezoneOffset = now.getTimezoneOffset();
-			var startTimeWithOffset = new Date(reservation.startDateTime).getTime() 
-				+ (timezoneOffset * 60 * 1000);
-			
-			return (startTimeWithOffset <= now.getTime());
+			return (reservation.startDateTime.getTime() <= new Date().getTime());
+		}
+		
+		$scope.reservationFinished = function (reservation) {
+			return (new Date().getTime() > reservation.endDateTime.getTime());
 		}
 		
 		$scope.getCurrentReservation = function () {
 	        $http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations")
 	            .then(function successCallback(response) {
 	                $scope.reservations	 = response.data;
+	                
+	                $scope.reservations.forEach(function (reservation, index) {
+	                	reservation.startDateTime = new Date(reservation.startDateTime);
+	                	reservation.endDateTime = new Date(reservation.endDateTime);
+	                });
 	                
 	            }, function errorCallback(response) {
 	            	console.log("[ERROR]: Couldn't load reservation data");

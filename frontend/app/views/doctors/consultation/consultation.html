@@ -31,6 +31,36 @@
 			</div>
 		</div>
 		
+		<div id="reservation-info" ng-show="currentReservation || nextReservation" class="row well text-center">
+			<div id="reservation-current" ng-show="currentReservation" class="btn-success pull-left reservation-data">
+					<span class="reservation-data-label row col-md-12">Aktualna rezerwacja</span>
+					<span class="col-md-5">
+						{{ currentReservation.patientName }}
+					</span>
+					<span class="col-md-3">
+						{{ currentReservation.startDateTime | date : 'HH:mm' }}
+					</span>
+					<span class="col-md-1">-</span>
+					<span class="col-md-3">
+						{{ currentReservation.endDateTime | date : 'HH:mm' }}
+					</span>
+			</div>
+						
+			<div id="reservation-next" ng-show="nextReservation" class="btn-default pull-right reservation-data">
+					<span class="reservation-data-label row col-md-12">Kolejna rezerwacja</span>
+					<span class="col-md-5 text-center">
+						{{ nextReservation.patientName }}
+					</span>
+					<span class="col-md-3 text-center">
+						{{ nextReservation.startDateTime | date : 'HH:mm' }}
+					</span>
+					<span class="col-md-1 text-center">-</span>
+					<span class="col-md-3 text-center">
+						{{ nextReservation.endDateTime | date : 'HH:mm' }}
+					</span>
+			</div>
+		</div>
+		
 		<div class="row well">
 				<div class="btn-group col-md-4 col-md-offset-4">
 				  <button id="tab-chat-btn" type="button" class="btn btn-success col-md-4" ng-click="showTab('tab-chat')">
@@ -102,10 +132,36 @@
 							</table>
 						</div>
 						
+					<div id="tab-notes" class="tab">
+						<div id="notes-wrapper" class="well col-md-8 col-md-offset-2 pre-scrollable"">
+							<div id="notes-list">
+								<h4>Notatki</h4>
+								<table id="notes-table" class="table table-hover">
+									<thead>
+										<tr>
+											<th ng-click="sortField = 'name'; sortReversed = !sortReversed" class="col-md-4">
+												Tytuł
+												<span ng-show="sortReversed" class="glyphicon glyphicon-menu-down"></span>
+												<span ng-show="!sortReversed" class="glyphicon glyphicon-menu-up"></span>
+											</th>
+											<th class="col-md-3">Opcje</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="note in notes | orderBy:sortField:sortReversed">
+											<td>{{ file.name }}</td>
+											
+											<td ng-attr-id="toolbar-{{ file.id }}" class="btn-toolbar">
+												<a ng-href="{{ file.url }}"><button class="btn btn-md btn-success"> Pobierz</button></a>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div id="notes-text"></div>
+						</div>
 					</div>
-					<div id="tab-notes" class="collapse">
-						notes
-					</div>
+					
 				</div>
 		</div>
 		

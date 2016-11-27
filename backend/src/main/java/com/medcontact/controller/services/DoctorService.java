@@ -1,5 +1,27 @@
 package com.medcontact.controller.services;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -10,6 +32,7 @@ import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.domain.SharedFile;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
+import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.ReservationDate;
 import com.medcontact.data.model.enums.ReservationState;
@@ -22,28 +45,9 @@ import com.medcontact.data.validation.ValidationResult;
 import com.medcontact.exception.NonExistentUserException;
 import com.medcontact.exception.UnauthorizedUserException;
 import com.medcontact.security.config.EntitlementValidator;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @Service
 public class DoctorService {
@@ -259,21 +263,46 @@ public class DoctorService {
                 .collect(Collectors.toList());
     }
 
-    public boolean setDoctorAvailable(Long id, boolean isAvailable) throws UnauthorizedUserException {
-        Doctor doctor = doctorRepository.findOne(id);
+    public boolean setDoctorAvailable(Long doctorId, boolean isAvailable) throws UnauthorizedUserException {
+        Doctor doctor = doctorRepository.findOne(doctorId);
         if (doctor == null) {
             throw new NonExistentUserException();
         }
-        if (!entitlementValidator.isEntitled(id, Doctor.class)){
+        if (!entitlementValidator.isEntitled(doctorId, Doctor.class)){
             throw new UnauthorizedUserException();
         }
-            doctor.setAvailable(isAvailable);
-            doctorRepository.save(doctor);
-            logger.info("Doctor [" + id + "] availability status has changed to: "
-                    + ("" + doctor.isAvailable()).toUpperCase());
-            brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/available", "" + isAvailable);
+        
+        doctor.setAvailable(isAvailable);
+        doctorRepository.save(doctor);
+        logger.info("Doctor [" + doctorId + "] availability status has changed to: "
+                + ("" + doctor.isAvailable()).toUpperCase());
+        brokerMessagingTemplate.convertAndSend("/topic/doctors/" + doctorId + "/available", "" + isAvailable);
 
         return doctor.isAvailable();
     }
 
+    
+    public BasicReservationData getNextReservation(Long doctorId, Long reservationId) throws UnauthorizedUserException {
+    	if (!entitlementValidator.isEntitled(doctorId, Doctor.class)){
+            throw new UnauthorizedUserException();
+        } 
+    	
+    	Reservation reservation = reservationRepository.findOne(reservationId);
+    	
+    	if (reservation == null) {
+    		throw new UnauthorizedUserException();
+    		
+    	} else if (!reservation.getDoctor().getId().equals(doctorId)) {
+    		throw new UnauthorizedUserException();
+    	}
+    	
+    	List<BasicReservationData> nextReservations = reservationRepository.findNextReservations(reservation.getStartDateTime())
+    			.stream()
+    			.filter(r -> r.getReservationState() == ReservationState.RESERVED)
+    			.limit(1)
+    			.map(r -> new BasicReservationData(r))
+    			.collect(Collectors.toList());
+    	
+    	return (nextReservations.size() > 0) ? nextReservations.get(0) : new BasicReservationData();
+    }
 }

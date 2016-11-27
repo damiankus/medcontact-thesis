@@ -10,16 +10,28 @@ public class BasicReservationData {
 	private long id;
 	private LocalDateTime startDateTime;
 	private LocalDateTime endDateTime;
+	private Long patientId;
+	private String patientName;
 	private Long doctorId;
 	private String doctorName;
-	private boolean doctorAvailable;
+	
+	public BasicReservationData() {
+		this.id = 0;
+		this.patientId = 0L;
+		this.patientName = "";
+		this.doctorId = 0L;
+		this.doctorName = "";
+		this.startDateTime = LocalDateTime.MIN;
+		this.endDateTime = LocalDateTime.MIN;
+	}
 	
 	public BasicReservationData(Reservation reservation) {
-		id = reservation.getId();
-		doctorId = reservation.getDoctor().getId();
-		doctorName = reservation.getDoctor().getFirstName() + " " + reservation.getDoctor().getLastName();
-		doctorAvailable = reservation.getDoctor().isAvailable();
-		startDateTime = reservation.getStartDateTime();
-		endDateTime = reservation.getEndDateTime();
+		this.id = reservation.getId();
+		this.patientId = reservation.getPatient().getId();
+		this.patientName = reservation.getPatient().getFirstName() + " " + reservation.getPatient().getLastName();
+		this.doctorId = reservation.getDoctor().getId();
+		this.doctorName = reservation.getDoctor().getFirstName() + " " + reservation.getDoctor().getLastName();
+		this.startDateTime = reservation.getStartDateTime();
+		this.endDateTime = reservation.getEndDateTime();
 	}
 }

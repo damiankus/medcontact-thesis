@@ -88,7 +88,8 @@ public class PatientAccountController {
     public void bookReservation(
             @PathVariable("id") Long patientId,
             @PathVariable("reservation_id") Long reservationId) {
-
+    	
+    	System.out.println("BOOKING");
         patientService.bookReservation(patientId, reservationId);
     }
 

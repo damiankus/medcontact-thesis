@@ -38,7 +38,7 @@ public class Note {
 	private Timestamp uploadTime;
 	
 	@ManyToOne
-	@JoinColumn(name="note_owner_id")
+	@JoinColumn(name="doctor_id")
 	@JsonProperty(access=Access.WRITE_ONLY)
 	private Doctor doctor;
 	
@@ -51,6 +51,5 @@ public class Note {
 		this.title = "";
 		this.content = "";
 		this.uploadTime = Timestamp.valueOf(LocalDateTime.now());
-		this.doctor = new Doctor();
 	}
 }

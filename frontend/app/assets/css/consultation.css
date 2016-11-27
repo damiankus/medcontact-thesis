@@ -65,8 +65,6 @@ ul {
 	font-size: 16px;
 }
 
-
-
 .tab-panel-row {
 	margin-top: 2%;
 }
@@ -83,4 +81,20 @@ ul {
 #files-table-wrapper {
 	overflow: auto;
 	min-height: 274px;
+}
+
+#notes-wrapper {
+	overflow: auto;
+	min-height: 274px;
+}
+
+.reservation-data-label {
+	margin-bottom: 2%;
+	font-size: 16px;
+}
+
+.reservation-data {
+	width: 49%;
+	padding: 2%;
+	border-radius: 5px;
 }

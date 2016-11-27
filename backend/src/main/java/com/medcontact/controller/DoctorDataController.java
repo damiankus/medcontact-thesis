@@ -6,6 +6,7 @@ import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
+import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.ReservationDate;
 import com.medcontact.data.model.enums.ReservationState;
@@ -100,5 +101,13 @@ public class DoctorDataController {
             UnauthorizedUserException {
 
         return doctorService.setDoctorAvailable(id, isAvailable);
+    }
+    
+    @GetMapping("{id}/reservations/{reservationId}/next")
+    public BasicReservationData getNextReservation(
+    		@PathVariable("id") Long doctorId,
+    		@PathVariable("reservationId") Long reservationId) throws UnauthorizedUserException {
+    	
+    	return doctorService.getNextReservation(doctorId, reservationId);
     }
 }	

@@ -57,6 +57,9 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 	    			$rootScope.prevPatient = $rootScope.callingPatient;
 					$rootScope.callingPatient = JSON.parse(message.body);
 					$rootScope.ringTone.play();
+
+					$rootScope.currentReservation = $rootScope.callingPatient.reservation;
+					getNextReservation($rootScope.currentReservation.id);
 					
 					var dialog = $("#modal-calling");
 					$("#calling-patient-id").text($scope.callingPatient.id);
@@ -71,11 +74,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 						$rootScope.ringTone.currentTime = 0;
 						
 						if ($location.url() !== "/doctor-consultation") {
-							
 							$location.path("/doctor-consultation");
-//							setTimeout(function () {
-//								$scope.$apply();
-//							}, 2000);
 							
 						} else {
 							getSharedFiles();
@@ -135,7 +134,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     }
     
     function sendStatus(patientId, status) {
-    	$scope.stompClient.send("/queue/patients/" + patientId + "/notifications",
+    	$scope.stompClient.send("/reservationqueue/patients/" + patientId + "/notifications",
 			{},
 			JSON.stringify({
 				status: status
@@ -358,6 +357,19 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         }
     }
     
+    function formatDate(dateTime) {
+    	var date = new Date(dateTime);
+    	return  "" + date.getDate() + "-" + date.getMonth() + "-" + date.getYear();
+    }
+    
+    function formatTime(dateTime) {
+    	var time = new Date(dateTime);
+		return  "" + ((time.getHours() > 9) ? time.getHours() : "0" + time.getHours()) 
+			+ ":" + ((time.getMinutes() > 9) ? time.getMinutes() : "0" + time.getMinutes());
+    }
+    
+    /* Text chat controls logic */
+    
     function addMessage(sender, content, bgClass) {
     	var messageEl = $("<div></div>")
     		.addClass("message")
@@ -388,7 +400,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 				senderId: $rootScope.userDetails.id,
 				sender: $rootScope.userDetails.firstName + " " + $rootScope.userDetails.lastName,
 				content: content
-			})
+			});
 			addMessage($rootScope.userDetails.name, content, "btn-default");
 			textInput.val("");
 		}
@@ -418,15 +430,25 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     	$("#chat-input-submit").click(sendTextMessage);
     }
     
-    function formatDate(dateTime) {
-    	var date = new Date(dateTime);
-    	return  "" + date.getDate() + "-" + date.getMonth() + "-" + date.getYear();
-    }
+    /* Current and previous reservation data controller */
     
-    function formatTime(dateTime) {
-    	var time = new Date(dateTime);
-		return  "" + ((time.getHours() > 9) ? time.getHours() : "0" + time.getHours()) 
-			+ ":" + ((time.getMinutes() > 9) ? time.getMinutes() : "0" + time.getMinutes());
+    function getNextReservation(reservationId) {
+		$http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/reservations/" + reservationId + "/next")
+		    .then(function successCallback(response) {
+		    	
+		    	if (response.data.id > 0) {
+		    		$rootScope.nextReservation = response.data;
+		    		$rootScope.nextReservation.startDateTime = new Date($rootScope.nextReservation.startDateTime);
+		    		$rootScope.nextReservation.endDateTime = new Date($rootScope.nextReservation.endDateTime);
+		    	
+		    	} else {
+		    		$rootScope.nextReservation = null;
+		    	}
+		    	
+		    }, function errorCallback(response) {
+		    	alert("[ERROR]: Couldn't load current reservation data");
+		    	$location.url("/login");
+		    });
     }
     
 }]);
