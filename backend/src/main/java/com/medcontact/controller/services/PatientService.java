@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.medcontact.exception.NotMatchedPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -314,7 +315,16 @@ public class PatientService {
 
     public void changePersonalData(Long patientId, PersonalDataPassword personalDataPassword) {
         Patient patient = patientRepository.findOne(patientId);
+
         patient.changePersonalData(personalDataPassword, passwordEncoder);
+        if(personalDataPassword.getNewPassword1() != null && personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2())){
+            if (passwordEncoder.matches(personalDataPassword.getOldPassword(), patient.getPassword())){
+                patient.setPassword(passwordEncoder.encode(personalDataPassword.getNewPassword1()));
+            }
+            else{
+                throw new NotMatchedPasswordException();
+            }
+        }
         patientRepository.save(patient);
     }
 }
