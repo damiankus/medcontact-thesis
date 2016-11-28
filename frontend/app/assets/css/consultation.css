@@ -80,12 +80,10 @@ ul {
 
 #files-table-wrapper {
 	overflow: auto;
-	min-height: 274px;
 }
 
 #notes-wrapper {
 	overflow: auto;
-	min-height: 274px;
 }
 
 .reservation-data-label {
@@ -96,5 +94,15 @@ ul {
 .reservation-data {
 	width: 49%;
 	padding: 2%;
+	border-radius: 5px;
+}
+
+.note {
+	white-space: pre-line;
+	overflow-wrap: break-word;
+	text-align: left;
+	padding: 2% 1% 2% 1%;
+	margin-bottom: 1%;
+	font-size: 16px;
 	border-radius: 5px;
 }

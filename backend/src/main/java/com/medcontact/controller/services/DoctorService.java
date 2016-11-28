@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -19,15 +20,19 @@ import org.springframework.stereotype.Service;
 import com.medcontact.controller.DoctorDataController;
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.FileEntry;
+import com.medcontact.data.model.domain.Note;
+import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.domain.SharedFile;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
+import com.medcontact.data.model.dto.BasicNoteDetails;
 import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.ReservationDate;
 import com.medcontact.data.model.enums.ReservationState;
-import com.medcontact.data.repository.BasicUserRepository;
 import com.medcontact.data.repository.DoctorRepository;
+import com.medcontact.data.repository.NoteRepository;
+import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
 import com.medcontact.data.repository.SharedFileRepository;
 import com.medcontact.exception.NonExistentUserException;
@@ -50,11 +55,14 @@ public class DoctorService {
     private SimpMessagingTemplate brokerMessagingTemplate;
 
     @Autowired
-    BasicUserRepository userRepository;
+    private DoctorRepository doctorRepository;
 
     @Autowired
-    DoctorRepository doctorRepository;
-
+    private PatientRepository patientRepository;
+    
+    @Autowired
+    private NoteRepository noteRepository;
+    
     @Autowired
     private ReservationRepository reservationRepository;
 
@@ -232,5 +240,89 @@ public class DoctorService {
     			.collect(Collectors.toList());
     	
     	return (nextReservations.size() > 0) ? nextReservations.get(0) : new BasicReservationData();
+    }
+    
+    public void addNote(Long doctorId, BasicNoteDetails noteDetails) throws UnauthorizedUserException {
+    	entitlementValidator.isEntitled(doctorId, Doctor.class);
+    	
+    	Doctor doctor = doctorRepository.findOne(doctorId);
+    	Patient patient = patientRepository.findOne(noteDetails.getPatientId());
+    	
+    	if (doctor == null) {
+    		throw new UnauthorizedUserException();
+    	} else if (!doctor.getId().equals(doctorId)) {
+    		throw new UnauthorizedUserException();
+    	} else if (patient == null) {
+    		throw new UnauthorizedUserException();
+    	} else {
+    		Note note = new Note();
+    		note.setContent(noteDetails.getContent());
+    		note.setPatient(patient);
+    		note.setDoctor(doctor);
+    		doctor.getNotes().add(note);
+    		
+    		doctorRepository.save(doctor);
+    	}
+    }
+    
+    public void updateNote(Long doctorId, BasicNoteDetails noteDetails) throws UnauthorizedUserException {
+    	entitlementValidator.isEntitled(doctorId, Doctor.class);
+    	Doctor doctor = doctorRepository.findOne(doctorId);
+    	
+    	if (doctor == null) {
+    		throw new UnauthorizedUserException();
+    		
+    	} else {
+    		Note note = noteRepository.findOne(noteDetails.getNoteId());
+    		
+    		if (note == null) {
+        		throw new UnauthorizedUserException();
+        		
+    		} else if (!note.getDoctor().getId().equals(doctorId)) {
+        		throw new UnauthorizedUserException();
+        		
+    		} else {
+    			note.setContent(noteDetails.getContent());
+    			noteRepository.save(note);
+    		}
+    	}
+    }
+    
+    public void deleteNote(Long doctorId, Long noteId) throws UnauthorizedUserException {
+    	entitlementValidator.isEntitled(doctorId, Doctor.class);
+    	
+    	Doctor doctor = doctorRepository.findOne(doctorId);
+    	
+    	if (doctor == null) {
+    		throw new UnauthorizedUserException();
+    	} else {
+    		Optional<Note> noteOptional = doctor.getNotes()
+    				.stream()
+    				.filter(n -> n.getId() == noteId)
+    				.findFirst();
+    		
+    		if (!noteOptional.isPresent()) {
+        		throw new UnauthorizedUserException();
+        		
+    		} else {
+    			doctor.getNotes().removeIf(n -> n.getId() == noteId);
+    			doctorRepository.save(doctor);
+    			noteRepository.delete(noteId);
+    		}
+    	}
+    }
+    
+    public List<Note> getNotesForPatient(Long doctorId, Long patientId) throws UnauthorizedUserException {
+    	entitlementValidator.isEntitled(doctorId, Doctor.class);
+    	
+    	Doctor doctor = doctorRepository.findOne(doctorId);
+    	
+    	if (doctor == null) {
+    		throw new UnauthorizedUserException();
+    	}
+    	
+    	return doctor.getNotes().stream()
+    			.filter(n -> n.getPatient().getId() == patientId)
+    			.collect(Collectors.toList());
     }
 }

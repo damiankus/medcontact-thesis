@@ -28,10 +28,7 @@ public class Note {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
-	@Column(nullable=false)
-	private String title;
-	
-	@Column(nullable=false)
+	@Column(nullable=false, length=1000)
 	private String content;
 	
 	@Column(nullable=false)
@@ -48,7 +45,6 @@ public class Note {
 	private Patient patient;
 	
 	public Note() {
-		this.title = "";
 		this.content = "";
 		this.uploadTime = Timestamp.valueOf(LocalDateTime.now());
 	}

@@ -98,7 +98,7 @@
 					</div>
 					
 					<div id="tab-files" class="collapse tab">
-						<div id="files-table-wrapper" class="well col-md-8 col-md-offset-2 pre-scrollable"">
+						<div id="files-table-wrapper" class="well col-md-12">
 							<h4>Udostępnione pliki</h4>
 							<table id="files-table" class="table table-hover">
 								<thead>
@@ -131,34 +131,66 @@
 								</tbody>
 							</table>
 						</div>
+					</div>
+					
+					<div id="tab-notes" class="collapse tab">
+						<div id="notes-wrapper" class="well col-md-12">
 						
-					<div id="tab-notes" class="tab">
-						<div id="notes-wrapper" class="well col-md-8 col-md-offset-2 pre-scrollable"">
 							<div id="notes-list">
 								<h4>Notatki</h4>
+								
+								<form>
+								  <div class="search-form form-group">
+								    <div class="input-group">
+								      <div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+								      <input type="text" class="form-control" placeholder="Szukaj notatki" ng-model="noteKeyWord">
+								    </div>      
+								  </div>
+								</form>
+									
 								<table id="notes-table" class="table table-hover">
 									<thead>
 										<tr>
-											<th ng-click="sortField = 'name'; sortReversed = !sortReversed" class="col-md-4">
-												Tytuł
+											<th ng-click="sortField = 'content'; sortReversed = !sortReversed" class="col-md-8">
+												Treść
 												<span ng-show="sortReversed" class="glyphicon glyphicon-menu-down"></span>
 												<span ng-show="!sortReversed" class="glyphicon glyphicon-menu-up"></span>
 											</th>
-											<th class="col-md-3">Opcje</th>
+											<th class="col-md-4">Opcje</th>
 										</tr>
 									</thead>
 									<tbody>
-										<tr ng-repeat="note in notes | orderBy:sortField:sortReversed">
-											<td>{{ file.name }}</td>
+										<tr ng-repeat="note in notes | filter:noteKeyWord | orderBy:sortField:sortReversed">
+											<td class="col-md-8">
+												<div ng-attr-id="note-{{ note.id }}" rows="1" class="note btn-default">
+														{{ note.content.trim() }}
+												</div>
+											</td>
 											
-											<td ng-attr-id="toolbar-{{ file.id }}" class="btn-toolbar">
-												<a ng-href="{{ file.url }}"><button class="btn btn-md btn-success"> Pobierz</button></a>
+											<td class="btn-toolbar col-md-4">
+												<button ng-show="!isNoteModified[note.id]" ng-click="editNote(note.id)" class="col-md-5 btn btn-md btn-default"> Edytuj</button></a>
+												<button ng-show="!isNoteModified[note.id]" ng-click="deleteNote(note.id)" class="col-md-5 btn btn-md btn-danger"> Usuń</button></a>
+
+												<button ng-show="isNoteModified[note.id]" ng-click="updateNote(note.id)" class="col-md-5 btn btn-md btn-success"> Zapisz</button></a>
+												<button ng-show="isNoteModified[note.id]" ng-click="cancelNoteModification(note.id)" class="col-md-5 btn btn-md btn-danger"> Anuluj</button></a>
 											</td>
 										</tr>
+										
+										<!-- New note row -->
+										
+										<tr ng-show="patientCalling">
+											<td>
+												<textarea id="new-note-text-input" ng-model="newNote.content" rows="5" class="note btn btn-md col-md-12" placeholder="Nowa notatka"></textarea>
+											</td>
+											<td class="btn-toolbar">
+												<button ng-click="addNote()" class="btn btn-md btn-success col-md-10"> Dodaj</button></a>
+											</td>
+										</tr>
+										
 									</tbody>
 								</table>
 							</div>
-							<div id="notes-text"></div>
+							
 						</div>
 					</div>
 					

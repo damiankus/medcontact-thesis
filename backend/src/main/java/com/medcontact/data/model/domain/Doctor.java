@@ -55,6 +55,8 @@ public class Doctor extends BasicUser {
 	@Column(nullable=false)
 	@NonNull
 	private String university;
+	
+	@Column(length=5000)
 	private String biography;
 	
 	@Column(nullable=false)

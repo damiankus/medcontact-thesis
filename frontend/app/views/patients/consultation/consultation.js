@@ -16,7 +16,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
 			|| $rootScope.reservation == null) {
 		
 		$location.url("/reservation");
-		$scope.$apply();
 	}
 	
 	$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/connection/" + $rootScope.reservation.id)
@@ -50,6 +49,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     
     	var socket = new SockJS(REST_API + "ws")
 		var stompClient = Stomp.over(socket);
+    	stompClient.debug = null;
     	$scope.stompClient = stompClient;
     	
     	stompClient.connect({}, function (frame) {
@@ -82,8 +82,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     
     function getCredentials() {
         var peerConnectionConfig;
-        console.log("Attempting to connect to the room with ID: ["
-            + $scope.connectionDetails.room + "]...");
       
         $.ajax({
             url: $scope.connectionDetails.iceEndpoint,
@@ -109,16 +107,14 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     
     function connect() {
     	$scope.connected = true;
-    	console.log("Connecting to [" + $scope.connectionDetails.room + "]");
+    	console.log("Connecting to [" + ($scope.doctorInfo.firstName + " " + $scope.doctorInfo.lastName) + "]'s room");
     	startTransmission();
     }
     
     function disconnect() {
-    	$scope.webrtc.leaveRoom();
     	$scope.connected = false;
+    	$scope.webrtc.leaveRoom();
         stopTransmission();
-        $scope.subscription.unsubscribe();
-        $scope.stompClient.disconnect();
         console.log("Disconnected from: [" + $scope.connectionDetails.room + "]");
     }
     
@@ -157,7 +153,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         $scope.webrtc.on("readyToCall", function () {
         	$scope.webrtc.joinRoom($scope.connectionDetails.room);
         	$scope.connected = true;
-            console.log("Connected to [" + $scope.connectionDetails.room + "]");
+            console.log("Connected to the consultation room");
         });
 
         $scope.webrtc.on("videoAdded", function (video, peer) {
@@ -167,6 +163,10 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
             console.log("A new user has joined the room");
             updateVolumeLevel();
             
+        });
+        
+        $scope.webrtc.on("videoRemoved", function (videoEl, peer) {
+        	disconnect();
         });
 
         /* disconnect and leave the room */
@@ -182,7 +182,6 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         });
   
         $("#call-btn").click(function () {
-            $("#call-btn").prop("disabled", false);
             notifyDoctor();
             
             if (!$scope.connected) {

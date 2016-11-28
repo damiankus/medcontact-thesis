@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.medcontact.exception.NotMatchedPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -44,6 +43,7 @@ import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
 import com.medcontact.data.repository.SharedFileRepository;
+import com.medcontact.exception.NotMatchedPasswordException;
 import com.medcontact.exception.UnauthorizedUserException;
 import com.medcontact.security.config.EntitlementValidator;
 
@@ -327,4 +327,5 @@ public class PatientService {
         }
         patientRepository.save(patient);
     }
+
 }
