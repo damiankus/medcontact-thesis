@@ -10,12 +10,13 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 myApp.controller('ResetPasswordCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
+        console.log("POST " + REST_API + "passwords/send-link", $scope.userDetails);
 
         $scope.resetPassword = function () {
             var request = {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                url: REST_API + "reset-password/send-link",
+                url: REST_API + "passwords/send-link",
                 transformRequest: function (obj) {
                     var str = [];
                     for (var p in obj)
@@ -30,6 +31,9 @@ myApp.controller('ResetPasswordCtrl', ['REST_API', "$rootScope", '$scope', '$htt
             $http(request)
                 .then(function successCallback(response) {
                     console.log("Success")
+                    $rootScope.resetPassword = true;
+                    $scope.resetFail = false;
+                    $location.url('/login');
                 }, function errorCallback(response) {
                     console.error("[ERROR]: ");
                     console.error(response);

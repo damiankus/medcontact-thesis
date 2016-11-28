@@ -1,3 +1,4 @@
+
 'use strict';
 
 
@@ -12,6 +13,12 @@ myApp.controller('LoginCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$lo
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
         $scope.loginError = false;
         $scope.loggedIn = false;
+        if ($rootScope.resetPassword == true) {
+            $scope.resetPassword = true;
+            $rootScope.resetPassword = false;
+        } else {
+            $scope.resetPassword = false;
+        }
 
         $scope.login = function () {
             var request = {
@@ -35,6 +42,7 @@ myApp.controller('LoginCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$lo
                         $rootScope.userDetails = UserService.getUser();
                         $scope.loginError = false;
                         $scope.loggedIn = true;
+                        $scope.resetPassword = false;
                         switch ($rootScope.userDetails.role){
                             case 'DOCTOR':
                                 $location.url('/add-schedule');
@@ -53,12 +61,14 @@ myApp.controller('LoginCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$lo
                         console.log("[ERROR]: " + response.data.message);
                         $scope.loginError = true;
                         $scope.loggedIn = false;
+                        $scope.resetPassword = false;
                     });
 
             }, function errorCallback(response) {
                 console.log("[ERROR]: " + response.data.message);
                 $scope.loginError = true;
                 $scope.loggedIn = false;
+                $scope.resetPassword = false;
             });
         }
     }]);
