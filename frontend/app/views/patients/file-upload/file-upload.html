@@ -2,7 +2,11 @@
 	<div class="container" ng-app="myApp" ng-controller="FileUploadCtrl"> 
 		<div class="well">
 			<form id="file-upload-form" class="form-inline" method="post" enctype="multipart/form-data">
-				<h4>Udostępnianie plików</h4>
+
+				<div class="text-center">
+					<h2>Udostępnianie plików</h2>
+				</div>				
+				
 				<fieldset id="file-upload-controls">
 					<textarea id="filename-area" class="form-control" placeholder="Nazwa pliku" readonly></textarea>
 					<label class="btn btn-default btn-file">
@@ -17,10 +21,20 @@
 		
 		<div class="well">
 			<h4>Przesłane pliki</h4>
+			
+			<form>
+			  <div class="search-form form-group">
+			    <div class="input-group">
+			      <div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+			      <input type="text" class="form-control" placeholder="Szukaj pliku" ng-model="fileKeyWord">
+			    </div>      
+			  </div>
+			</form>			
+					
 			<table id="files-table" class="table table-hover">
 				<thead>
 					<tr>
-					
+						<th>#</th>
 						<th ng-click="sortField = 'name'; sortReversed = !sortReversed" class="col-md-4">
 							Nazwa pliku 
 							<span ng-show="sortField == 'name' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
@@ -44,7 +58,8 @@
 				</thead>
 				
 				<tbody>
-					<tr ng-repeat="file in files | orderBy:sortField:sortReversed">
+					<tr ng-repeat="file in files | filter:fileKeyWord | orderBy:sortField:sortReversed">
+						<td>{{ $index + 1 }}</td>
 						<td>{{ file.name }}</td>
 						<td>{{ file.uploadTime | date : 'dd-MM-yyyy HH:mm:ss' }}</td>
 						<td>{{ file.contentType }}</td>

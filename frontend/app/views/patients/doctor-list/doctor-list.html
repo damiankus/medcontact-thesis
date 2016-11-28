@@ -2,25 +2,41 @@
 <div class="container">
     <div class="jumbotron">
 
-        <div class="form-group">
-            <span class="col-md-4"></span>
-            <h2 class="col-md-8">Lista lekarzy</h2>
+        <div class="form-group text-center">
+            <h2 class="col-md-12">Lekarze</h2>
         </div>
+
+				<form>
+				  <div class="search-form form-group">
+				    <div class="input-group">
+				      <div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+				      <input type="text" class="form-control" placeholder="Szukaj lekarza" ng-model="doctorKeyWord">
+				    </div>      
+				  </div>
+				</form>
 
         <table class="table table-hover">
             <thead>
             <tr>
                 <th>#</th>
-                <th>Specjalizacje</th>
-                <th>Imię i nazwisko</th>
+                <th ng-click="sortField = 'doctorName'; sortReversed = !sortReversed">
+                	Imię i nazwisko
+                	<span ng-show="sortField == 'doctorName' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
+									<span ng-show="sortField == 'doctorName' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
+               	</th>
+                <th ng-click="sortField = 'specialties'; sortReversed = !sortReversed">
+                	Specjalizacje
+                	<span ng-show="sortField == 'specialties' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
+									<span ng-show="sortField == 'specialties' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
+                </th>
                 <th>Terminy</th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="doctor in doctors">
+            <tr ng-repeat="doctor in doctors | filter:doctorKeyWord | orderBy:sortField:sortReversed">
                 <td>{{ $index + 1 }}</td>
-                <td ng-repeat="specialization in doctor.specialties">{{ specialization.name }} {{$last ? '' : ', '}} </td>
-                <td>{{ doctor.firstName + " " + doctor.lastName}}</td>
+                <td>{{ doctor.fullName }}</td>
+                <td>{{ doctor.specialties }}</td>
                 <td><a ng-href="{{ doctor }}">
                     <a ng-click="showTerm(doctor)" class="btn btn-sm btn-success">Pokaż terminy</a>
                 </a></td>
