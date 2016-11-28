@@ -60,10 +60,6 @@ public class Patient extends BasicUser {
 		this.firstName = personalDataPassword.getFirstName();
 		this.lastName = personalDataPassword.getLastName();
 		this.email = personalDataPassword.getEmail();
-
-		if(passwordEncoder.matches(personalDataPassword.getOldPassword(), this.password) &&
-				personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2()))
-			this.password = passwordEncoder.encode(personalDataPassword.getNewPassword1());
 	}
 
 	public void addReservatin(Reservation reservation) {

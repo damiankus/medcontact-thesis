@@ -93,7 +93,7 @@ public class PatientAccountController {
         patientService.bookReservation(patientId, reservationId);
     }
 
-    @PostMapping(value = "{id}/personal-data")
+    @PutMapping(value = "{id}")
     @ResponseBody
     public void changePersonalData(
             @PathVariable("id") Long patientId,
