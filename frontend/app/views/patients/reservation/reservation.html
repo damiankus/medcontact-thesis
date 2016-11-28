@@ -2,33 +2,42 @@
 <div class="container">
     <div class="jumbotron" ng-app="myApp" ng-controller="ReservationCtrl">
 
-        <div class="form-group">
-            <span class="col-md-4"></span>
-            <h2 class="col-md-8">Rezerwacje</h2>
+        <div class="form-group text-center">
+            <h2 class="col-md-12">Rezerwacje</h2>
         </div>
+        
+				<form>
+				  <div class="search-form form-group">
+				    <div class="input-group">
+				      <div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+				      <input type="text" class="form-control" placeholder="Szukaj rezerwacji" ng-model="reservationKeyWord">
+				    </div>      
+				  </div>
+				</form>
         
         <table id="reservations-table" class="table table-hover">
             <thead>
             <tr>
-	           	<th ng-click="sortField = 'doctorName'; sortReversed = !sortReversed" class="col-md-4">
+            	<th>#</th>
+	           	<th ng-click="sortField = 'doctorName'; sortReversed = !sortReversed" class="col-md-3">
 								Lekarz
 								<span ng-show="sortField == 'doctorName' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 								<span ng-show="sortField == 'doctorName' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 							</th>
 							
-							<th ng-click="sortField = 'uploadTime'; sortReversed = !sortReversed" class="col-md-3">
+							<th ng-click="sortField = 'uploadTime'; sortReversed = !sortReversed" class="col-md-2">
 								Data
 								<span ng-show="sortField == 'uploadTime' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 								<span ng-show="sortField == 'uploadTime' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 							</th>
 							
-							<th ng-click="sortField = 'startDateTime'; sortReversed = !sortReversed" class="col-md-2">
+							<th ng-click="sortField = 'startDateTime'; sortReversed = !sortReversed" class="col-md-3">
 								 Godzina rozpoczęcia
 								<span ng-show="sortField == 'startDateTime' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 								<span ng-show="sortField == 'startDateTime' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 							</th>
 							
-							<th ng-click="sortField = 'endDateTime'; sortReversed = !sortReversed" class="col-md-2">
+							<th ng-click="sortField = 'endDateTime'; sortReversed = !sortReversed" class="col-md-3">
 								 Godzina zakończenia
 								<span ng-show="sortField == 'endDateTime' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 								<span ng-show="sortField == 'endDateTime' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
@@ -38,7 +47,8 @@
             </tr>
             </thead>
 	         	<tbody>
-							<tr ng-repeat="reservation in reservations | orderBy:sortField:sortReversed">
+							<tr ng-repeat="reservation in reservations | filter:reservationKeyWord| orderBy:sortField:sortReversed">
+								<td>{{ $index + 1 }}</td>
 								<td>{{ reservation.doctorName }}</td>
 								<td>{{ reservation.startDateTime | date : 'dd-MM-yyyy' }}</td>
 								<td>{{ reservation.startDateTime | date : 'HH:mm:ss' }}</td>
