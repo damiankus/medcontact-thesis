@@ -1,54 +1,50 @@
 package com.medcontact.controller.services;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.medcontact.controller.DoctorDataController;
-import com.medcontact.data.model.domain.Doctor;
-import com.medcontact.data.model.domain.FileEntry;
-import com.medcontact.data.model.domain.Reservation;
-import com.medcontact.data.model.domain.SharedFile;
-import com.medcontact.data.model.dto.BasicDoctorDetails;
-import com.medcontact.data.model.dto.ConnectionData;
-import com.medcontact.data.model.dto.ReservationDate;
-import com.medcontact.data.model.enums.ReservationState;
-import com.medcontact.data.repository.BasicUserRepository;
-import com.medcontact.data.repository.DoctorRepository;
-import com.medcontact.data.repository.ReservationRepository;
-import com.medcontact.data.repository.SharedFileRepository;
-import com.medcontact.data.validation.DoctorValidator;
-import com.medcontact.data.validation.ValidationResult;
-import com.medcontact.exception.NonExistentUserException;
-import com.medcontact.exception.UnauthorizedUserException;
-import com.medcontact.security.config.EntitlementValidator;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+
+import com.medcontact.controller.DoctorDataController;
+import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.domain.FileEntry;
+import com.medcontact.data.model.domain.Note;
+import com.medcontact.data.model.domain.Patient;
+import com.medcontact.data.model.domain.Reservation;
+import com.medcontact.data.model.domain.SharedFile;
+import com.medcontact.data.model.dto.BasicDoctorDetails;
+import com.medcontact.data.model.dto.BasicNoteDetails;
+import com.medcontact.data.model.dto.BasicReservationData;
+import com.medcontact.data.model.dto.ConnectionData;
+import com.medcontact.data.model.dto.ReservationDate;
+import com.medcontact.data.model.enums.ReservationState;
+import com.medcontact.data.repository.DoctorRepository;
+import com.medcontact.data.repository.NoteRepository;
+import com.medcontact.data.repository.PatientRepository;
+import com.medcontact.data.repository.ReservationRepository;
+import com.medcontact.data.repository.SharedFileRepository;
+import com.medcontact.exception.NonExistentUserException;
+import com.medcontact.exception.UnauthorizedUserException;
+import com.medcontact.security.config.EntitlementValidator;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Service
 public class DoctorService {
     private Logger logger = Logger.getLogger(DoctorDataController.class.getName());
-    private DoctorValidator doctorValidator = new DoctorValidator();
 
     @Getter
     @Setter
@@ -59,11 +55,14 @@ public class DoctorService {
     private SimpMessagingTemplate brokerMessagingTemplate;
 
     @Autowired
-    BasicUserRepository userRepository;
+    private DoctorRepository doctorRepository;
 
     @Autowired
-    DoctorRepository doctorRepository;
-
+    private PatientRepository patientRepository;
+    
+    @Autowired
+    private NoteRepository noteRepository;
+    
     @Autowired
     private ReservationRepository reservationRepository;
 
@@ -90,10 +89,6 @@ public class DoctorService {
     @Value("${webrtc.turn.secret}")
     private String turnSecret;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-
     public BasicDoctorDetails getDoctorInfo(Long doctorId) {
         Doctor doctor = doctorRepository.findOne(doctorId);
 
@@ -118,61 +113,6 @@ public class DoctorService {
         return connectionData;
     }
 
-    public ResponseEntity<Map<String, Object>> addDoctor(Doctor doctor) throws UnirestException {
-        Map<String, Object> body = new HashMap<>();
-        HttpStatus status = HttpStatus.CREATED;
-
-        if (!userRepository.isEmailAvailable(doctor.getEmail())) {
-            body.put("errors", Arrays.asList("Email already taken"));
-            status = HttpStatus.CONFLICT;
-
-        } else {
-            ValidationResult validationResult = doctorValidator.validate(doctor);
-
-            if (!validationResult.isValid()) {
-                body.put("errors", validationResult.getErrors());
-                status = HttpStatus.BAD_REQUEST;
-
-            } else {
-
-				/* Make a GET request to the TURN server mediating
-				 * in the audio-video communication in order to create
-				 * a new room for the doctor. */
-
-                HttpResponse<JsonNode> jsonResponse = Unirest.post(turnApiEndpoint + "room")
-                        .field("ident", turnIdent)
-                        .field("secret", turnSecret)
-                        .field("domain", turnDomain)
-                        .field("application", turnApplicationName)
-                        .field("room", doctor.getRoomId())
-                        .field("secure", 1)
-                        .asJson();
-
-				/* 201 - CREATED */
-
-                if (jsonResponse.getStatus() != 201) {
-                    System.out.println(jsonResponse.getStatusText().toLowerCase());
-                    System.out.println(HttpStatus.CREATED.toString().toLowerCase());
-                    body.put("errors", Arrays.asList("Couldn't create consultation room"));
-                    status = HttpStatus.SERVICE_UNAVAILABLE;
-                    logger.warning("Couldn't create a room for the new doctor");
-
-                } else {
-
-					/* Replace the original password with a hashed one. */
-
-                    doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
-                    doctorRepository.save(doctor);
-                    body.put("id", "" + doctor.getId());
-                    status = HttpStatus.CREATED;
-                    logger.warning("A new room created successfully");
-                }
-            }
-        }
-
-        return new ResponseEntity<>(body, status);
-    }
-
     public List<BasicDoctorDetails> getDoctors() {
         return doctorRepository.findAll()
                 .stream()
@@ -183,7 +123,7 @@ public class DoctorService {
     public void addNewReservation(Long id, ReservationDate reservationDate) {
         Doctor doctor = doctorRepository.findOne(id);
         Reservation reservation = new Reservation(doctor, reservationDate.getStart(), reservationDate.getEnd());
-        doctor.addReservation(reservation);
+        doctor.getReservations().add(reservation);
         doctorRepository.save(doctor);
     }
 
@@ -259,21 +199,130 @@ public class DoctorService {
                 .collect(Collectors.toList());
     }
 
-    public boolean setDoctorAvailable(Long id, boolean isAvailable) throws UnauthorizedUserException {
-        Doctor doctor = doctorRepository.findOne(id);
+    public boolean setDoctorAvailable(Long doctorId, boolean isAvailable) throws UnauthorizedUserException {
+        Doctor doctor = doctorRepository.findOne(doctorId);
         if (doctor == null) {
             throw new NonExistentUserException();
         }
-        if (!entitlementValidator.isEntitled(id, Doctor.class)){
+        if (!entitlementValidator.isEntitled(doctorId, Doctor.class)){
             throw new UnauthorizedUserException();
         }
-            doctor.setAvailable(isAvailable);
-            doctorRepository.save(doctor);
-            logger.info("Doctor [" + id + "] availability status has changed to: "
-                    + ("" + doctor.isAvailable()).toUpperCase());
-            brokerMessagingTemplate.convertAndSend("/topic/doctors/" + id + "/available", "" + isAvailable);
+        
+        doctor.setAvailable(isAvailable);
+        doctorRepository.save(doctor);
+        logger.info("Doctor [" + doctorId + "] availability status has changed to: "
+                + ("" + doctor.isAvailable()).toUpperCase());
+        brokerMessagingTemplate.convertAndSend("/topic/doctors/" + doctorId + "/available", "" + isAvailable);
 
         return doctor.isAvailable();
     }
 
+    
+    public BasicReservationData getNextReservation(Long doctorId, Long reservationId) throws UnauthorizedUserException {
+    	if (!entitlementValidator.isEntitled(doctorId, Doctor.class)){
+            throw new UnauthorizedUserException();
+        } 
+    	
+    	Reservation reservation = reservationRepository.findOne(reservationId);
+    	
+    	if (reservation == null) {
+    		throw new UnauthorizedUserException();
+    		
+    	} else if (!reservation.getDoctor().getId().equals(doctorId)) {
+    		throw new UnauthorizedUserException();
+    	}
+    	
+    	List<BasicReservationData> nextReservations = reservationRepository.findNextReservations(reservation.getStartDateTime())
+    			.stream()
+    			.filter(r -> r.getReservationState() == ReservationState.RESERVED)
+    			.limit(1)
+    			.map(r -> new BasicReservationData(r))
+    			.collect(Collectors.toList());
+    	
+    	return (nextReservations.size() > 0) ? nextReservations.get(0) : new BasicReservationData();
+    }
+    
+    public void addNote(Long doctorId, BasicNoteDetails noteDetails) throws UnauthorizedUserException {
+    	entitlementValidator.isEntitled(doctorId, Doctor.class);
+    	
+    	Doctor doctor = doctorRepository.findOne(doctorId);
+    	Patient patient = patientRepository.findOne(noteDetails.getPatientId());
+    	
+    	if (doctor == null) {
+    		throw new UnauthorizedUserException();
+    	} else if (!doctor.getId().equals(doctorId)) {
+    		throw new UnauthorizedUserException();
+    	} else if (patient == null) {
+    		throw new UnauthorizedUserException();
+    	} else {
+    		Note note = new Note();
+    		note.setContent(noteDetails.getContent());
+    		note.setPatient(patient);
+    		note.setDoctor(doctor);
+    		doctor.getNotes().add(note);
+    		
+    		doctorRepository.save(doctor);
+    	}
+    }
+    
+    public void updateNote(Long doctorId, BasicNoteDetails noteDetails) throws UnauthorizedUserException {
+    	entitlementValidator.isEntitled(doctorId, Doctor.class);
+    	Doctor doctor = doctorRepository.findOne(doctorId);
+    	
+    	if (doctor == null) {
+    		throw new UnauthorizedUserException();
+    		
+    	} else {
+    		Note note = noteRepository.findOne(noteDetails.getNoteId());
+    		
+    		if (note == null) {
+        		throw new UnauthorizedUserException();
+        		
+    		} else if (!note.getDoctor().getId().equals(doctorId)) {
+        		throw new UnauthorizedUserException();
+        		
+    		} else {
+    			note.setContent(noteDetails.getContent());
+    			noteRepository.save(note);
+    		}
+    	}
+    }
+    
+    public void deleteNote(Long doctorId, Long noteId) throws UnauthorizedUserException {
+    	entitlementValidator.isEntitled(doctorId, Doctor.class);
+    	
+    	Doctor doctor = doctorRepository.findOne(doctorId);
+    	
+    	if (doctor == null) {
+    		throw new UnauthorizedUserException();
+    	} else {
+    		Optional<Note> noteOptional = doctor.getNotes()
+    				.stream()
+    				.filter(n -> n.getId() == noteId)
+    				.findFirst();
+    		
+    		if (!noteOptional.isPresent()) {
+        		throw new UnauthorizedUserException();
+        		
+    		} else {
+    			doctor.getNotes().removeIf(n -> n.getId() == noteId);
+    			doctorRepository.save(doctor);
+    			noteRepository.delete(noteId);
+    		}
+    	}
+    }
+    
+    public List<Note> getNotesForPatient(Long doctorId, Long patientId) throws UnauthorizedUserException {
+    	entitlementValidator.isEntitled(doctorId, Doctor.class);
+    	
+    	Doctor doctor = doctorRepository.findOne(doctorId);
+    	
+    	if (doctor == null) {
+    		throw new UnauthorizedUserException();
+    	}
+    	
+    	return doctor.getNotes().stream()
+    			.filter(n -> n.getPatient().getId() == patientId)
+    			.collect(Collectors.toList());
+    }
 }

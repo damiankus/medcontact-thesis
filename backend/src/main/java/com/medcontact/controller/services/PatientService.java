@@ -43,6 +43,7 @@ import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
 import com.medcontact.data.repository.SharedFileRepository;
+import com.medcontact.exception.NotMatchedPasswordException;
 import com.medcontact.exception.UnauthorizedUserException;
 import com.medcontact.security.config.EntitlementValidator;
 
@@ -314,7 +315,17 @@ public class PatientService {
 
     public void changePersonalData(Long patientId, PersonalDataPassword personalDataPassword) {
         Patient patient = patientRepository.findOne(patientId);
+
         patient.changePersonalData(personalDataPassword, passwordEncoder);
+        if(personalDataPassword.getNewPassword1() != null && personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2())){
+            if (passwordEncoder.matches(personalDataPassword.getOldPassword(), patient.getPassword())){
+                patient.setPassword(passwordEncoder.encode(personalDataPassword.getNewPassword1()));
+            }
+            else{
+                throw new NotMatchedPasswordException();
+            }
+        }
         patientRepository.save(patient);
     }
+
 }

@@ -46,33 +46,40 @@ public class Application implements CommandLineRunner {
         Admin admin = (Admin) Admin.getBuilder()
                 .setFirstName("Admin")
                 .setLastName("Adminowski")
-                .setEmail("admin@gmail")
+                .setEmail("a1@test.com")
                 .setPassword(passwordEncoder.encode("haslo"))
                 .build();
 
         adminRepository.save(admin);
 
-        Patient patient = (Patient) Patient.getBuilder()
+        Patient patient1 = (Patient) Patient.getBuilder()
                 .setFirstName("Jan")
                 .setLastName("Kowalski")
-                .setEmail("kowal@gmail.com")
+                .setEmail("p1@test.com")
                 .setPassword(passwordEncoder.encode("haslo"))
                 .build();
+        patientRepository.save(patient1);
+        
         Patient patient2 = (Patient) Patient.getBuilder()
-                .setFirstName("Damian")
-                .setLastName("Drugi")
-                .setEmail("dkus@gmail.com")
+                .setFirstName("Anna")
+                .setLastName("Malinowska")
+                .setEmail("p2@test.com")
                 .setPassword(passwordEncoder.encode("haslo"))
                 .build();
-        patientRepository.save(patient);
         patientRepository.save(patient2);
+        
+        Patient patient3 = (Patient) Patient.getBuilder()
+                .setFirstName("Agata")
+                .setLastName("Rusin")
+                .setEmail("p3@test.com")
+                .setPassword(passwordEncoder.encode("haslo"))
+                .build();
+        patientRepository.save(patient3);
 
         Note note = new Note();
         note.setContent("Notatka probna");
-        note.setTitle("NOTATKA PACJENT 1");
         note.setUploadTime(Timestamp.valueOf(LocalDateTime.now()));
-        note.setPatient(patient);
-
+        note.setPatient(patient1);
 
         Specialty infectious = new Specialty();
         infectious.setName("choroby zakaźne");
@@ -91,14 +98,65 @@ public class Application implements CommandLineRunner {
                 .setPassword(passwordEncoder.encode("haslo"))
                 .setFirstName("Gregory")
                 .setLastName("House")
-                .setEmail("house@gmail.com")
+                .setEmail("d1@test.com")
                 .build();
-
 
         note.setDoctor(doctor);
         doctor.getNotes().add(note);
 
-        doctor.setRoomId("default");
+        doctor.setRoomId("d1-room");
         doctorRepository.save(doctor);
+
+        Specialty specialty2 = new Specialty();
+        specialty2.setName("pneumologia");
+        
+        Doctor doctor2 = (Doctor) DoctorBuilder.getBuilder()
+                .setSpecialties(Arrays.asList(specialty2))
+                .setBiography("Lorem ipsum dolor sit amet, "
+                		+ "consectetur adipiscing elit, sed do eiusmod"
+                		+ " tempor incididunt ut labore et dolore magna"
+                		+ " aliqua. Ut enim ad minim veniam, quis nostrud"
+                		+ " exercitation ullamco laboris nisi ut aliquip"
+                		+ " ex ea commodo consequat. Duis aute irure dolor"
+                		+ " in reprehenderit in voluptate velit esse"
+                		+ " cillum dolore eu fugiat nulla pariatur."
+                		+ " Excepteur sint occaecat cupidatat non proident,"
+                		+ " sunt in culpa qui officia deserunt mollit anim id est laborum.")
+                .setUniversity("Śląski Uniwersytet Medyczny")
+                .setTitle("dr")
+                .setPassword(passwordEncoder.encode("haslo"))
+                .setFirstName("Anna")
+                .setLastName("Kowalczyk")
+                .setEmail("d2@test.com")
+                .build();
+        
+        doctor2.setRoomId("d2-room");
+        doctorRepository.save(doctor2);
+        
+        Specialty specialty3 = new Specialty();
+        specialty3.setName("dermatologia");
+        
+        Doctor doctor3 = (Doctor) DoctorBuilder.getBuilder()
+                .setSpecialties(Arrays.asList(specialty3))
+                .setBiography("Lorem ipsum dolor sit amet, "
+                		+ "consectetur adipiscing elit, sed do eiusmod"
+                		+ " tempor incididunt ut labore et dolore magna"
+                		+ " aliqua. Ut enim ad minim veniam, quis nostrud"
+                		+ " exercitation ullamco laboris nisi ut aliquip"
+                		+ " ex ea commodo consequat. Duis aute irure dolor"
+                		+ " in reprehenderit in voluptate velit esse"
+                		+ " cillum dolore eu fugiat nulla pariatur."
+                		+ " Excepteur sint occaecat cupidatat non proident,"
+                		+ " sunt in culpa qui officia deserunt mollit anim id est laborum.")
+                .setTitle("dr")
+                .setUniversity("Uniwersytet Jagielloński")
+                .setPassword(passwordEncoder.encode("haslo"))
+                .setFirstName("Jan")
+                .setLastName("Malinowski")
+                .setEmail("d3@test.com")
+                .build();
+        
+        doctor3.setRoomId("d3-room");
+        doctorRepository.save(doctor3);
     }
 }

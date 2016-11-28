@@ -46,10 +46,9 @@ public class SignUpController {
 	public ResponseEntity<String> isEmailAvailable(
 			@RequestParam("email") String email) {
 		
-		boolean emailAvailable = userRepository.isEmailAvailable(email);
 		ResponseEntity<String> response;
 		
-		if (emailAvailable) {
+		if (userRepository.findByEmail(email).isPresent()) {
 			response = new ResponseEntity<String>("Email taken.", HttpStatus.CONFLICT);
 		} else {
 			response = new ResponseEntity<>("Email available.", HttpStatus.OK);

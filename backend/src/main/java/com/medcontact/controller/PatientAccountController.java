@@ -34,10 +34,10 @@ public class PatientAccountController {
     @Autowired
     private PatientService patientService;
 
-    @GetMapping("{patientId}/connection/{consultationId}")
+    @GetMapping("{patientId}/connection/{reservationId}")
     public ResponseEntity<ConnectionData> getConnectionData(
             @PathVariable("patientId") Long patientId,
-            @PathVariable("consultationId") Long reservationId) {
+            @PathVariable("reservationId") Long reservationId) {
 
         return patientService.getConnectionData(patientId, reservationId);
     }
@@ -88,11 +88,12 @@ public class PatientAccountController {
     public void bookReservation(
             @PathVariable("id") Long patientId,
             @PathVariable("reservation_id") Long reservationId) {
-
+    	
+    	System.out.println("BOOKING");
         patientService.bookReservation(patientId, reservationId);
     }
 
-    @PostMapping(value = "{id}/personal-data")
+    @PutMapping(value = "{id}")
     @ResponseBody
     public void changePersonalData(
             @PathVariable("id") Long patientId,

@@ -10,7 +10,14 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
   function (REST_API, $rootScope, $scope, $http, $location, UserService) {
 	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/add-schedule");
+	$scope.isNoteModified = {};
 	initControlls();
+	
+	if (typeof $rootScope.callingPatient !== "undefined") {
+		getSharedFiles();
+		getNextReservation($rootScope.currentReservation.id);
+		getNotesForPatient($rootScope.callingPatient.id);
+	}
 	
 	$http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/connection")
 	    .then(function successCallback(response) {
@@ -19,7 +26,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 	    	
 	    	if ($scope.connectionDetails === undefined
 	        		|| $scope.connectionDetails === null) {
-	            alert("[ERROR]: Invalid connection data");
+	            console.error("[ERROR]: Invalid connection data");
 	            $location.url("/login");
 
 	        } else {
@@ -51,12 +58,16 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 	    	var socket = new SockJS(REST_API + "ws")
 			var stompClient = Stomp.over(socket);
 	    	$rootScope.stompClient = stompClient;
+	    	stompClient.debug = null;
 	    	
 	    	stompClient.connect({}, function (frame) {
 	    		$rootScope.subscription = stompClient.subscribe("/queue/doctors/" + $rootScope.userDetails.id + "/calling", function (message) {
 	    			$rootScope.prevPatient = $rootScope.callingPatient;
 					$rootScope.callingPatient = JSON.parse(message.body);
 					$rootScope.ringTone.play();
+					$rootScope.patientCalling = true;
+
+					$rootScope.currentReservation = $rootScope.callingPatient.reservation;
 					
 					var dialog = $("#modal-calling");
 					$("#calling-patient-id").text($scope.callingPatient.id);
@@ -71,18 +82,12 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 						$rootScope.ringTone.currentTime = 0;
 						
 						if ($location.url() !== "/doctor-consultation") {
-							
 							$location.path("/doctor-consultation");
-//							setTimeout(function () {
-//								$scope.$apply();
-//							}, 2000);
 							
 						} else {
 							getSharedFiles();
-							
-							if (!$scope.connected) {
-								connect();
-							}
+							getNextReservation($rootScope.currentReservation.id);
+							getNotesForPatient($rootScope.callingPatient.id);
 						}
 					});
 					
@@ -96,8 +101,6 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 	
     function getCredentials() {
         var peerConnectionConfig;
-        console.log("Attempting to connect to the room with ID: ["
-            + $scope.connectionDetails.room + "]...");
       
         $.ajax({
             url: $scope.connectionDetails.iceEndpoint,
@@ -121,17 +124,18 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         });
     }
     
-    function connect() {
-		console.log("Connecting to [" + $scope.connectionDetails.room + "]");
+    $scope.connect = function () {
+		console.log("Connecting to [" + $scope.userDetails.name + "]'s room");
 		$scope.connected = true;
 		startTransmission();
 	}
     
-    function disconnect() {
+    $scope.disconnect = function () {
     	$scope.webrtc.leaveRoom();
     	stopTransmission();
+    	$rootScope.patientCalling = false;
     	$scope.connected = false;
-		console.log("Disconnected from: [" + $scope.connectionDetails.room + "]");
+		console.log("$scope.disconnected from: [" + $scope.connectionDetails.room + "]");
     }
     
     function sendStatus(patientId, status) {
@@ -195,13 +199,13 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         });
 
     	$scope.$on('$locationChangeStart', function(event, oldUrl, newUrl) {
-    		disconnect();
+    		$scope.disconnect();
 		});
         
     	$scope.webrtc.on("readyToCall", function () {
         	$scope.webrtc.joinRoom($scope.connectionDetails.room);
         	$scope.connected = true;
-        	console.error("Connected to [" + $scope.connectionDetails.room + "]");
+        	console.log("Connected to the consultation room");
         });
 
         $scope.webrtc.on("videoAdded", function (video, peer) {
@@ -209,12 +213,12 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
                 .css("width", "auto")
                 .css("height", "auto");
             
-            console.error("A new user has joined the room");
+            console.log("A new user has joined the room");
             updateVolumeLevel()
         });
 
         $scope.webrtc.on("localScreenRemoved", function (video) {
-            disconnect();
+            $scope.disconnect();
         });
         
         $scope.webrtc.connection.on("message", function(message){
@@ -225,12 +229,12 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         
         $("#call-btn").click(function () {
         	if (!$scope.connected) {
-        		connect();
+        		$scope.connect();
         	}
         });
 
         $("#disconnect-btn").click(function () {
-            disconnect();
+            $scope.disconnect();
         });
         
         $("#terminate-consultation-btn").click(function () {
@@ -317,13 +321,13 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     }
     
     function startTransmission() {
-        console.error("Transmission started");
+        console.log("Transmission started");
         $scope.webrtc.unmute();
         $scope.webrtc.startLocalVideo();
     }
 
     function stopTransmission() {
-		console.error("Transmission stopped");
+		console.log("Transmission stopped");
 		$scope.webrtc.mute();
 		$scope.webrtc.stopLocalVideo();
     }
@@ -331,7 +335,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     function setAvailability(isAvailable) {
     	$http.post(REST_API + "doctors/" + $rootScope.userDetails.id + "/available/set/" + isAvailable)
     		.then(function successCallback(response) {
-    			console.error("Availability status has been changed to: " + response.data);
+    			console.log("Availability status has been changed to: " + response.data);
     		
     		}, function errorCallback(response) {
     	    	console.error("[ERROR]: Couldn't change availability status");
@@ -357,6 +361,19 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
             muteBtn.addClass("glyphicon-volume-off");
         }
     }
+    
+    function formatDate(dateTime) {
+    	var date = new Date(dateTime);
+    	return  "" + date.getDate() + "-" + date.getMonth() + "-" + date.getYear();
+    }
+    
+    function formatTime(dateTime) {
+    	var time = new Date(dateTime);
+		return  "" + ((time.getHours() > 9) ? time.getHours() : "0" + time.getHours()) 
+			+ ":" + ((time.getMinutes() > 9) ? time.getMinutes() : "0" + time.getMinutes());
+    }
+    
+    /* Text chat controls logic */
     
     function addMessage(sender, content, bgClass) {
     	var messageEl = $("<div></div>")
@@ -388,7 +405,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 				senderId: $rootScope.userDetails.id,
 				sender: $rootScope.userDetails.firstName + " " + $rootScope.userDetails.lastName,
 				content: content
-			})
+			});
 			addMessage($rootScope.userDetails.name, content, "btn-default");
 			textInput.val("");
 		}
@@ -418,15 +435,121 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     	$("#chat-input-submit").click(sendTextMessage);
     }
     
-    function formatDate(dateTime) {
-    	var date = new Date(dateTime);
-    	return  "" + date.getDate() + "-" + date.getMonth() + "-" + date.getYear();
+    /* Current and previous reservation data controller */
+    
+    function getNextReservation(reservationId) {
+		$http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/reservations/" + reservationId + "/next")
+		    .then(function successCallback(response) {
+		    	
+		    	if (response.data.id > 0) {
+		    		$rootScope.nextReservation = response.data;
+		    		$rootScope.nextReservation.startDateTime = new Date($rootScope.nextReservation.startDateTime);
+		    		$rootScope.nextReservation.endDateTime = new Date($rootScope.nextReservation.endDateTime);
+		    	
+		    	} else {
+		    		$rootScope.nextReservation = null;
+		    	}
+		    	
+		    }, function errorCallback(response) {
+		    	alert("[ERROR]: Couldn't load current reservation data");
+		    	$location.url("/login");
+		    });
     }
     
-    function formatTime(dateTime) {
-    	var time = new Date(dateTime);
-		return  "" + ((time.getHours() > 9) ? time.getHours() : "0" + time.getHours()) 
-			+ ":" + ((time.getMinutes() > 9) ? time.getMinutes() : "0" + time.getMinutes());
+    /*
+     * Notes controller
+     * */
+    
+    $scope.isNoteModified = function (noteId) {
+    	return $scope.notesModificationState[noteId];
+    };
+    
+    function getNotesForPatient(patientId) {
+    	$http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/notes/patient/" + patientId)
+		    .then(function successCallback(response) {
+		    	$rootScope.notes = response.data;
+		    	
+		    }, function errorCallback(response) {
+		    	alert("[ERROR]: Couldn't load notes");
+		    	$location.url("/login");
+		    });
     }
     
+    $scope.addNote = function () {
+    	if ($scope.newNote && $scope.newNote.content.length > 0) {
+	    	$scope.newNote.patientId = $rootScope.callingPatient.id;
+    		$scope.newNote.doctorId = $rootScope.userDetails.id;
+    		$scope.newNote.content = $scope.newNote.content.trim();
+	    		
+	    	$http.post(REST_API + "doctors/" + $rootScope.userDetails.id + "/notes", 
+	    			$scope.newNote)
+			    .then(function successCallback(response) {
+			    	$scope.newNote.content = "";
+			    	getNotesForPatient($rootScope.callingPatient.id);
+			    	
+			    }, function errorCallback(response) {
+			    	alert("[ERROR]: Couldn't load notes");
+			    	$location.url("/login");
+			    });
+    	}
+    }
+    
+    $scope.editNote = function (noteId) {
+    	$scope.isNoteModified[noteId] = true;
+
+    	var note = $("#note-" + noteId);
+    	var textArea = $('<textarea id="note-text-input-' + noteId + '" rows="5" class="note btn btn-md col-md-12"></textarea>')
+    	textArea.text(note.text().trim());
+    	
+    	textArea.insertAfter(note);
+    	note.addClass("collapse");
+    }
+    
+    $scope.cancelNoteModification = function (noteId) {
+    	$scope.isNoteModified[noteId] = false;
+
+    	$("#note-text-input-" + noteId).remove();
+    	$("#note-" + noteId).removeClass("collapse");
+    }
+    
+    $scope.updateNote = function (noteId) {
+    	var newContent = $("#note-text-input-" + noteId).val().trim();
+    	
+    	if (newContent.length > 0) {
+    		$scope.cancelNoteModification(noteId);
+    		
+    		var noteDetails = {
+    				noteId: noteId,
+    				patientId: $rootScope.callingPatient.id,
+    				doctorId: $rootScope.userDetails.id,
+    				content: newContent
+    		};
+    		
+    		$http.put(REST_API + "doctors/" + $rootScope.userDetails.id + "/notes", 
+    				noteDetails)
+    				.then(function successCallback(response) {
+    					$("#note-" + noteId).text(newContent);
+    					
+    				}, function errorCallback(response) {
+    					alert("[ERROR]: Couldn't load notes");
+    					$location.url("/login");
+    				});
+    	}
+    	
+    }
+    
+    $scope.deleteNote = function (noteId) {
+    	$scope.isNoteModified[noteId] = false;
+    	
+    	$http.delete(REST_API + "doctors/" + $rootScope.userDetails.id + "/notes/" + noteId)
+		    .then(function successCallback(response) {
+		    	$rootScope.notes = $rootScope.notes.filter(function (item) {
+		    		return item.id !== noteId;
+		    	});
+		    	
+		    }, function errorCallback(response) {
+		    	alert("[ERROR]: Couldn't load notes");
+		    	$location.url("/login");
+		    });
+    }
 }]);

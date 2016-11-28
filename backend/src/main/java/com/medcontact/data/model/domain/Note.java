@@ -28,17 +28,14 @@ public class Note {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
-	@Column(nullable=false)
-	private String title;
-	
-	@Column(nullable=false)
+	@Column(nullable=false, length=1000)
 	private String content;
 	
 	@Column(nullable=false)
 	private Timestamp uploadTime;
 	
 	@ManyToOne
-	@JoinColumn(name="note_owner_id")
+	@JoinColumn(name="doctor_id")
 	@JsonProperty(access=Access.WRITE_ONLY)
 	private Doctor doctor;
 	
@@ -48,9 +45,7 @@ public class Note {
 	private Patient patient;
 	
 	public Note() {
-		this.title = "";
 		this.content = "";
 		this.uploadTime = Timestamp.valueOf(LocalDateTime.now());
-		this.doctor = new Doctor();
 	}
 }

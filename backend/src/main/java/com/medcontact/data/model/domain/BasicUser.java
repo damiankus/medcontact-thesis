@@ -152,6 +152,11 @@ public class BasicUser implements UserDetails {
 		this.username = email.toLowerCase();
 	}
 	
+	public void setUsername(String username) {
+		this.email = username;
+		this.username = username;
+	}
+	
 	public static BasicUserBuilder getBuilder() {
 		return new BasicUserBuilder();
 	}
