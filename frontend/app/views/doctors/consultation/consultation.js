@@ -134,7 +134,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     }
     
     function sendStatus(patientId, status) {
-    	$scope.stompClient.send("/reservationqueue/patients/" + patientId + "/notifications",
+    	$scope.stompClient.send("/queue/patients/" + patientId + "/notifications",
 			{},
 			JSON.stringify({
 				status: status

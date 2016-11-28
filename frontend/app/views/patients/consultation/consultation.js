@@ -114,9 +114,11 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     }
     
     function disconnect() {
+    	$scope.webrtc.leaveRoom();
     	$scope.connected = false;
         stopTransmission();
-        $scope.webrtc.leaveRoom();
+        $scope.subscription.unsubscribe();
+        $scope.stompClient.disconnect();
         console.log("Disconnected from: [" + $scope.connectionDetails.room + "]");
     }
     

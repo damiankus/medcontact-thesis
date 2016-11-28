@@ -1,8 +1,23 @@
 package com.medcontact.controller;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.messaging.MessagingException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.medcontact.controller.services.DoctorService;
-import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.dto.BasicDoctorDetails;
@@ -11,16 +26,6 @@ import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.ReservationDate;
 import com.medcontact.data.model.enums.ReservationState;
 import com.medcontact.exception.UnauthorizedUserException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.MessagingException;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("doctors")
@@ -43,13 +48,6 @@ public class DoctorDataController {
             @PathVariable("doctorId") Long doctorId) throws UnauthorizedUserException {
 
         return doctorService.getConnectionData(doctorId);
-    }
-
-    @PostMapping("")
-    public ResponseEntity<Map<String, Object>> addDoctor(
-            @RequestBody Doctor doctor) throws UnirestException {
-
-        return doctorService.addDoctor(doctor);
     }
 
     @GetMapping(value = "")

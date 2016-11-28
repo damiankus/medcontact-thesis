@@ -1,44 +1,37 @@
 package com.medcontact.controller;
 
-import com.medcontact.data.model.domain.Doctor;
-import com.medcontact.data.model.dto.DoctorCreateData;
-import com.medcontact.data.repository.BasicUserRepository;
-import com.medcontact.data.repository.DoctorRepository;
-import com.medcontact.exception.EmailTakenException;
-import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-
+import java.util.Map;
 import java.util.logging.Logger;
 
-@RestController
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.medcontact.controller.services.AdminService;
+import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.exception.UnauthorizedUserException;
+
+import lombok.Data;
+
+@Controller
 @RequestMapping("admins")
 @Data
 public class AdminDataController {
     private Logger logger = Logger.getLogger(AdminDataController.class.getName());
 
     @Autowired
-    private BasicUserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private DoctorRepository doctorRepository;
-
-    @PostMapping(value = "doctors")
-    @ResponseStatus(value = HttpStatus.CREATED, reason = "Doctor has been created.")
-    @ResponseBody
-    public void addNewDoctor(@RequestBody DoctorCreateData doctorCreateData) {
-        if (userRepository.findByEmail(
-                doctorCreateData.getEmail())
-                .isPresent()) {
-            throw new EmailTakenException(doctorCreateData.getEmail());
-        }
-        String encodedPassword = passwordEncoder.encode(doctorCreateData.getPassword());
-        Doctor doctor = new Doctor(doctorCreateData, encodedPassword);
-        doctorRepository.save(doctor);
+    private AdminService adminService;
+    
+    @PostMapping(value = "{id}/doctors")
+    public ResponseEntity<Map<String, Object>> addNewDoctor(
+    		@PathVariable("id") Long adminId,
+    		@RequestBody Doctor doctor) throws UnirestException, UnauthorizedUserException {
+        
+    	return adminService.addDoctor(adminId, doctor);
     }
 }

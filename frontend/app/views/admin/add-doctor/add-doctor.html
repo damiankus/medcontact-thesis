@@ -2,13 +2,17 @@
 <div class="container">
     <div class="jumbotron">
 
-        <div ng-show="addDoctorError" class="alert alert-danger">
+        <div ng-show="emailTaken" class="alert alert-danger">
             <span class="col-md-4"></span>
             <div class="row">Podany adres e-mail jest już zajęty</div>
         </div>
         <div ng-show="showSuccessMessage" class="alert alert-success">
             <span class="col-md-4"></span>
             Dodano nowego lekarza!
+        </div>
+        <div ng-show="addDoctorError" class="alert alert-danger">
+            <span class="col-md-4"></span>
+            <div class="row">Wystąpił błąd przy próbie dodania lekarza</div>
         </div>
 
         <form class="form-horizontal form-group" name="addDoctorForm">
@@ -37,7 +41,7 @@
             <div class="form-group">
                 <label class="col-md-4 control-label">Adres e-mail: </label>
                 <div class="col-md-8">
-                    <input ng-model="doctor.email" name="email" type="email" class="form-control" required="required"/>
+                    <input ng-model="doctor.username" name="email" type="email" class="form-control" required="required"/>
                 </div>
             </div>
 

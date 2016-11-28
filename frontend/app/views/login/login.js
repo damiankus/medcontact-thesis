@@ -50,7 +50,9 @@ myApp.controller('LoginCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$lo
                                 console.error("Unknown user role: ", $rootScope.userDetails.role)
                         }
                     }, function errorCallback(response) {
-                        console.log("[ERROR]: " + response.data.message);
+                        console.log("[ERROR]: Login error");
+                        console.log(response);
+                        
                         $scope.loginError = true;
                         $scope.loggedIn = false;
                     });
