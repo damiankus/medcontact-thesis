@@ -34,10 +34,10 @@ public class PatientAccountController {
     @Autowired
     private PatientService patientService;
 
-    @GetMapping("{patientId}/connection/{consultationId}")
+    @GetMapping("{patientId}/connection/{reservationId}")
     public ResponseEntity<ConnectionData> getConnectionData(
             @PathVariable("patientId") Long patientId,
-            @PathVariable("consultationId") Long reservationId) {
+            @PathVariable("reservationId") Long reservationId) {
 
         return patientService.getConnectionData(patientId, reservationId);
     }

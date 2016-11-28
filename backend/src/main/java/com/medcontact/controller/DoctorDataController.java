@@ -34,7 +34,7 @@ public class DoctorDataController {
     @Autowired
     private DoctorService doctorService;
 
-    @GetMapping("{id}/info")
+    @GetMapping("{id}")
     @ResponseBody
     public BasicDoctorDetails getDoctorInfo(
             @PathVariable("id") Long doctorId) throws IllegalArgumentException {

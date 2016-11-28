@@ -373,7 +373,7 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     	 * Load doctor info
     	 *  */
     	
-    	$http.get(REST_API + "doctors/" + $rootScope.reservation.doctorId + "/info")
+    	$http.get(REST_API + "doctors/" + $rootScope.reservation.doctorId)
 			.then(function successCallback(response) {
 				$scope.doctorInfo = response.data;
 				
