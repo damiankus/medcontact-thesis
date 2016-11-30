@@ -28,8 +28,8 @@ import com.medcontact.mail.MailUtility;
 public class PasswordRefreshingController {
 	private MailUtility mailUtility = new MailUtility();
 
-	@Value("${general.host}")
-	private String hostname;
+	@Value("${frontend.host}")
+	private String frontEndHost;
 
 	private Cache<String, String> refreshTokens = CacheBuilder.newBuilder()
 			.expireAfterWrite(10, TimeUnit.MINUTES)
@@ -60,7 +60,7 @@ public class PasswordRefreshingController {
 			MimeMessage message = new MimeMessage(mailUtility.getSession());
 			message.setSubject("Zmiana hasła");
 			message.setContent("Link do zmiany hasła: <a href=\""
-					+ hostname + "passwords/" + refreshToken + "/set\">Zmiana hasła</a>",
+					+ frontEndHost + "/#!/passwords/" + refreshToken + "\">Zmiana hasła</a>",
 					"text/html; charset=utf-8");
 			mailUtility.sendMessage(message, email);
 
@@ -71,7 +71,7 @@ public class PasswordRefreshingController {
 		return new ResponseEntity<String>(body, status);
 	}
 
-	@PostMapping(value = "{token}/set")
+	@PostMapping(value = "{token}")
 	public ResponseEntity<String> setPassword(
 			@PathVariable("token") String token,
 			@RequestBody Password password) throws MessagingException {

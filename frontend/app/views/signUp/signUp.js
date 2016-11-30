@@ -12,7 +12,7 @@ myApp.controller('SignUpCtrl', ['REST_API', '$scope', '$rootScope', '$http', '$l
         $scope.signupError = false;
 
         $scope.create = function () {
-            console.log("POST " + REST_API + "signup/save", $scope.user);
+            console.log("POST " + REST_API + "signup", $scope.user);
             $http.post(REST_API + "signup/save", $scope.user)
                 .then(function successCallback() {
                     $scope.loginError = false;

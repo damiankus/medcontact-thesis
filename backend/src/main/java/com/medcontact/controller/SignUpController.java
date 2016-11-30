@@ -25,7 +25,7 @@ public class SignUpController {
 	@Autowired
 	PasswordEncoder passwordEncoder;
 	
-	@PostMapping(value = "save")
+	@PostMapping(value = "")
 	@ResponseStatus(value = HttpStatus.CREATED, reason = "Account has been created.")
 	@ResponseBody
 	public void saveUser(@RequestBody BasicUser user) {
