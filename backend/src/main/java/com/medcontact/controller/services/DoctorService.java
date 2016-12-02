@@ -24,8 +24,8 @@ import com.medcontact.data.model.domain.Note;
 import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.domain.SharedFile;
-import com.medcontact.data.model.dto.BasicDoctorDetails;
-import com.medcontact.data.model.dto.BasicNoteDetails;
+import com.medcontact.data.model.dto.BasicDoctorData;
+import com.medcontact.data.model.dto.BasicNoteData;
 import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.ReservationDate;
@@ -89,14 +89,14 @@ public class DoctorService {
     @Value("${webrtc.turn.secret}")
     private String turnSecret;
 
-    public BasicDoctorDetails getDoctorInfo(Long doctorId) {
+    public BasicDoctorData getDoctorInfo(Long doctorId) {
         Doctor doctor = doctorRepository.findOne(doctorId);
 
         if (doctor == null) {
             throw new IllegalArgumentException();
 
         } else {
-            return new BasicDoctorDetails(doctor);
+            return new BasicDoctorData(doctor);
         }
     }
 
@@ -113,10 +113,10 @@ public class DoctorService {
         return connectionData;
     }
 
-    public List<BasicDoctorDetails> getDoctors() {
+    public List<BasicDoctorData> getDoctors() {
         return doctorRepository.findAll()
                 .stream()
-                .map(BasicDoctorDetails::new)
+                .map(BasicDoctorData::new)
                 .collect(Collectors.toList());
     }
 
@@ -242,7 +242,7 @@ public class DoctorService {
     	return (nextReservations.size() > 0) ? nextReservations.get(0) : new BasicReservationData();
     }
     
-    public void addNote(Long doctorId, BasicNoteDetails noteDetails) throws UnauthorizedUserException {
+    public void addNote(Long doctorId, BasicNoteData noteDetails) throws UnauthorizedUserException {
     	entitlementValidator.isEntitled(doctorId, Doctor.class);
     	
     	Doctor doctor = doctorRepository.findOne(doctorId);
@@ -265,7 +265,7 @@ public class DoctorService {
     	}
     }
     
-    public void updateNote(Long doctorId, BasicNoteDetails noteDetails) throws UnauthorizedUserException {
+    public void updateNote(Long doctorId, BasicNoteData noteDetails) throws UnauthorizedUserException {
     	entitlementValidator.isEntitled(doctorId, Doctor.class);
     	Doctor doctor = doctorRepository.findOne(doctorId);
     	

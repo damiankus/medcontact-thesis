@@ -3,11 +3,17 @@ package com.medcontact.data.model.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.medcontact.data.model.builders.PatientBuilder;
 import com.medcontact.data.model.dto.PersonalDataPassword;
 import com.medcontact.data.model.enums.ApplicationRole;
 
@@ -26,7 +32,7 @@ import lombok.ToString;
  * overriding the mentioned methods. */
 
 @EqualsAndHashCode(callSuper=false)
-@ToString(exclude={"fileEntries", "reservations", "opinions"})
+@ToString(exclude={"fileEntries", "reservations"})
 public class Patient extends BasicUser {
 	private static final long serialVersionUID = -6160436846217117334L;
 
@@ -38,16 +44,11 @@ public class Patient extends BasicUser {
     @JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
     private List<Reservation> reservations;
 
-    @OneToMany(mappedBy="ratingPatient", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-    @JsonProperty(access= JsonProperty.Access.WRITE_ONLY)
-    private List<Opinion> opinions;
-
 	/* Setting default values for the members */
 
 	public Patient() {
 		super();
 		this.fileEntries = new ArrayList<>();
-		this.opinions = new ArrayList<>();
 		this.reservations = new ArrayList<>();
 		this.role = ApplicationRole.PATIENT;
 	}
@@ -66,24 +67,4 @@ public class Patient extends BasicUser {
 		this.reservations.add(reservation);
 	}
 
-    public static class PatientBuilder extends BasicUser.BasicUserBuilder {
-		public PatientBuilder() {
-			this.user = new Patient();
-		}
-
-		public PatientBuilder setFiles(List<FileEntry> fileEntries) {
-			((Patient) user).setFileEntries(fileEntries);
-			return this;
-		}
-
-		public PatientBuilder setOpinions(List<Opinion> opinions) {
-			((Patient) user).setOpinions(opinions);
-			return this;
-		}
-
-		public PatientBuilder setReservations(List<Reservation> reservations) {
-			((Patient) user).setReservations(reservations);
-			return this;
-		}
-	}
 }

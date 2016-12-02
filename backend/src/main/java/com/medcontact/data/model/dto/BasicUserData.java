@@ -5,7 +5,7 @@ import com.medcontact.data.model.enums.ApplicationRole;
 import lombok.Data;
 
 @Data
-public class BasicUserDetails {
+public class BasicUserData {
 	
 	protected long id;
 	protected String email;
@@ -13,7 +13,7 @@ public class BasicUserDetails {
 	protected String lastName;
 	protected ApplicationRole role;
 	
-	public BasicUserDetails() {
+	public BasicUserData() {
 		this.id = 0L;
 		this.email = "";
 		this.firstName = "";
@@ -21,7 +21,7 @@ public class BasicUserDetails {
 		this.role = ApplicationRole.PATIENT;
 	}
 	
-	public BasicUserDetails(BasicUser user) {
+	public BasicUserData(BasicUser user) {
 		this.id = user.getId();
 		this.email = user.getEmail();
 		this.firstName = user.getFirstName();

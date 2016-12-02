@@ -1,10 +1,13 @@
 package com.medcontact.data.model.builders;
 
-import com.medcontact.data.model.domain.*;
-
 import java.util.List;
 
-public class DoctorBuilder extends BasicUser.BasicUserBuilder {
+import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.domain.Note;
+import com.medcontact.data.model.domain.Reservation;
+import com.medcontact.data.model.domain.Specialty;
+
+public class DoctorBuilder extends BasicUserBuilder {
     public static DoctorBuilder getBuilder() {
         return new DoctorBuilder();
     }
@@ -30,11 +33,6 @@ public class DoctorBuilder extends BasicUser.BasicUserBuilder {
 
     public DoctorBuilder setSpecialties(List<Specialty> specialties) {
         ((Doctor) user).setSpecialties(specialties);
-        return this;
-    }
-
-    public DoctorBuilder setOpinions(List<Opinion> opinions) {
-        ((Doctor) user).setOpinions(opinions);
         return this;
     }
 

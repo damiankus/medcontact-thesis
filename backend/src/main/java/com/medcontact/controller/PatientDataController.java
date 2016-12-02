@@ -30,7 +30,7 @@ import com.medcontact.exception.UnauthorizedUserException;
 
 @RestController
 @RequestMapping(value = "patients")
-public class PatientAccountController {
+public class PatientDataController {
     @Autowired
     private PatientService patientService;
 

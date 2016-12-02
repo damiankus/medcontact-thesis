@@ -14,7 +14,6 @@ public class DoctorValidator extends DataValidatorHelper<Doctor> {
 
 	private BasicUserValidator userValidator = new BasicUserValidator();
 	private NoteValidator noteValidator = new NoteValidator();
-	private OpinionValidator opinionValidator = new OpinionValidator();
 	private ReservationValidator reservationValidator = new ReservationValidator();
 
 	@Override
@@ -49,26 +48,19 @@ public class DoctorValidator extends DataValidatorHelper<Doctor> {
 						result.addManyErrors(partialResult.getErrors());
 
 					} else {
-						partialResult = isListValid(doctor.getOpinions(), "opinions", MAX_OPINIONS_SIZE, opinionValidator);
+						partialResult = isListValid(doctor.getReservations(), "reservations",  MAX_RESERVATIONS_SIZE, reservationValidator);
 
 						if (!partialResult.isValid()) {
-							result.addManyErrors(partialResult.getErrors());
+                            result.addManyErrors(partialResult.getErrors());
 
-						} else {
-							partialResult = isListValid(doctor.getReservations(), "reservations",  MAX_RESERVATIONS_SIZE, reservationValidator);
 
-							if (!partialResult.isValid()) {
+                            if (!partialResult.isValid()) {
                                 result.addManyErrors(partialResult.getErrors());
 
-
-                                if (!partialResult.isValid()) {
-                                    result.addManyErrors(partialResult.getErrors());
-
-                                } else {
-                                    result.setValid(true);
-                                }
+                            } else {
+                                result.setValid(true);
                             }
-						}
+                        }
 					}
 				}
 			}

@@ -22,8 +22,8 @@ import com.medcontact.controller.services.DoctorService;
 import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Note;
 import com.medcontact.data.model.domain.Reservation;
-import com.medcontact.data.model.dto.BasicDoctorDetails;
-import com.medcontact.data.model.dto.BasicNoteDetails;
+import com.medcontact.data.model.dto.BasicDoctorData;
+import com.medcontact.data.model.dto.BasicNoteData;
 import com.medcontact.data.model.dto.BasicReservationData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.ReservationDate;
@@ -39,7 +39,7 @@ public class DoctorDataController {
 
     @GetMapping("{id}")
     @ResponseBody
-    public BasicDoctorDetails getDoctorInfo(
+    public BasicDoctorData getDoctorInfo(
             @PathVariable("id") Long doctorId) throws IllegalArgumentException {
 
         return doctorService.getDoctorInfo(doctorId);
@@ -55,7 +55,7 @@ public class DoctorDataController {
 
     @GetMapping(value = "")
     @ResponseBody
-    public List<BasicDoctorDetails> getDoctors() {
+    public List<BasicDoctorData> getDoctors() {
 
         return doctorService.getDoctors();
     }
@@ -106,7 +106,7 @@ public class DoctorDataController {
     @PostMapping("{id}/notes")
     public void addNote(
     		@PathVariable("id") Long doctorId,
-    		@RequestBody BasicNoteDetails noteDetails) throws UnauthorizedUserException {
+    		@RequestBody BasicNoteData noteDetails) throws UnauthorizedUserException {
     	
     	doctorService.addNote(doctorId, noteDetails);
     }
@@ -114,7 +114,7 @@ public class DoctorDataController {
     @PutMapping("{id}/notes")
     public void updateNote(
     		@PathVariable("id") Long doctorId,
-    		@RequestBody BasicNoteDetails noteDetails) throws UnauthorizedUserException {
+    		@RequestBody BasicNoteData noteDetails) throws UnauthorizedUserException {
     	
     	doctorService.updateNote(doctorId, noteDetails);
     }

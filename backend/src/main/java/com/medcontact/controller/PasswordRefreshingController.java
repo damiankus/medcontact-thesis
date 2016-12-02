@@ -82,6 +82,7 @@ public class PasswordRefreshingController {
 		if(password.getPassword1().equals(password.getPassword2())) {
 			String email = refreshTokens.getIfPresent(token);
 			Optional<BasicUser> optionalUser = userRepository.findByEmail(email);
+			
 			if(optionalUser.isPresent()) {
 				optionalUser.get().setPassword(passwordEncoder.encode(password.getPassword1()));
 				body = "{\"status\": \"Password changed\"}";
