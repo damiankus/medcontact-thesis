@@ -48,7 +48,7 @@ public class DoctorService {
 
     @Getter
     @Setter
-    @Value("${general.host}")
+    @Value("${frontend.host}")
     private String host;
 
     @Autowired
