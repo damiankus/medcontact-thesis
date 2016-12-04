@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.medcontact.data.model.domain.BasicUser;
-import com.medcontact.data.model.dto.BasicUserDetails;
+import com.medcontact.data.model.dto.BasicUserData;
 import com.medcontact.data.model.domain.Patient;
 
 @Controller
@@ -32,7 +32,7 @@ public class LoggedInUserController {
 			status = HttpStatus.NOT_FOUND;
 			
 		} else {
-			body = new BasicUserDetails((BasicUser) principal);
+			body = new BasicUserData((BasicUser) principal);
 			status = HttpStatus.OK;
 		}
 		

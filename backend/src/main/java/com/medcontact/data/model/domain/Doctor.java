@@ -29,7 +29,7 @@ import lombok.ToString;
 @Table(name="doctors")
 @DiscriminatorValue("DOCTOR")
 @Data
-@ToString(exclude={"opinions", "reservations", "notes"})
+@ToString(exclude={"reservations", "notes"})
 
 /* This annotations prevents the lombok library
  * from calling the superclass' equals and hashCode 
@@ -74,10 +74,6 @@ public class Doctor extends BasicUser {
 	@Column(nullable=false)
 	private boolean available;
 	
-	@OneToMany(mappedBy="ratedDoctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
-	@JsonProperty(access=Access.WRITE_ONLY)
-	private List<Opinion> opinions;
-	
 	@OneToMany(mappedBy="doctor", fetch=FetchType.LAZY, cascade=CascadeType.ALL)
 	@JsonProperty(access=Access.WRITE_ONLY)
 	private List<Reservation> reservations;
@@ -96,7 +92,6 @@ public class Doctor extends BasicUser {
 		this.biography = "";
 		this.available = false;
 		
-		this.opinions = new ArrayList<>();
 		this.reservations = new ArrayList<>();
 		this.roomId = UUID.randomUUID().toString();
 		this.notes = new ArrayList<>();

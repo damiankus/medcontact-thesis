@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,8 +23,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.medcontact.data.model.builders.BasicUserBuilder;
 import com.medcontact.data.model.enums.ApplicationRole;
-import com.medcontact.data.model.enums.Sex;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -94,10 +93,6 @@ public class BasicUser implements UserDetails {
 	@NonNull
 	protected String lastName;
 	
-	@Transient
-	@JsonIgnore
-	protected Sex sex;
-	
 	/* We serialize references to objects of supertype 
 	 * BasicUser in other objects as IDs */
 	
@@ -119,7 +114,6 @@ public class BasicUser implements UserDetails {
 		this.role = ApplicationRole.PATIENT;
 		this.firstName = "";
 		this.lastName = "";
-		this.sex = Sex.OTHER;
 		this.email = "";
 	}
 	
@@ -137,7 +131,6 @@ public class BasicUser implements UserDetails {
 		
 		this.firstName = other.getFirstName();
 		this.lastName = other.getLastName();
-		this.sex = other.getSex();
 		this.email = other.getEmail();
 	}
 	
@@ -161,59 +154,6 @@ public class BasicUser implements UserDetails {
 		return new BasicUserBuilder();
 	}
 	
-	/* 
-	 * For the sake of convenience we provide a fluent API
-	 * for building BasicUser objects.
-	 *  */
-	
-	public abstract static class AbstractUserBuilder<T extends BasicUser> {
-		protected T user;
-				
-		public AbstractUserBuilder<T> setPassword(String password) {
-			user.setPassword(password);
-			return this;
-		}
-		
-		public AbstractUserBuilder<T> setFirstName(String firstName) {
-			user.setFirstName(firstName);
-			return this;
-		}
-		
-		public AbstractUserBuilder<T> setLastName(String lastName) {
-			user.setLastName(lastName);
-			return this;
-		}
-		
-		public AbstractUserBuilder<T> setEmail(String email) {
-			user.setEmail(email);
-			return this;
-		}
-		
-		public AbstractUserBuilder<T> setSex(Sex sex) {
-			user.setSex(sex);
-			return this;
-		}
-		
-		public AbstractUserBuilder<T> valueOf(BasicUser otherUser) {
-			user.setPassword(otherUser.getPassword());
-			user.setEmail(otherUser.getEmail());
-			user.setFirstName(otherUser.getFirstName());
-			user.setLastName(otherUser.getLastName());
-			user.setSex(otherUser.getSex());
-			
-			return this;
-		}
-		
-		public T build() {
-			return this.user;
-		}
-	}
-	
-	public static class BasicUserBuilder extends AbstractUserBuilder<BasicUser> {
-		public BasicUserBuilder() {
-			this.user = new BasicUser();
-		}
-	}
 
 	@Override
 	@JsonIgnore

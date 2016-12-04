@@ -9,7 +9,6 @@ public class PatientValidator extends DataValidatorHelper<Patient> {
 	
 	private BasicUserValidator userValidator = new BasicUserValidator();
 	private FileEntryValidator fileEntryValidator = new FileEntryValidator();
-	private OpinionValidator opinionValidator = new OpinionValidator();
 	private ReservationValidator reservationValidator = new ReservationValidator();
 	
 	@Override
@@ -20,27 +19,20 @@ public class PatientValidator extends DataValidatorHelper<Patient> {
 		if (!partialResult.isValid()) {
 			result.addManyErrors(partialResult.getErrors());
 		} else {
-			partialResult = isListValid(patient.getOpinions(), "opinions", 
-					MAX_OPINIONS_SIZE, opinionValidator);
+			partialResult = isListValid(patient.getReservations(), "reservations", 
+					MAX_RESERVATIONS_SIZE, reservationValidator);
 			
 			if (!partialResult.isValid()) {
 				result.addManyErrors(partialResult.getErrors());
 			} else {
-				partialResult = isListValid(patient.getReservations(), "reservations", 
-						MAX_RESERVATIONS_SIZE, reservationValidator);
+				partialResult = isListValid(patient.getFileEntries(), "files", 
+						MAX_FILES_SIZE, fileEntryValidator);
 				
 				if (!partialResult.isValid()) {
 					result.addManyErrors(partialResult.getErrors());
-				} else {
-					partialResult = isListValid(patient.getFileEntries(), "files", 
-							MAX_FILES_SIZE, fileEntryValidator);
 					
-					if (!partialResult.isValid()) {
-						result.addManyErrors(partialResult.getErrors());
-						
-					} else {
-						result.setValid(true);
-					}
+				} else {
+					result.setValid(true);
 				}
 			}
 		}

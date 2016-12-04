@@ -1,4 +1,4 @@
-package com.medcontact.data.model.dto;
+package com.medcontact.data.converters;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

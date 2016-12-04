@@ -161,6 +161,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		config.setAllowCredentials(true);
 		config.addAllowedOrigin("http://localhost:8000");
 		config.addAllowedOrigin("https://medcontact.herokuapp.com");
+		config.addAllowedOrigin("http://medcontact.herokuapp.com");
 		config.addAllowedHeader("*");
 		config.addAllowedMethod("*");
 		source.registerCorsConfiguration("/**", config);

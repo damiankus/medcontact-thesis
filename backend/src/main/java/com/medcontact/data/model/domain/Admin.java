@@ -4,7 +4,9 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.medcontact.data.model.builders.AdminBuilder;
 import com.medcontact.data.model.enums.ApplicationRole;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -35,10 +37,5 @@ public class Admin extends BasicUser {
 	public static AdminBuilder getBuilder() {
 		return new AdminBuilder();
 	}
-	
-	public static class AdminBuilder extends BasicUser.BasicUserBuilder {
-		public AdminBuilder() {
-			this.user = new Admin();
-		}
-	}
+
 }
