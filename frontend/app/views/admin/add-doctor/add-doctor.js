@@ -43,7 +43,7 @@ myApp.controller('AddDoctorCtrl', ['REST_API', "$rootScope", '$scope', '$http', 
                 		$scope.addDoctorError = true;
                 		
                 		console.error("[ERROR]: Couldn't create room for a doctor");
-                		
+
                 	} else if (response.status == 404) {
                 		$scope.emailTaken = false;
                 		$scope.addDoctorError = true;

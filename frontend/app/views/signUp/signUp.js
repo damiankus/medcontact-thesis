@@ -5,7 +5,7 @@ myApp.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'views/signUp/signUp.html',
         controller: 'SignUpCtrl'
     });
-}])
+}]);
 
 myApp.controller('SignUpCtrl', ['REST_API', '$scope', '$rootScope', '$http', '$location',
     function (REST_API, $scope, $rootScope, $http, $location) {
@@ -13,7 +13,7 @@ myApp.controller('SignUpCtrl', ['REST_API', '$scope', '$rootScope', '$http', '$l
 
         $scope.create = function () {
             console.log("POST " + REST_API + "signup", $scope.user);
-            $http.post(REST_API + "signup/save", $scope.user)
+            $http.post(REST_API + "signup", $scope.user)
                 .then(function successCallback() {
                     $scope.loginError = false;
                     $scope.loggedIn = false;
