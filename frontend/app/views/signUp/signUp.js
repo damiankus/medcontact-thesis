@@ -5,7 +5,7 @@ myApp.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'views/signUp/signUp.html',
         controller: 'SignUpCtrl'
     });
-}])
+}]);
 
 myApp.controller('SignUpCtrl', ['REST_API', '$scope', '$rootScope', '$http', '$location',
     function (REST_API, $scope, $rootScope, $http, $location) {
