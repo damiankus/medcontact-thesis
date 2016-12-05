@@ -20,7 +20,10 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 			$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations")
 				.then(function successCallback(response) {
 					$scope.reservations	 = response.data;
-					console.log($scope.reservations);
+	                $scope.reservations.forEach(function (reservation, index) {
+	                	reservation.startDateTime = new Date(reservation.startDateTime);
+	                	reservation.endDateTime = new Date(reservation.endDateTime);
+	                });
 					
 				}, function errorCallback(response) {
 		            	console.log("[ERROR]: " + response.data.message);

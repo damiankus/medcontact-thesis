@@ -48,7 +48,7 @@ public class DoctorService {
 
     @Getter
     @Setter
-    @Value("${frontend.host}")
+    @Value("${backend.host}")
     private String host;
 
     @Autowired
@@ -140,7 +140,6 @@ public class DoctorService {
             throws IOException, UnauthorizedUserException {
         if (entitlementValidator.isEntitled(doctorId, Doctor.class)) {
             SharedFile sharedFile = sharedFileRepository.findOne(sharedFileId);
-            System.out.println("\n\n\n" + sharedFileId + "\n\n\n");
 
             if (sharedFile == null) {
                 throw new UnauthorizedUserException();
@@ -193,7 +192,7 @@ public class DoctorService {
                 .stream()
                 .map(s -> {
                     s.getFileEntry().setId(s.getId());
-                    s.getFileEntry().setUrl(host + "doctors/" + doctorId + "/sharedFiles/" + s.getId());
+                    s.getFileEntry().setUrl(host + "/doctors/" + doctorId + "/sharedFiles/" + s.getId());
                     return s.getFileEntry();
                 })
                 .collect(Collectors.toList());

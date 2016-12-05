@@ -32,10 +32,12 @@ myApp.controller('ResetPasswordCtrl', ['REST_API', "$rootScope", '$scope', '$htt
                 .then(function successCallback(response) {
                     console.log("Success")
                     $rootScope.resetPassword = true;
-                    $scope.resetFail = false;
+                    $scope.sendFail = false;
                     $location.url('/login');
+                    
                 }, function errorCallback(response) {
-                    console.error("[ERROR]: ");
+                	$scope.sendFail = true;
+                	
                     console.error(response);
                 })
         }

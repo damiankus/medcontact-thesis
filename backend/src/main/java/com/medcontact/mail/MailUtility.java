@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -12,21 +13,33 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@Getter
+import lombok.Data;
+
+@Component
+@Data
 public class MailUtility {
 
-	private String mailHost = "smtp.gmail.com";
-	private String mailPort = "465";
-	private String mailUsername = "medcontact.project@gmail.com";
-	private String mailPassword = "!contac-med@";
+	@Value("${spring.mail.host}")
+	private String mailHost;
+	
+	@Value("${spring.mail.port}")
+	private String mailPort;
+	
+	@Value("${spring.mail.username}")
+	private String mailUsername;
+	
+	@Value("${spring.mail.password}")
+	private String mailPassword;
 	
 	private Session session;
 	private Address senderAddress;
 	private Logger logger = Logger.getLogger(MailUtility.class.getName());
 	
-	public MailUtility() {
+	@PostConstruct
+	public void init() {
 		Properties properties = new Properties();
 		properties.setProperty("mail.smtp.user", mailUsername);
 		properties.setProperty("mail.smtp.host", mailHost);

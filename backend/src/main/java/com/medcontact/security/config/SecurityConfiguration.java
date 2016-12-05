@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,12 +32,20 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Configuration
 @EnableWebSecurity
 //@EnableGlobalMethodSecurity(prePostEnabled=true, securedEnabled=true, proxyTargetClass=true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	Logger logger = Logger.getLogger(this.getClass().getName());
+	
+    @Value("${frontend.host}")
+    @Getter
+    @Setter
+    private String frontendHost;
 	
 	@Autowired
 	AuthenticationSuccessHandler authenticationSuccessHandler;
@@ -52,11 +61,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
-//				.antMatchers("/patients/**").hasRole("PATIENT")
-//				.antMatchers("/doctors/**").hasRole("DOCTOR")
-//				.antMatchers("/admins/**").hasRole("ADMIN")
-//				.antMatchers("/signup/**").permitAll()
-//				.antMatchers("/home/**").permitAll()
 				.anyRequest().permitAll()
 				.and()
 			.formLogin()
@@ -159,9 +163,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
-		config.addAllowedOrigin("http://localhost:8000");
-		config.addAllowedOrigin("https://medcontact.herokuapp.com");
-		config.addAllowedOrigin("http://medcontact.herokuapp.com");
+		config.addAllowedOrigin(frontendHost);
 		config.addAllowedHeader("*");
 		config.addAllowedMethod("*");
 		source.registerCorsConfiguration("/**", config);

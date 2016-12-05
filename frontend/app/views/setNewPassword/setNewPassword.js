@@ -12,17 +12,29 @@ myApp.controller('PasswordRefreshingCtrl', ['REST_API', "$rootScope", '$scope', 
         var refreshToken = $routeParams.refreshToken;
 
         $scope.setPassword = function () {
-            var password = {
-                password1: $scope.user.password1,
-                password2: $scope.user.password2
-            };
-
-            $http.post(REST_API + "passwords/" + refreshToken, password)
-                .then(function successCallback(response) {
-                    console.log("Success");
-                    $location.url("/login");
-                }, function errorCallback(response) {
-                    console.log("[ERROR]: " + response.data.message);
-                })
+        	if ($scope.user.password1 !==  $scope.user.password2) {
+        		$scope.differentPasswords = true;
+        		
+        	} else {
+        		$scope.differentPasswords = false;
+        		
+        		var password = {
+        				password1: $scope.user.password1,
+        				password2: $scope.user.password2
+        		};
+        		
+        		$http.post(REST_API + "passwords/" + refreshToken, password)
+        		.then(function successCallback(response) {
+        			console.log("Success");
+        			$location.url("/login");
+        			
+        		}, function errorCallback(response) {
+        			if (response.status == 403) {
+        				$scope.linkExpired = true;
+        			}
+        			console.log("[ERROR]: " + response);
+        		})
+        	}
+        	
         }
     }]);

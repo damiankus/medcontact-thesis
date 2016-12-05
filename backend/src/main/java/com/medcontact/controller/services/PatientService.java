@@ -66,7 +66,7 @@ public class PatientService {
 
     @Getter
     @Setter
-    @Value("${frontend.host}")
+    @Value("${backend.host}")
     private String host;
 
     @Autowired
@@ -201,7 +201,7 @@ public class PatientService {
                         file.getOriginalFilename());
 
                 String fileUrl = String.format(
-                        "%s%s/%d/files/",
+                        "%s/%s/%d/files/",
                         host,
                         patientFilesPathRoot,
                         patientId);

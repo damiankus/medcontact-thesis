@@ -26,12 +26,14 @@ import com.medcontact.mail.MailUtility;
 @Controller
 @RequestMapping("passwords")
 public class PasswordRefreshingController {
-	private MailUtility mailUtility = new MailUtility();
+	
+	@Autowired
+	private MailUtility mailUtility;
 
 	@Value("${frontend.host}")
 	private String frontEndHost;
 
-	private Cache<String, String> refreshTokens = CacheBuilder.newBuilder()
+	private Cache<String, String> emailForRefreshToken = CacheBuilder.newBuilder()
 			.expireAfterWrite(10, TimeUnit.MINUTES)
 			.concurrencyLevel(4)
 			.build();
@@ -41,7 +43,7 @@ public class PasswordRefreshingController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
+	
 	@PostMapping(value = "send-link")
 	public ResponseEntity<String> sendRefreshMessage(
 			@RequestParam("email") String email) throws MessagingException {
@@ -55,7 +57,7 @@ public class PasswordRefreshingController {
 
 		} else {
 			String refreshToken = "" + UUID.randomUUID() + "-"  + UUID.randomUUID();
-			refreshTokens.put(email, refreshToken);
+			emailForRefreshToken.put(refreshToken, email);
 
 			MimeMessage message = new MimeMessage(mailUtility.getSession());
 			message.setSubject("Zmiana hasła");
@@ -80,19 +82,24 @@ public class PasswordRefreshingController {
 		HttpStatus status;
 
 		if(password.getPassword1().equals(password.getPassword2())) {
-			String email = refreshTokens.getIfPresent(token);
+			String email = emailForRefreshToken.getIfPresent(token);
 			Optional<BasicUser> optionalUser = userRepository.findByEmail(email);
 			
 			if(optionalUser.isPresent()) {
-				optionalUser.get().setPassword(passwordEncoder.encode(password.getPassword1()));
+				optionalUser.get().setPassword(
+						passwordEncoder.encode(
+								password.getPassword1()));
+				userRepository.save(optionalUser.get());
+				
 				body = "{\"status\": \"Password changed\"}";
 				status = HttpStatus.OK;
+				
 			} else {
-				body = "{\"status\": \"Invalid token\"}";
-				status = HttpStatus.BAD_REQUEST;
+				body = "{\"status\": \"Link expired\"}";
+				status = HttpStatus.FORBIDDEN;
 			}
 		} else {
-			body = "{\"status\": \"Passwords not match\"}";
+			body = "{\"status\": \"Passwords don't match\"}";
 			status = HttpStatus.BAD_REQUEST;
 		}
 

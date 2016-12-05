@@ -20,6 +20,7 @@ import java.util.Arrays;
 @ComponentScan(basePackages = {
         "com.medcontact.controller",
         "com.medcontact.security.config",
+        "com.medcontact.mail",
         "com.medcontact.data.config",
         "com.medcontact.websocket"
 })

@@ -38,6 +38,7 @@
 	border-radius: 5px;
 	width: 100%;
 	height: auto;
+	transform: scaleX(1) !important;
 }
 
 #remoteVideos video {

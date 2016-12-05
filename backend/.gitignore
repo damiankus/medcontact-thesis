@@ -9,6 +9,6 @@ mvnw.cmd
 target
 .idea/
 patients/
-src/main/resources/application.properties
+
 
 

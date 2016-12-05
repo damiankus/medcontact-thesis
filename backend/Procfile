@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -jar target/medcontact-0.0.1-SNAPSHOT.jar   
+web: java -Dserver.port=$PORT -jar target/medcontact-release.jar   
