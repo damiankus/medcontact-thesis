@@ -50,9 +50,6 @@
         <li ng-show="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
             <a href="#!/file-upload" class="btn btn-default navbar-btn">Pliki</a>
         </li>
-        <li ng-show="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
-            <a href="#!/personal-data" class="btn btn-default navbar-btn">Dane Osobowe</a>
-        </li>
         <!--DOCTOR-->
         <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item">
             <a href="#!/doctor-consultation" class="btn btn-default navbar-btn">Pokój rozmów</a>
@@ -60,7 +57,14 @@
         <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item">
             <a href="#!/add-schedule" class="btn btn-default navbar-btn">Terminy konsultacji</a>
         </li>
+        <!--ADMIN-->
+        <li ng-show="userDetails.id && userDetails.role === 'ADMIN'" class="nav-item">
+            <a href="#!/add-doctor" class="btn btn-default navbar-btn">Dodaj lekarza</a>
+        </li>
         <!--ALL-->
+        <li ng-show="userDetails.id" class="nav-item">
+            <a href="#!/personal-data" class="btn btn-default navbar-btn">Dane Osobowe</a>
+        </li>
         <li ng-show="userDetails.id" class="nav-item">
             <a href="#!/logout" class="btn btn-default navbar-btn">Wyloguj się</a>
         </li>
@@ -134,7 +138,7 @@
 <!--PATIENT-->
 <script src="views/patients/reservation/reservation.js"></script>
 <script src="views/patients/file-upload/file-upload.js"></script>
-<script src="views/patients/personal-data/personal-data.js"></script>
+<script src="views/personal-data/personal-data.js"></script>
 <script src="views/patients/doctor-list/doctor-list.js"></script>
 <script src="views/patients/available-schedule/available-schedule.js"></script>
 <script src="views/patients/consultation/consultation.js"></script>

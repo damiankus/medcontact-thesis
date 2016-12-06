@@ -3,7 +3,7 @@
 
 myApp.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/personal-data', {
-        templateUrl: 'views/patients/personal-data/personal-data.html',
+        templateUrl: 'views/personal-data/personal-data.html',
         controller: 'PersonalDataCtrl'
     });
 }]);
@@ -22,7 +22,13 @@ myApp.controller('PersonalDataCtrl', ['REST_API', "$rootScope", '$scope', '$http
                 newPassword2: $scope.userDetails.newPassword2
             }
 
-            $http.put(REST_API + "patients/" + $rootScope.userDetails.id, personalDataPassword)
+            if($rootScope.userDetails.role == "ADMIN")
+                var url = "admins";
+            else if($rootScope.userDetails.role == "DOCTOR")
+                var url = "doctors";
+            else var url = "patients";
+
+            $http.put(REST_API + url + "/" + $rootScope.userDetails.id, personalDataPassword)
                 .then(function successCallback(response) {
                     console.log("Success");
                     var personalData = {
@@ -30,7 +36,7 @@ myApp.controller('PersonalDataCtrl', ['REST_API', "$rootScope", '$scope', '$http
                         firstName: $scope.userDetails.firstName,
                         lastName: $scope.userDetails.lastName,
                         email: $scope.userDetails.email,
-                        role: "PATIENT"
+                        role: $rootScope.userDetails.role
                     };
                     console.log($rootScope.userDetails);
                     UserService.setUser(personalData);

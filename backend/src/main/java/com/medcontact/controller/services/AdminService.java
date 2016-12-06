@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.medcontact.data.model.domain.Patient;
+import com.medcontact.data.model.dto.PersonalDataPassword;
+import com.medcontact.data.repository.AdministratorRepository;
+import com.medcontact.exception.NotMatchedPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -103,5 +107,20 @@ public class AdminService {
         }
 
         return new ResponseEntity<>(body, status);
+    }
+
+    public void changePersonalData(Long adminId, PersonalDataPassword personalDataPassword) {
+        Admin admin = (Admin)userRepository.findOne(adminId);
+
+        admin.changePersonalData(personalDataPassword, passwordEncoder);
+        if(personalDataPassword.getNewPassword1() != null && personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2())){
+            if (passwordEncoder.matches(personalDataPassword.getOldPassword(), admin.getPassword())){
+                admin.setPassword(passwordEncoder.encode(personalDataPassword.getNewPassword1()));
+            }
+            else{
+                throw new NotMatchedPasswordException();
+            }
+        }
+        userRepository.save(admin);
     }
 }

@@ -12,23 +12,16 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.medcontact.data.model.domain.*;
+import com.medcontact.data.model.dto.*;
+import com.medcontact.exception.NotMatchedPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.medcontact.controller.DoctorDataController;
-import com.medcontact.data.model.domain.Doctor;
-import com.medcontact.data.model.domain.FileEntry;
-import com.medcontact.data.model.domain.Note;
-import com.medcontact.data.model.domain.Patient;
-import com.medcontact.data.model.domain.Reservation;
-import com.medcontact.data.model.domain.SharedFile;
-import com.medcontact.data.model.dto.BasicDoctorData;
-import com.medcontact.data.model.dto.BasicNoteData;
-import com.medcontact.data.model.dto.BasicReservationData;
-import com.medcontact.data.model.dto.ConnectionData;
-import com.medcontact.data.model.dto.ReservationDate;
 import com.medcontact.data.model.enums.ReservationState;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.NoteRepository;
@@ -71,6 +64,9 @@ public class DoctorService {
 
     @Autowired
     private EntitlementValidator entitlementValidator;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 	/* Bind the configuration data from the properties file. */
 
@@ -323,5 +319,20 @@ public class DoctorService {
     	return doctor.getNotes().stream()
     			.filter(n -> n.getPatient().getId() == patientId)
     			.collect(Collectors.toList());
+    }
+
+    public void changePersonalData(Long doctorId, PersonalDataPassword personalDataPassword) {
+        Doctor doctor = doctorRepository.findOne(doctorId);
+
+        doctor.changePersonalData(personalDataPassword, passwordEncoder);
+        if(personalDataPassword.getNewPassword1() != null && personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2())){
+            if (passwordEncoder.matches(personalDataPassword.getOldPassword(), doctor.getPassword())){
+                doctor.setPassword(passwordEncoder.encode(personalDataPassword.getNewPassword1()));
+            }
+            else{
+                throw new NotMatchedPasswordException();
+            }
+        }
+        doctorRepository.save(doctor);
     }
 }

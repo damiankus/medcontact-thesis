@@ -3,13 +3,11 @@ package com.medcontact.controller;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.medcontact.data.model.dto.PersonalDataPassword;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.medcontact.controller.services.AdminService;
@@ -33,5 +31,14 @@ public class AdminDataController {
     		@RequestBody Doctor doctor) throws UnirestException, UnauthorizedUserException {
         
     	return adminService.addDoctor(adminId, doctor);
+    }
+
+    @PutMapping(value = "{id}")
+    @ResponseBody
+    public void changePersonalData(
+            @PathVariable("id") Long adminId,
+            @RequestBody PersonalDataPassword personalDataPassword) {
+
+        adminService.changePersonalData(adminId, personalDataPassword);
     }
 }

@@ -57,13 +57,7 @@ public class Patient extends BasicUser {
 		return new PatientBuilder();
 	}
 
-	public void changePersonalData(PersonalDataPassword personalDataPassword, PasswordEncoder passwordEncoder) {
-		this.firstName = personalDataPassword.getFirstName();
-		this.lastName = personalDataPassword.getLastName();
-		this.email = personalDataPassword.getEmail();
-	}
-
-	public void addReservatin(Reservation reservation) {
+	public void addReservation(Reservation reservation) {
 		this.reservations.add(reservation);
 	}
 
