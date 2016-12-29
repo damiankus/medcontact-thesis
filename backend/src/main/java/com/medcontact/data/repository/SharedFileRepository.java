@@ -9,4 +9,5 @@ import com.medcontact.data.model.domain.SharedFile;
 
 public interface SharedFileRepository extends JpaRepository<SharedFile, Long> {
 	public List<SharedFile> findByReservationId(Long id);
+	public SharedFile findByFileEntryIdAndReservationId(Long fileEntryId, Long reservationId);
 }

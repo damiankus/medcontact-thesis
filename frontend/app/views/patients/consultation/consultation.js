@@ -1,7 +1,7 @@
 'use strict';
 
 myApp.config(['$routeProvider', function ($routeProvider) {
-    $routeProvider.when('/patient-consultation', {
+    $routeProvider.when('/patient/consultation', {
         templateUrl: 'views/patients/consultation/consultation.html',
         controller: 'ConsultationPatientCtrl'
     });
@@ -9,7 +9,6 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
   function (REST_API, $rootScope, $scope, $http, $location, UserService) {
-	
 	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/reservation");
 
 	if (typeof $rootScope.reservation === "undefined"

@@ -27,13 +27,10 @@ myApp.controller('DoctorListCtrl', ['REST_API', "$rootScope", '$scope', '$http',
                         });
                         
                         $scope.doctors.forEach(function (item, index) {
-                        	item.specialties = 
-                        	item.specialties.sort();
+                        	item.specialties = item.specialties.sort();
                         	item.specialties = item.specialties.join(", ");
                         	item.fullName = item.firstName + " " + item.lastName;
                         });
-                        
-                        console.log($scope.doctors);
                         
                     }, function errorCallback(response) {
                         console.log("[ERROR]: " + response.data.message);
@@ -44,5 +41,18 @@ myApp.controller('DoctorListCtrl', ['REST_API', "$rootScope", '$scope', '$http',
         $scope.showTerm = function(doctor){
             $rootScope.fullDoctorName = doctor.firstName + " " + doctor.lastName;
             $location.url("/available-schedule/" + doctor.id);
+        }
+        
+        $scope.showDoctorInfo = function (doctor) {
+        	$scope.selectedDoctorInfo = doctor;
+        	console.log($scope.selectedDoctorInfo);
+        	
+        	var dialog = $("#modal-doctor-info");
+			
+			$("#modal-hide-btn").one("click", function () {
+				dialog.modal("hide");
+			});
+			
+			dialog.modal("show");
         }
     }]);

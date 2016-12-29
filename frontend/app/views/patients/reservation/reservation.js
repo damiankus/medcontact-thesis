@@ -29,7 +29,7 @@ myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http'
 			return (new Date().getTime() > reservation.endDateTime.getTime());
 		}
 		
-		$scope.getCurrentReservation = function () {
+		$scope.getCurrentReservations = function () {
 	        $http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations")
 	            .then(function successCallback(response) {
 	                $scope.reservations	 = response.data;
@@ -43,11 +43,39 @@ myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http'
 	            	console.log("[ERROR]: Couldn't load reservation data");
 	            });
 	    }
+
+		
+		$scope.showCancelReservationModal = function (reservationId) {
+        	$scope.cancelledReservationId = reservationId;
+        	
+        	var dialog = $("#modal-cancel-reservation");
+			dialog.modal("show");
+        }
+		
+		$scope.hideCancelReservationModal = function () {
+        	$scope.cancelledReservationId = -1;
+        	
+        	var dialog = $("#modal-cancel-reservation");
+			dialog.modal("hide");
+        }
+		
+		$scope.cancelReservation = function () {
+			$http.delete(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations/" + $scope.cancelledReservationId)
+            .then(function successCallback(response) {
+            	$scope.getCurrentReservations();
+            	console.log("[INFO]: Reservation has been cancelled")
+                
+            }, function errorCallback(response) {
+            	console.log("[ERROR]: Couldn't cancel reservation");
+            });
+			
+			$scope.hideCancelReservationModal();
+		};
 		
 	    $scope.call = function (reservation) {
 	    	$rootScope.reservation = reservation;
-	    	$location.url("/patient-consultation");
+	    	$location.url("/patient/consultation");
 	    }
 	    
-	    $scope.getCurrentReservation();
+	    $scope.getCurrentReservations();
 	}]);

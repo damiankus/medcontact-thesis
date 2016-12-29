@@ -29,6 +29,7 @@
                 	<span ng-show="sortField == 'specialties' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 									<span ng-show="sortField == 'specialties' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
                 </th>
+                <th>O lekarzu</th>
                 <th>Terminy</th>
             </tr>
             </thead>
@@ -37,14 +38,75 @@
                 <td>{{ $index + 1 }}</td>
                 <td>{{ doctor.fullName }}</td>
                 <td>{{ doctor.specialties }}</td>
-                <td><a ng-href="{{ doctor }}">
-                    <a ng-click="showTerm(doctor)" class="btn btn-sm btn-success">Pokaż terminy</a>
-                </a></td>
+                <td>
+       						<button type="button" class="btn btn-default" ng-click="showDoctorInfo(doctor)">
+										Szczegóły
+									</button>
+                </td>
+                <td>
+            	    <button type="button" ng-click="showTerm(doctor)" class="btn btn-sm btn-success">Pokaż terminy</button>
+                </td>
             </tr>
-
             </tbody>
         </table>
     </div>
+</div>
+
+<div id="modal-doctor-info" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+	  
+	    <div class="modal-header">
+	      <h3 class="modal-title"> 
+	      	<span class="glyphicon glyphicon-user"></span>
+	      		O lekarzu
+	      </h3>
+	    </div>
+	    
+			<div class="modal-body">
+				<div class="row">
+					<div id="modal-doctor-info" class="">
+						<div class="col-md-12">
+							<div class="row tab-panel-row">
+								<span class="tab-panel-label label label-success col-md-3 text-right">Imię i nazwisko</span>
+								<span id="doctor-name" class="col-md-9 text-left">
+									{{ selectedDoctorInfo.firstName + " " + selectedDoctorInfo.lastName }}
+								</span>
+							</div>
+							<div class="row tab-panel-row">
+								<span class="tab-panel-label label label-success col-md-3 text-right">Tytuł naukowy</span>
+								<span class="col-md-9 text-left">
+									{{ selectedDoctorInfo.title }}
+								</span>
+							</div>	
+							<div class="row tab-panel-row">
+								<div class="tab-panel-label label label-success col-md-3">Specjalizacje</div>
+								<div class="col-md-9">
+											{{ selectedDoctorInfo.specialties }}
+								</div>
+							</div>	
+							<div class="row tab-panel-row">
+								<span class="tab-panel-label label label-success col-md-3 text-right">Uczelnia</span>
+								<span class="col-md-9 text-left">
+									{{ selectedDoctorInfo.university }}
+								</span>
+							</div>								
+							<div class="row tab-panel-row">
+								<span class="row center-block tab-panel-row tab-panel-label label label-success col-md-12">Biografia</span>
+								<div class="row center-block well col-md-12">
+									{{ selectedDoctorInfo.biography }}
+								</div>
+							</div>	
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		  <div class="modal-footer">
+		    <button id="modal-hide-btn" type="button" class="btn btn-lg btn-success">Schowaj</button>
+		  </div>
+		</div>
+	</div>
 </div>
 
 </body>

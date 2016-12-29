@@ -15,7 +15,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
-import com.medcontact.data.model.dto.PersonalDataPassword;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,7 +28,6 @@ import com.medcontact.data.model.enums.ApplicationRole;
 
 import lombok.Data;
 import lombok.NonNull;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Entity
@@ -163,11 +161,5 @@ public class BasicUser implements UserDetails {
 		return Arrays.asList(
 				new SimpleGrantedAuthority(
 						this.role.toString()));
-	}
-
-	public void changePersonalData(PersonalDataPassword personalDataPassword, PasswordEncoder passwordEncoder) {
-		this.firstName = personalDataPassword.getFirstName();
-		this.lastName = personalDataPassword.getLastName();
-		this.email = personalDataPassword.getEmail();
 	}
 }

@@ -1,6 +1,7 @@
 package com.medcontact.controller.services;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,8 +35,8 @@ import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.domain.SharedFile;
 import com.medcontact.data.model.dto.BasicReservationData;
+import com.medcontact.data.model.dto.BasicUserData;
 import com.medcontact.data.model.dto.ConnectionData;
-import com.medcontact.data.model.dto.PersonalDataPassword;
 import com.medcontact.data.model.dto.SharedFileDetails;
 import com.medcontact.data.model.dto.UserFilename;
 import com.medcontact.data.model.enums.ReservationState;
@@ -43,8 +44,12 @@ import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
 import com.medcontact.data.repository.SharedFileRepository;
+import com.medcontact.exception.ItemNotFoundException;
 import com.medcontact.exception.NotMatchedPasswordException;
+import com.medcontact.exception.ReservationNotFoundException;
+import com.medcontact.exception.ReservationTakenException;
 import com.medcontact.exception.UnauthorizedUserException;
+import com.medcontact.exception.UserNotFoundException;
 import com.medcontact.security.config.EntitlementValidator;
 
 import lombok.Getter;
@@ -260,6 +265,35 @@ public class PatientService {
             }
         }
     }
+    
+    public void deleteFile(Long patientId, Long fileId) throws UnauthorizedUserException, ItemNotFoundException, FileNotFoundException, IOException {
+    	if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+    		FileEntry fileEntry = fileRepository.findOne(fileId);
+    		
+    		if (fileEntry == null) {
+    			throw new ItemNotFoundException();
+    		}
+    		if (!fileEntry.getFileOwner().getId().equals(patientId)) {
+    			throw new UnauthorizedUserException();
+    		}
+    		
+    		/* Delete the file entry and information about sharing that file with doctors */
+    		
+    		fileRepository.delete(fileId);
+    		sharedFileRepository.deleteInBatch(fileEntry.getSharedFiles());
+
+    		Patient patient = patientRepository.findOne(patientId);
+    		patient.getFileEntries().removeIf(f -> fileId.equals(f.getId()));
+    		patientRepository.save(patient);
+
+    		/* Remove the file from the local file system */
+    		
+            File fileToDelete = Paths.get(fileEntry.getPath()).toAbsolutePath().toFile();
+            try (FileOutputStream out = new FileOutputStream(fileToDelete)) {
+                Files.deleteIfExists(fileToDelete.toPath());
+            }
+    	}
+    }
 
     public void shareFile(Long patientId, SharedFileDetails sharedFileDetails) throws UnauthorizedUserException {
         if (entitlementValidator.isEntitled(patientId, Patient.class)) {
@@ -290,42 +324,114 @@ public class PatientService {
             }
         }
     }
+    
+    public List<SharedFile> getSharedFilesForPatient(Long patientId) throws UnauthorizedUserException, UserNotFoundException {
+    	if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+    		Patient patient = patientRepository.findOne(patientId);
+    		
+    		if (patient == null) {
+    			throw new UserNotFoundException();
+    		}
+    		
+    		return patient.getFutureReservations()
+    				.stream()
+    				.flatMap(r -> r.getSharedFiles().stream())
+    				.collect(Collectors.toList());
+    	} else {
+    		
+    		/* Compiler demands that the method returns a list. */
+    		return new ArrayList<>();
+    	}
+    }
+    
+    public void cancelShareByFileIdAndReservationId(Long patientId, Long fileId, Long reservationId) throws UnauthorizedUserException, ItemNotFoundException {
+    	if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+    		SharedFile sharedFile = sharedFileRepository.findByFileEntryIdAndReservationId(fileId, reservationId);
+    		
+    		if (sharedFile == null) {
+    			throw new ItemNotFoundException();
+    		}
+    		
+    		sharedFileRepository.delete(sharedFile);
+    	}
+    }
 
-    public List<BasicReservationData> getCurrentReservations(Long patientId) throws UnauthorizedUserException {
+    public List<BasicReservationData> getFutureReservations(Long patientId) throws UnauthorizedUserException {
         if (entitlementValidator.isEntitled(patientId, Patient.class)) {
             return patientRepository.findOne(patientId)
-                    .getReservations()
+                    .getFutureReservations()
                     .stream()
-                    .filter(r -> r.getEndDateTime().isAfter(LocalDateTime.now()))
                     .map(BasicReservationData::new)
                     .collect(Collectors.toList());
 
         } else {
+        	
+        	/* Compiler demands that the method returns a list. */
             return new ArrayList<>();
         }
     }
 
-    public void bookReservation(Long patientId, Long reservationId) {
-        Patient patient = patientRepository.findOne(patientId);
-        Reservation reservation = reservationRepository.findOne(reservationId);
-        reservation.setReservationState(ReservationState.RESERVED);
-        reservation.setPatient(patient);
-        reservationRepository.save(reservation);
+    public void bookReservation(Long patientId, Long reservationId) throws UnauthorizedUserException, ReservationTakenException {
+    	if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+    		Reservation reservation = reservationRepository.findOne(reservationId);
+
+    		if (reservation.getReservationState() != ReservationState.UNRESERVED) {
+    			throw new ReservationTakenException();
+    		} 
+    		
+    		reservation.setReservationState(ReservationState.RESERVED);
+    		Patient patient = patientRepository.findOne(patientId);
+    		reservation.setPatient(patient);
+    		patient.getReservations().add(reservation);
+    		
+    		reservationRepository.save(reservation);
+    		patientRepository.save(patient);
+    	}
+    }
+    
+    public void cancelReservation(Long patientId, Long reservationId) throws UnauthorizedUserException, ReservationNotFoundException {
+    	if (entitlementValidator.isEntitled(patientId, Patient.class)) {
+    		Reservation reservation = reservationRepository.findOne(reservationId);
+    		
+    		if (reservation == null) {
+    			throw new ReservationNotFoundException();
+    		}
+    		if (!reservation.getPatient().getId().equals(patientId)) {
+    			throw new UnauthorizedUserException();
+    		}
+    		
+    		reservation.setPatient(null);
+    		reservation.setReservationState(ReservationState.UNRESERVED);
+    		
+    		Patient patient = patientRepository.findOne(patientId);
+    		patient.getReservations().removeIf(r -> reservationId.equals(r.getId()));
+    		
+    		reservationRepository.save(reservation);
+    		patientRepository.save(patient);
+    	}
     }
 
-    public void changePersonalData(Long patientId, PersonalDataPassword personalDataPassword) {
-        Patient patient = patientRepository.findOne(patientId);
-
-        patient.changePersonalData(personalDataPassword, passwordEncoder);
-        if(personalDataPassword.getNewPassword1() != null && personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2())){
-            if (passwordEncoder.matches(personalDataPassword.getOldPassword(), patient.getPassword())){
-                patient.setPassword(passwordEncoder.encode(personalDataPassword.getNewPassword1()));
-            }
-            else{
-                throw new NotMatchedPasswordException();
-            }
+    public void changePersonalData(Long patientId, BasicUserData patientData) throws UnauthorizedUserException {
+		Patient patient = patientRepository.findOne(patientId);
+        
+        if (patient == null) {
+        	throw new UnauthorizedUserException();
+        	
+        } else if(passwordEncoder.matches(
+        			patientData.getOldPassword(), patient.getPassword())
+        		&& patientData.getNewPassword1() != null 
+        		&& patientData.getNewPassword1().equals(patientData.getNewPassword2())){
+        		
+    		patient.setEmail(patientData.getUsername());
+    		patient.setFirstName(patientData.getFirstName());
+    		patient.setLastName(patientData.getLastName());
+    		patient.setPassword(passwordEncoder.encode(patientData.getNewPassword1()));
+            
+    		patientRepository.save(patient);
+    		
+        } else{
+            throw new NotMatchedPasswordException();
         }
-        patientRepository.save(patient);
     }
 
 }

@@ -11,6 +11,8 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 myApp.controller('PersonalDataCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
         $rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
+        $scope.badRequest = false;
+        $scope.changeSuccess = false;
 
         $scope.changePersonalData = function () {
             var personalDataPassword = {
@@ -24,8 +26,6 @@ myApp.controller('PersonalDataCtrl', ['REST_API', "$rootScope", '$scope', '$http
 
             if($rootScope.userDetails.role == "ADMIN")
                 var url = "admins";
-            else if($rootScope.userDetails.role == "DOCTOR")
-                var url = "doctors";
             else var url = "patients";
 
             $http.put(REST_API + url + "/" + $rootScope.userDetails.id, personalDataPassword)
@@ -38,12 +38,19 @@ myApp.controller('PersonalDataCtrl', ['REST_API', "$rootScope", '$scope', '$http
                         email: $scope.userDetails.email,
                         role: $rootScope.userDetails.role
                     };
+                    
                     console.log($rootScope.userDetails);
                     UserService.setUser(personalData);
                     $rootScope.userDetails = UserService.getUser();
                     console.log($rootScope.userDetails);
+                    
+                    $scope.badRequest = false;
+                    $scope.changeSuccess = true;
+                    
                 }, function errorCallback(response) {
                     console.log("[ERROR]: " + response.data.message);
+                    $scope.badRequest = true;
+                    $scope.changeSuccess = false;
                 })
         }
     }]);

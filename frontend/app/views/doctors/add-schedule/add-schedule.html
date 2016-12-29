@@ -4,7 +4,8 @@
             <span class="col-md-4"></span>
             <h2 class="col-md-8">{{userDetails.firstName + " " + userDetails.lastName}}</h2>
         </div>
-        <div ng-show="emptySchedule" class="col-md-offset-1 alert alert-warning">
+        
+        <div ng-show="emptySchedule" class="col-md-offset-1 col-md-10 alert alert-warning">
             Lekarz nie posiada wolnych terminów
         </div>
 
@@ -12,14 +13,18 @@
             <thead ng-repeat-start="schedule in schedules">
             <tr>
                 <th>{{schedule.key | date:'EEEE: dd MMMM yyyy'}}</th>
-                <th></th>
+                <th>Status</th>
             </tr>
             </thead>
             <tbody ng-repeat-end>
-            <tr ng-repeat="value in schedule.values">
-                <td>{{value.startDateTime | date:'HH:mm'}} - {{value.endDateTime | date:'HH:mm'}}</td>
-                <!--<td><input name="submit-btn" class="btn btn-sm btn-warning" type="submit" value="Usuń termin"-->
-                           <!--ng-click="bookTerm(value.id)"/></td>-->
+            <tr ng-repeat="term in schedule.values">
+                <td>{{term.startDateTime | date:'HH:mm'}} - {{term.endDateTime | date:'HH:mm'}}</td>
+                <td>
+                	<span ng-show="term.reservationState === 'UNRESERVED'" class="term-status label label-default">wolny</span>
+                	<span ng-show="term.reservationState === 'RESERVED'" class="term-status label label-success">zajęty</span>
+                </td>
+								<!--<td><input name="submit-btn" class="btn btn-sm btn-warning" type="submit" value="Usuń termin"
+                           ng-click="bookTerm(value.id)"/></td>-->
             </tr>
             </tbody>
         </table>

@@ -30,42 +30,53 @@
         </li>
     </ul>
     <ul id="home-login-btns" class="nav navbar-nav pull-right">
+       
         <!--GUEST-->
-        <li ng-show="!userDetails.id" class="nav-item">
+        <li ng-show="!userDetails.id" class="nav-item" ng-cloak>
             <a href="#!/signUp" class="btn btn-default navbar-btn">Rejestracja</a>
         </li>
-        <li ng-show="!userDetails.id" class="nav-item">
+        <li ng-show="!userDetails.id" class="nav-item" ng-cloak>
             <a href="#!/login" class="btn btn-success navbar-btn">Logowanie</a>
         </li>
+      
         <!--PATIENT-->
-        <li ng-if="userDetails.id && userDetails.role === 'PATIENT' && userDetails.consultation" class="nav-item">
-            <a href="#!/patient-consultation" class="btn btn-default navbar-btn">Konsultacja</a>
+        <li ng-if="userDetails.id && userDetails.role === 'PATIENT' && userDetails.consultation" class="nav-item" ng-cloak>
+            <a href="#!/patient/consultation" class="btn btn-default navbar-btn">Konsultacja</a>
         </li>
-        <li ng-if="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
+        <li ng-if="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item" ng-cloak>
             <a href="#!/reservation" class="btn btn-default navbar-btn">Rezerwacje</a>
         </li>
-        <li ng-if="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
+        <li ng-if="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item" ng-cloak>
             <a href="#!/doctor-list" class="btn btn-default navbar-btn">Lekarze</a>
         </li>
-        <li ng-show="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item">
+        <li ng-show="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item" ng-cloak>
             <a href="#!/file-upload" class="btn btn-default navbar-btn">Pliki</a>
         </li>
-        <!--DOCTOR-->
-        <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item">
-            <a href="#!/doctor-consultation" class="btn btn-default navbar-btn">Pokój rozmów</a>
-        </li>
-        <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item">
-            <a href="#!/add-schedule" class="btn btn-default navbar-btn">Terminy konsultacji</a>
-        </li>
-        <!--ADMIN-->
-        <li ng-show="userDetails.id && userDetails.role === 'ADMIN'" class="nav-item">
-            <a href="#!/add-doctor" class="btn btn-default navbar-btn">Dodaj lekarza</a>
-        </li>
-        <!--ALL-->
-        <li ng-show="userDetails.id" class="nav-item">
+        <li ng-show="userDetails.id && userDetails.role === 'PATIENT'" class="nav-item" ng-cloak>
             <a href="#!/personal-data" class="btn btn-default navbar-btn">Dane Osobowe</a>
         </li>
-        <li ng-show="userDetails.id" class="nav-item">
+        
+        <!--DOCTOR-->
+        <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item" ng-cloak>
+            <a href="#!/doctor/consultation" class="btn btn-default navbar-btn">Pokój rozmów</a>
+        </li>
+        <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item" ng-cloak>
+            <a href="#!/add-schedule" class="btn btn-default navbar-btn">Terminy konsultacji</a>
+        </li>
+        <li ng-show="userDetails.id && userDetails.role === 'DOCTOR'" class="nav-item" ng-cloak>
+            <a href="#!/doctor/personal-data" class="btn btn-default navbar-btn">Dane Osobowe</a>
+        </li>
+        
+        <!--ADMIN-->
+        <li ng-show="userDetails.id && userDetails.role === 'ADMIN'" class="nav-item" ng-cloak>
+            <a href="#!/add-doctor" class="btn btn-default navbar-btn">Dodaj lekarza</a>
+        </li>
+        <li ng-show="userDetails.id && userDetails.role === 'ADMIN'" class="nav-item" ng-cloak>
+            <a href="#!/personal-data" class="btn btn-default navbar-btn">Dane Osobowe</a>
+        </li>
+        
+        <!--ALL-->
+        <li ng-show="userDetails.id" class="nav-item" ng-cloak>
             <a href="#!/logout" class="btn btn-default navbar-btn">Wyloguj się</a>
         </li>
 
@@ -145,6 +156,7 @@
 <!--DOCTOR-->
 <script src="views/doctors/add-schedule/add-schedule.js"></script>
 <script src="views/doctors/consultation/consultation.js"></script>
+<script src="views/doctors/personal-data/personal-data.js"></script>
 <!--ADMIN-->
 <script src="views/admin/add-doctor/add-doctor.js"></script>
 </body>

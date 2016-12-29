@@ -9,6 +9,7 @@ myApp.config(['$routeProvider', function ($routeProvider) {
 
 var isValidDate = function (date) {
     if (Object.prototype.toString.call(date) === "[object Date]") {
+    	
         // it is a date
         if (isNaN(date.getTime())) {  // d.valueOf() could also work
             console.error("date is not valid");
@@ -20,7 +21,7 @@ var isValidDate = function (date) {
         }
     }
     else {
-        console.error("it is not a date");
+        console.error("[ERROR]: It is not a date");
         return false;
     }
 };
@@ -28,11 +29,58 @@ var isValidDate = function (date) {
 myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
         $rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
+        subscribeForNotifications();
         getSchedule();
         $scope.emptySchedule = false;
+        
+        function subscribeForNotifications() {
+	    	var socket = new SockJS(REST_API + "ws")
+			var stompClient = Stomp.over(socket);
+	    	$rootScope.stompClient = stompClient;
+	    	stompClient.debug = null;
+	    	$rootScope.ringTone = new Audio("assets/sounds/ring.mp3");
+	    	
+	    	stompClient.connect({}, function (frame) {
+	    		$rootScope.subscription = stompClient.subscribe("/queue/doctors/" + $rootScope.userDetails.id + "/calling", function (message) {
+	    			$rootScope.prevPatient = $rootScope.callingPatient;
+					$rootScope.callingPatient = JSON.parse(message.body);
+					$rootScope.ringTone.play();
+					$rootScope.patientCalling = true;
+
+					$rootScope.currentReservation = $rootScope.callingPatient.reservation;
+					
+					var dialog = $("#modal-calling");
+					$("#calling-patient-id").text($scope.callingPatient.id);
+					$("#calling-patient-name").text($scope.callingPatient.name);
+					
+					var startTime = formatTime(new Date($scope.callingPatient.reservation.startDateTime));
+					
+					$("#calling-patient-start").text(startTime);
+					$("#redirect-to-consultation-btn").one("click", function () {
+						dialog.modal("hide");
+						$rootScope.ringTone.pause();
+						$rootScope.ringTone.currentTime = 0;
+						
+						if ($location.url() !== "/doctor/consultation") {
+							$location.path("/doctor/consultation");
+							
+						} else {
+							getSharedFiles();
+							getNextReservation($rootScope.currentReservation.id);
+							getNotesForPatient($rootScope.callingPatient.id);
+						}
+					});
+					
+					dialog.modal("show");
+	    		});
+	    	}, 
+	    	{
+				id: $rootScope.userDetails.id
+			});
+	    }
 
         function getSchedule() {
-            $http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/reservations/UNRESERVED")
+            $http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/reservations")
                 .then(function successCallback(response) {
                         response.data.forEach(function (schedule) {
                             schedule.startDateTime = new Date(schedule.startDateTime);
@@ -72,8 +120,9 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
                     end: end
                 })
                     .then(function successCallback(response) {
-                        getSchedule()
-                        console.log("Success")
+                        getSchedule();
+                        $scope.emptySchedule = false;
+                        console.log("Success");
                     }, function errorCallback(response) {
                         console.log("[ERROR]: " + response.data.message);
                     })
@@ -83,8 +132,7 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
             }
 
         };
-
-
+        
         $(function () {
             $('#datePickerDiv').datetimepicker({
                 locale: 'pl',
@@ -113,4 +161,10 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
                 $('#startTimePickerDiv').data("DateTimePicker").maxDate(e.date);
             });
         });
+        
+        function formatTime(dateTime) {
+        	var time = new Date(dateTime);
+    		return  "" + ((time.getHours() > 9) ? time.getHours() : "0" + time.getHours()) 
+    			+ ":" + ((time.getMinutes() > 9) ? time.getMinutes() : "0" + time.getMinutes());
+        }
     }]);

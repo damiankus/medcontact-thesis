@@ -67,12 +67,22 @@ public class DoctorDataController {
 
     @GetMapping(value = "{id}/reservations/{type}")
     @ResponseBody
-    public List<Reservation> getReservationBasedOnType(@PathVariable("id") Long id, @PathVariable("type")
+    public List<Reservation> getReservationBasedOnType(
+    		@PathVariable("id") Long id,
+    		@PathVariable("type")
             ReservationState reservationState) {
 
         return doctorService.getReservationBasedOnType(id, reservationState);
     }
-
+    
+    @GetMapping(value = "{id}/reservations")
+    @ResponseBody
+    public List<Reservation> getReservationBasedOnType(@PathVariable("id") Long id) 
+    		throws UnauthorizedUserException {
+    	
+        return doctorService.getCurrentReservations(id);
+    }
+    
     @GetMapping(value = "{id}/sharedFiles/{sharedFileId}")
     public void getSharedFile(
             @PathVariable("id") Long doctorId,
@@ -135,8 +145,8 @@ public class DoctorDataController {
     @ResponseBody
     public void changePersonalData(
             @PathVariable("id") Long doctorId,
-            @RequestBody PersonalDataPassword personalDataPassword) {
+            @RequestBody BasicDoctorData doctorData) throws UnauthorizedUserException {
 
-        doctorService.changePersonalData(doctorId, personalDataPassword);
+        doctorService.changePersonalData(doctorId, doctorData);
     }
 }	

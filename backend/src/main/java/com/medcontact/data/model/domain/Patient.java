@@ -1,7 +1,9 @@
 package com.medcontact.data.model.domain;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
@@ -10,11 +12,8 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.medcontact.data.model.builders.PatientBuilder;
-import com.medcontact.data.model.dto.PersonalDataPassword;
 import com.medcontact.data.model.enums.ApplicationRole;
 
 import lombok.Data;
@@ -57,8 +56,10 @@ public class Patient extends BasicUser {
 		return new PatientBuilder();
 	}
 
-	public void addReservation(Reservation reservation) {
-		this.reservations.add(reservation);
+	public List<Reservation> getFutureReservations() {
+        return this.reservations
+            .stream()
+            .filter(r -> r.getEndDateTime().isAfter(LocalDateTime.now()))
+            .collect(Collectors.toList());
 	}
-
 }

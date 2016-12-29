@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -119,6 +120,8 @@ public class DoctorService {
     public void addNewReservation(Long id, ReservationDate reservationDate) {
         Doctor doctor = doctorRepository.findOne(id);
         Reservation reservation = new Reservation(doctor, reservationDate.getStart(), reservationDate.getEnd());
+        
+        
         doctor.getReservations().add(reservation);
         doctorRepository.save(doctor);
     }
@@ -128,8 +131,22 @@ public class DoctorService {
                 .findOne(id)
                 .getReservations()
                 .stream()
-                .filter(reservation -> reservation.getReservationState() == reservationState)
+                .filter(reservation -> ((reservation.getReservationState() == reservationState)
+                		&& (reservation.getEndDateTime().isAfter(LocalDateTime.now()))))
                 .collect(Collectors.toList());
+    }
+    
+    public List<Reservation> getCurrentReservations(Long doctorId) throws UnauthorizedUserException {
+        if (entitlementValidator.isEntitled(doctorId, Doctor.class)) {
+            return doctorRepository.findOne(doctorId)
+                    .getReservations()
+                    .stream()
+                    .filter(r -> r.getEndDateTime().isAfter(LocalDateTime.now()))
+                    .collect(Collectors.toList());
+
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public void getSharedFile(Long doctorId, Long sharedFileId, HttpServletResponse response)
@@ -321,18 +338,32 @@ public class DoctorService {
     			.collect(Collectors.toList());
     }
 
-    public void changePersonalData(Long doctorId, PersonalDataPassword personalDataPassword) {
+    public void changePersonalData(Long doctorId, BasicDoctorData doctorData) throws UnauthorizedUserException {
         Doctor doctor = doctorRepository.findOne(doctorId);
-
-        doctor.changePersonalData(personalDataPassword, passwordEncoder);
-        if(personalDataPassword.getNewPassword1() != null && personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2())){
-            if (passwordEncoder.matches(personalDataPassword.getOldPassword(), doctor.getPassword())){
-                doctor.setPassword(passwordEncoder.encode(personalDataPassword.getNewPassword1()));
-            }
-            else{
-                throw new NotMatchedPasswordException();
-            }
+        
+        System.out.println(doctorData);
+        
+        if (doctor == null) {
+        	throw new UnauthorizedUserException();
+        	
+        } else if(passwordEncoder.matches(
+    				doctorData.getOldPassword(), doctor.getPassword())
+        		&& doctorData.getNewPassword1() != null 
+        		&& doctorData.getNewPassword1().equals(doctorData.getNewPassword2())){
+        		
+        		doctor.setEmail(doctorData.getEmail());
+        		doctor.setFirstName(doctorData.getFirstName());
+        		doctor.setLastName(doctorData.getLastName());
+        		doctor.setBiography(doctorData.getBiography());
+        		doctor.setUniversity(doctorData.getUniversity());
+        		doctor.setSpecialties(doctorData.getSpecialties());
+        		doctor.setTitle(doctorData.getTitle());
+        		doctor.setPassword(passwordEncoder.encode(doctorData.getNewPassword1()));
+                
+                doctorRepository.save(doctor);
+                
+        } else{
+            throw new NotMatchedPasswordException();
         }
-        doctorRepository.save(doctor);
     }
 }

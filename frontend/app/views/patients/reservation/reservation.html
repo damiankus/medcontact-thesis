@@ -1,6 +1,6 @@
-<body>
+<body ng-app="myApp" ng-controller="ReservationCtrl">
 <div class="container">
-    <div class="jumbotron" ng-app="myApp" ng-controller="ReservationCtrl">
+    <div class="jumbotron">
 
         <div class="form-group text-center">
             <h2 class="col-md-12">Rezerwacje</h2>
@@ -19,7 +19,7 @@
             <thead>
             <tr>
             	<th>#</th>
-	           	<th ng-click="sortField = 'doctorName'; sortReversed = !sortReversed" class="col-md-3">
+	           	<th ng-click="sortField = 'doctorName'; sortReversed = !sortReversed" class="col-md-2">
 								Lekarz
 								<span ng-show="sortField == 'doctorName' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 								<span ng-show="sortField == 'doctorName' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
@@ -31,19 +31,19 @@
 								<span ng-show="sortField == 'uploadTime' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 							</th>
 							
-							<th ng-click="sortField = 'startDateTime'; sortReversed = !sortReversed" class="col-md-3">
+							<th ng-click="sortField = 'startDateTime'; sortReversed = !sortReversed" class="col-md-2">
 								 Godzina rozpoczęcia
 								<span ng-show="sortField == 'startDateTime' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 								<span ng-show="sortField == 'startDateTime' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 							</th>
 							
-							<th ng-click="sortField = 'endDateTime'; sortReversed = !sortReversed" class="col-md-3">
+							<th ng-click="sortField = 'endDateTime'; sortReversed = !sortReversed" class="col-md-2">
 								 Godzina zakończenia
 								<span ng-show="sortField == 'endDateTime' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 								<span ng-show="sortField == 'endDateTime' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 							</th>
 							
-							<th>Opcje</th>
+							<th class="col-md-4">Opcje</th>
             </tr>
             </thead>
 	         	<tbody>
@@ -54,14 +54,42 @@
 								<td>{{ reservation.startDateTime | date : 'HH:mm:ss' }}</td>
 								<td>{{ reservation.endDateTime | date : 'HH:mm:ss' }}</td>
 								
-								<td><button ng-attr-id="{{ 'call-btn-' + reservation.id }}" 
-									ng-disabled="!reservationStarted(reservation) || reservationFinished(reservation)"
-									ng-class="reservationStarted(reservation) ? 'btn-success' : 'btn-danger'"
-									ng-click="call(reservation)" class="btn btn-sm"> Zadzwoń</button></td>
+								<td>
+									<button ng-click="showCancelReservationModal(reservation.id)" class="btn btn-sm btn-danger">Anuluj</button>
+									<button ng-attr-id="{{ 'call-btn-' + reservation.id }}" 
+										ng-disabled="!reservationStarted(reservation) || reservationFinished(reservation)"
+										ng-class="reservationStarted(reservation) ? 'btn-success' : 'btn-danger'"
+										ng-click="call(reservation)" class="btn btn-sm"> Zadzwoń</button>
+								</td>
 							</tr>
             <tbody>
         </table>
     </div>
+</div>
+
+<div id="modal-cancel-reservation" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+	  
+	    <div class="modal-header">
+	      <h3 class="modal-title"> 
+	      	<span class="glyphicon glyphicon-delete"></span>
+	      	<span>Rezygnacja z rezerwacji</span>
+	      </h3>
+	    </div>
+	    
+			<div class="modal-body">
+				<div class="row">
+					Na pewno anulować konsultację?
+				</div>
+			</div>
+			
+		  <div class="modal-footer">
+		    <button id="modal-reject-btn" type="button" ng-click="hideCancelReservationModal()" class="btn btn-lg btn-danger">Nie</button>
+		    <button id="modal-confirm-btn" type="button" ng-click="cancelReservation(cancelledReservationId)" class="btn btn-lg btn-success">Tak</button>
+		  </div>
+		</div>
+	</div>
 </div>
 
 </body>

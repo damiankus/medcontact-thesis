@@ -5,10 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.medcontact.data.model.domain.Patient;
-import com.medcontact.data.model.dto.PersonalDataPassword;
-import com.medcontact.data.repository.AdministratorRepository;
-import com.medcontact.exception.NotMatchedPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,8 +18,11 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.medcontact.data.model.domain.Admin;
 import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.dto.BasicUserData;
+import com.medcontact.data.repository.AdministratorRepository;
 import com.medcontact.data.repository.BasicUserRepository;
 import com.medcontact.data.repository.DoctorRepository;
+import com.medcontact.exception.NotMatchedPasswordException;
 import com.medcontact.exception.UnauthorizedUserException;
 import com.medcontact.security.config.EntitlementValidator;
 
@@ -32,10 +31,13 @@ public class AdminService {
     private Logger logger = Logger.getLogger(AdminService.class.getName());
     
     @Autowired
-    BasicUserRepository userRepository;
+    private BasicUserRepository userRepository;
 
     @Autowired
-    DoctorRepository doctorRepository;
+    private DoctorRepository doctorRepository;
+    
+    @Autowired 
+    private AdministratorRepository adminRepository;
     
     @Autowired
     private EntitlementValidator entitlementValidator;
@@ -63,10 +65,6 @@ public class AdminService {
     		
     	Map<String, Object> body = new HashMap<>();
         HttpStatus status = HttpStatus.CREATED;
-        
-        System.out.println("\n\n\n (email): " + doctor.getUsername());
-        System.out.println("email present? " + userRepository.findByUsername(doctor.getUsername()).isPresent());
-        System.out.println("\n\n\n");
         
         if (userRepository.findByUsername(doctor.getUsername()).isPresent()) {
             body.put("errors", Arrays.asList("Email already taken"));
@@ -109,18 +107,26 @@ public class AdminService {
         return new ResponseEntity<>(body, status);
     }
 
-    public void changePersonalData(Long adminId, PersonalDataPassword personalDataPassword) {
-        Admin admin = (Admin)userRepository.findOne(adminId);
-
-        admin.changePersonalData(personalDataPassword, passwordEncoder);
-        if(personalDataPassword.getNewPassword1() != null && personalDataPassword.getNewPassword1().equals(personalDataPassword.getNewPassword2())){
-            if (passwordEncoder.matches(personalDataPassword.getOldPassword(), admin.getPassword())){
-                admin.setPassword(passwordEncoder.encode(personalDataPassword.getNewPassword1()));
-            }
-            else{
-                throw new NotMatchedPasswordException();
-            }
+    public void changePersonalData(Long adminId, BasicUserData adminData) throws UnauthorizedUserException {
+		Admin admin = adminRepository.findOne(adminId);
+        
+        if (admin == null) {
+        	throw new UnauthorizedUserException();
+        	
+        } else if(passwordEncoder.matches(
+    				adminData.getOldPassword(), admin.getPassword())
+        		&& adminData.getNewPassword1() != null 
+        		&& adminData.getNewPassword1().equals(adminData.getNewPassword2())){
+        		
+        		admin.setEmail(adminData.getEmail());
+        		admin.setFirstName(adminData.getFirstName());
+        		admin.setLastName(adminData.getLastName());
+        		admin.setPassword(passwordEncoder.encode(adminData.getNewPassword1()));
+                
+        		adminRepository.save(admin);
+                
+        } else{
+            throw new NotMatchedPasswordException();
         }
-        userRepository.save(admin);
     }
 }

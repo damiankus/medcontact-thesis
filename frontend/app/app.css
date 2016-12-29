@@ -30,4 +30,11 @@ th:hover {
 	margin-bottom: 2% !important;
 }
 
+.term-status {
+	font-size: 16px;
+}
+
+[ng-cloak] .ng-cloak {
+	display: none !important;
+}
 

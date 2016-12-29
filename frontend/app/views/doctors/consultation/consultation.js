@@ -1,7 +1,7 @@
 'use strict';
 
 myApp.config(['$routeProvider', function ($routeProvider) {
-    $routeProvider.when('/doctor-consultation', {
+    $routeProvider.when('/doctor/consultation', {
         templateUrl: 'views/doctors/consultation/consultation.html',
         controller: 'ConsultationDoctorCtrl'
     });
@@ -81,8 +81,8 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 						$rootScope.ringTone.pause();
 						$rootScope.ringTone.currentTime = 0;
 						
-						if ($location.url() !== "/doctor-consultation") {
-							$location.path("/doctor-consultation");
+						if ($location.url() !== "/doctor/consultation") {
+							$location.path("/doctor/consultation");
 							
 						} else {
 							getSharedFiles();
@@ -114,7 +114,6 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
                     console.error("[ERROR]: Connection attempt has failed");
                     
                 } else {
-                	subscribeForNotifications();
                 	initListeners(peerConnectionConfig);
                 }
             },
