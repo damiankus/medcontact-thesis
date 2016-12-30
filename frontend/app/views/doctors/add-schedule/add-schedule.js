@@ -82,11 +82,14 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
         function getSchedule() {
             $http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/reservations")
                 .then(function successCallback(response) {
+                	
                         response.data.forEach(function (schedule) {
+                        	console.log(schedule);
                             schedule.startDateTime = new Date(schedule.startDateTime);
                             schedule.endDateTime = new Date(schedule.endDateTime);
                             schedule.day = moment(schedule.startDateTime).format("DD MM YYYY");
                         });
+                        
                         response.data = _.groupBy(response.data, function (schedule) {
                             return schedule.day;
                         });

@@ -1,8 +1,8 @@
 <div class="container">
     <div class="jumbotron">
-        <div class="form-group">
-            <span class="col-md-4"></span>
-            <h2 class="col-md-8">{{userDetails.firstName + " " + userDetails.lastName}}</h2>
+        <div class="form-group text-center">
+            <h2>{{userDetails.firstName + " " + userDetails.lastName}}</h2>
+            <h3>Terminy konsultacji</h2>
         </div>
         
         <div ng-show="emptySchedule" class="col-md-offset-1 col-md-10 alert alert-warning">
@@ -31,10 +31,11 @@
     </div>
 
     <div class="jumbotron">
-        <form name="scheduleForm" class="form-horizontal">  
+        <form id="scheduleForm" name="scheduleForm" class="form-horizontal">  
             <div class="form-group">
-                <span class="col-md-4"></span>
-                <h2 class="col-md-8">Dodawanie nowego terminu</h2>
+								<div class="text-center">
+	                <h2>Dodawanie nowego terminu</h2>
+								</div>
             </div>
 
             <div class="form-group">
@@ -64,11 +65,12 @@
                     </span>
                 </span>
                 </div>
+			           	<button id="shedule-submit-btn" ng-click="scheduleForm.$valid && addSchedule()" 
+			           			class="col-md-8 col-md-offset-2 btn btn-lg btn-success">
+			           		Dodaj termin
+			         		</button>
             </div>
-
-            <div class="pull-right">
-                <button ng-click="scheduleForm.$valid && addSchedule()" class="btn btn-lg btn-success">Dodaj termin</button>
-            </div>
+						
 
         </form>
 

@@ -1,8 +1,9 @@
 /* app css stylesheet */
 
+@import url('/assets/css/add-schedule.css');
 @import url('/assets/css/consultation.css');
-@import url('/assets/css/signup.css');
 @import url('/assets/css/file-upload.css');
+@import url('/assets/css/signup.css');
 
 .nav > .nav-item {
 	margin-right: 5px;
@@ -22,7 +23,7 @@ th:hover {
 }
 
 .btn-toolbar button {
-	margin-right: 2px;
+	margin-right: 5px;
 }
 
 .search-form {

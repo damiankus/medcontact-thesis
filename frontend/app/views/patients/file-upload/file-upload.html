@@ -35,13 +35,13 @@
 				<thead>
 					<tr>
 						<th>#</th>
-						<th ng-click="sortField = 'name'; sortReversed = !sortReversed" class="col-md-4">
+						<th ng-click="sortField = 'name'; sortReversed = !sortReversed" class="col-md-3">
 							Nazwa pliku 
 							<span ng-show="sortField == 'name' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 							<span ng-show="sortField == 'name' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 						</th>
 						
-						<th ng-click="sortField = 'uploadTime'; sortReversed = !sortReversed" class="col-md-3">
+						<th ng-click="sortField = 'uploadTime'; sortReversed = !sortReversed" class="col-md-2">
 							Data przesłania
 							<span ng-show="sortField == 'uploadTime' && sortReversed" class="glyphicon glyphicon-menu-down"></span>
 							<span ng-show="sortField == 'uploadTime' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
@@ -53,7 +53,7 @@
 							<span ng-show="sortField == 'contentType' && !sortReversed" class="glyphicon glyphicon-menu-up"></span>
 						</th>
 						
-						<th class="col-md-3">Opcje</th>
+						<th class="col-md-5">Opcje</th>
 					</tr>
 				</thead>
 				
@@ -65,12 +65,13 @@
 						<td>{{ file.contentType }}</td>
 						
 						<td ng-attr-id="toolbar-{{ file.id }}" class="btn-toolbar">
+							<button ng-click="deleteFile(file.id)" class="btn btn-md btn-danger">Usuń</button>
 							<a ng-href="{{ file.url }}"><button class="btn btn-md btn-success"> Pobierz</button></a>
 						
-							<div class="dropdown">
+							<div ng-attr-id="dropdown-{{ file.id }}" class="dropdown">
 								<button class="btn btn-md btn-default dropdown-toggle" 
-										type="button" id="reservations" 
-										data-toggle="dropdown" 
+										ng-click="openDropdownForFileId(file.id)"
+										type="button" id="reservations"
 										aria-haspopup="true" 
 										aria-expanded="true">
 									Udostępnij
@@ -78,16 +79,16 @@
 								</button>
 
 								<ul class="dropdown-menu" aria-labelledby="reservations">
-									<li class="dropdown-item" ng-repeat="reservation in reservations">
-										<div ng-click="shareFile(file.id, reservation.id)">
-											<div> {{ reservation.doctorName }} </div>
-											<div> {{ ' (' + (reservation.startDateTime | date : 'dd-MM-yyyy HH:mm') + ')' }} </div>
+									<li ng-attr-id="reservation-{{ reservation.id }}" class="dropdown-item" ng-repeat="reservation in reservations">
+										<div ng-click="toggleFileShare(file.id, reservation.id)">
+											<span> {{ reservation.doctorName }}</span>
+											<span> {{ ' (' + (reservation.startDateTime | date : 'dd-MM-yyyy HH:mm') + ')' }} </span>
 										</div>
 									</li>
 								</ul>
 							</div>
-							
 						</td>
+						
 					</tr>
 				</tbody>
 			</table>

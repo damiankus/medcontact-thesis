@@ -35,6 +35,7 @@ import com.medcontact.data.model.domain.Patient;
 import com.medcontact.data.model.domain.Reservation;
 import com.medcontact.data.model.domain.SharedFile;
 import com.medcontact.data.model.dto.BasicReservationData;
+import com.medcontact.data.model.dto.BasicSharedFileData;
 import com.medcontact.data.model.dto.BasicUserData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.SharedFileDetails;
@@ -279,12 +280,12 @@ public class PatientService {
     		
     		/* Delete the file entry and information about sharing that file with doctors */
     		
-    		fileRepository.delete(fileId);
-    		sharedFileRepository.deleteInBatch(fileEntry.getSharedFiles());
-
     		Patient patient = patientRepository.findOne(patientId);
     		patient.getFileEntries().removeIf(f -> fileId.equals(f.getId()));
     		patientRepository.save(patient);
+
+    		sharedFileRepository.deleteInBatch(fileEntry.getSharedFiles());
+    		fileRepository.delete(fileId);
 
     		/* Remove the file from the local file system */
     		
@@ -325,7 +326,7 @@ public class PatientService {
         }
     }
     
-    public List<SharedFile> getSharedFilesForPatient(Long patientId) throws UnauthorizedUserException, UserNotFoundException {
+    public List<BasicSharedFileData> getSharedFilesForPatient(Long patientId) throws UnauthorizedUserException, UserNotFoundException {
     	if (entitlementValidator.isEntitled(patientId, Patient.class)) {
     		Patient patient = patientRepository.findOne(patientId);
     		
@@ -336,7 +337,9 @@ public class PatientService {
     		return patient.getFutureReservations()
     				.stream()
     				.flatMap(r -> r.getSharedFiles().stream())
+    				.map(BasicSharedFileData::new)
     				.collect(Collectors.toList());
+    		
     	} else {
     		
     		/* Compiler demands that the method returns a list. */
@@ -405,6 +408,10 @@ public class PatientService {
     		
     		Patient patient = patientRepository.findOne(patientId);
     		patient.getReservations().removeIf(r -> reservationId.equals(r.getId()));
+    		
+    		/* Delete shared file entries attached to the reservation being cancelled */
+    		sharedFileRepository.deleteInBatch(reservation.getSharedFiles());
+    		reservation.setSharedFiles(new ArrayList<>());
     		
     		reservationRepository.save(reservation);
     		patientRepository.save(patient);

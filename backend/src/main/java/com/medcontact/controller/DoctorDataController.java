@@ -88,7 +88,7 @@ public class DoctorDataController {
             @PathVariable("id") Long doctorId,
             @PathVariable("sharedFileId") Long sharedFileId,
             HttpServletResponse response)
-            throws UnauthorizedUserException, IOException {
+            		throws UnauthorizedUserException, IOException {
 
         doctorService.getSharedFile(doctorId, sharedFileId, response);
     }

@@ -25,8 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.medcontact.controller.services.PatientService;
 import com.medcontact.data.model.domain.FileEntry;
-import com.medcontact.data.model.domain.SharedFile;
 import com.medcontact.data.model.dto.BasicReservationData;
+import com.medcontact.data.model.dto.BasicSharedFileData;
 import com.medcontact.data.model.dto.BasicUserData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.SharedFileDetails;
@@ -93,7 +93,7 @@ public class PatientDataController {
     }
     
     @GetMapping(value = "{id}/sharedFiles")
-    public List<SharedFile> getSharedFilesForPatient(
+    public List<BasicSharedFileData> getSharedFilesForPatient(
     		@PathVariable("id") Long patientId) throws UnauthorizedUserException, UserNotFoundException {
     	
     	return patientService.getSharedFilesForPatient(patientId);

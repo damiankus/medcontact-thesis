@@ -13,36 +13,65 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
     function (REST_API, $rootScope, $scope, $http, $location, UserService) {
 		
 		$rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
+		$scope.sortField = "uploadTime";
+		$scope.sortReversed = true;
+		$scope.fileServiceUrl = REST_API + "patients/" + $rootScope.userDetails.id + "/files";
+		
+		$scope.getReservations = function () {
+			$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations")
+			.then(function successCallback(response) {
+				$scope.reservations	 = response.data;
+				$scope.reservations.forEach(function (reservation, index) {
+					reservation.startDateTime = new Date(reservation.startDateTime);
+					reservation.endDateTime = new Date(reservation.endDateTime);
+				});
+				
+			}, function errorCallback(response) {
+				console.log("[ERROR]: " + response.data.message);
+			});
+		}
 		
 		if ($scope.reservations === undefined
 				|| $scope.reservations == null) {
 			
-			$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations")
-				.then(function successCallback(response) {
-					$scope.reservations	 = response.data;
-	                $scope.reservations.forEach(function (reservation, index) {
-	                	reservation.startDateTime = new Date(reservation.startDateTime);
-	                	reservation.endDateTime = new Date(reservation.endDateTime);
-	                });
-					
-				}, function errorCallback(response) {
-		            	console.log("[ERROR]: " + response.data.message);
-	            });
+			$scope.getReservations();
 		}
 		
-		$scope.sortField = "uploadTime";
-		$scope.sortReversed = true;
-		$scope.fileServiceUrl = REST_API + "patients/" + $rootScope.userDetails.id + "/files";
-	
 		/* Load file info from the server */
 		
-		$scope.getFiles = function() {
+		$scope.getSharedFiles = function () {
+			$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/sharedFiles")
+			.then(function successCallback(response) {
+				$scope.sharedFiles = response.data;
+				$scope.fileReservationMap = {};
+				
+				$scope.files.forEach(function (file, index) {
+					$scope.fileReservationMap[file.id] = {};
+					$scope.reservations.forEach(function (reservation, index) {
+						$scope.fileReservationMap[file.id][reservation.id] = false;
+					});
+				});
+				
+				console.log($scope.fileReservationMap);
+				
+				$scope.sharedFiles.forEach(function (item, index) {
+					$scope.fileReservationMap[item.fileEntryId][item.reservationId] = true;
+				});
+				
+			}, function errorCallback(response) {
+				console.log("[ERROR]: " + response);
+			});
+		}
+		
+		$scope.getFiles = function () {
 			$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/fileEntries")
 			.then(function successCallback(response) {
 				$scope.files = response.data;
 				$scope.files.forEach(function (item) {
 					item.uploadTime = new Date(item.uploadTime);
 				});
+				
+				$scope.getSharedFiles();
 				
 			}, function errorCallback(response) {
 				console.log("[ERROR]: " + response);
@@ -148,30 +177,77 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 				});
 			});
 			
-			$scope.shareFile = function (fileId, reservationId) {
-				console.log("File: " + fileId);
-				console.log("reservation: " + reservationId);
+			$scope.toggleFileShare = function (fileId, reservationId) {
 				
-				$http({
-					method: "POST",
-					url: REST_API + "patients/" + $rootScope.userDetails.id + "/sharedFiles",
-					headers: {
-						"Content-Type": "application/json"
-					},
-					data: {
-						fileEntryId: fileId,
-						reservationId: reservationId
-					}
-				})
-				.then(function successCallback(response) {
-					$scope.indicateSuccess("#toolbar-" + fileId);
+				if ($scope.fileReservationMap[fileId][reservationId] == false) {
+					/* Share file */
 					
-				}, function errorCallback(response) {
-						$scope.indicateFailure("#toolbar-" + fileId);
-		            	console.log("[ERROR]: Couldn't share a file");
-	            });
+					$http({
+						method: "POST",
+						url: REST_API + "patients/" + $rootScope.userDetails.id + "/sharedFiles",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						data: {
+							fileEntryId: fileId,
+							reservationId: reservationId
+						}
+					})
+					.then(function successCallback(response) {
+						$scope.fileReservationMap[fileId][reservationId] = true;
+						$("#dropdown-" + fileId + " #reservation-" + reservationId).addClass("dropdown-item-selected");
+						console.log("[INFO]: File has been successfully shared");
+						
+					}, function errorCallback(response) {
+							$scope.indicateFailure("#toolbar-" + fileId);
+			            	console.log("[ERROR]: Couldn't share the file");
+		            });
+				} else {
+					/* Cancel already shared file */
+					
+					$http.delete(REST_API + "patients/" + $rootScope.userDetails.id + "/sharedFiles/file/" + fileId + "/reservation/" + reservationId)
+					.then(function successCallback(response) {
+						$scope.fileReservationMap[fileId][reservationId] = false;
+						$("#dropdown-" + fileId + " #reservation-" + reservationId).removeClass("dropdown-item-selected");
+						console.log("[INFO]: Share has been successfully cancelled");
+						
+					}, function errorCallback(response) {
+							$scope.indicateFailure("#toolbar-" + fileId);
+			            	console.log("[ERROR]: Couldn't share the file");
+		            });
+				}
 			};
+			
+			$("html").on("click", function (e) {
+				if ($(e.target).parents(".dropdown").length == 0) {
+					$(".dropdown").each(function (index, val) {
+						$(val).removeClass("open");
+					});
+				}
+			});
 		}
+
+		$scope.openDropdownForFileId = function (fileId) {
+			$("#dropdown-" + fileId).addClass("open");
+			
+			$scope.reservations.forEach(function (reservation, index) {
+				console.log("fileId: "+ fileId + ", reservation: " + reservation.id + " -> " + $scope.fileReservationMap[fileId][reservation.id]);
+				if ($scope.fileReservationMap[fileId][reservation.id] == true) {
+					$("#dropdown-" + fileId + " #reservation-" + reservation.id).addClass("dropdown-item-selected");
+				}
+			});
+		};
+		
+		$scope.deleteFile = function (fileId) {
+			$http.delete(REST_API + "patients/" + $rootScope.userDetails.id + "/files/" + fileId)
+			.then(function successCallback(response) {
+				$scope.getFiles();
+				console.log("File has been successfully deleted");
+				
+			}, function errorCallback(response) {
+            	console.log("[ERROR]: Couldn't delete the file");
+            });
+		};
 		
 		$scope.getFiles();
 		$scope.initListeners();
