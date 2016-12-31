@@ -29,9 +29,10 @@ var isValidDate = function (date) {
 myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService', 'TimeService',
     function (REST_API, $rootScope, $scope, $http, $location, UserService, TimeService) {
         $rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
-        subscribeForNotifications();
         getSchedule();
+        subscribeForNotifications();
         $scope.emptySchedule = false;
+        moment.locale('pl');
         
         function subscribeForNotifications() {
 	    	var socket = new SockJS(REST_API + "ws")
@@ -48,16 +49,15 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
 					$rootScope.callingPatient = JSON.parse(message.body);
 					$rootScope.ringTone.play();
 					$rootScope.patientCalling = true;
-
 					$rootScope.currentReservation = $rootScope.callingPatient.reservation;
 					
 					var dialog = $("#modal-calling");
-					$("#calling-patient-id").text($scope.callingPatient.id);
-					$("#calling-patient-name").text($scope.callingPatient.name);
+					$("#calling-patient-id").text($rootScope.callingPatient.id);
+					$("#calling-patient-name").text($rootScope.callingPatient.name);
+					$scope.callingPatient.reservation.startDateTime = TimeService.parseTimeWithTimezone($scope.callingPatient.reservation.startDateTime);
+					$scope.callingPatient.reservation.endDateTime = TimeService.parseTimeWithTimezone($scope.callingPatient.reservation.endDateTime);
 					
-					var startTime = TimeService.parseWithTimezone($scope.callingPatient.reservation.startDateTime);
-					
-					$("#calling-patient-start").text(startTime);
+					$("#calling-patient-start").text($scope.callingPatient.reservation.startDateTime);
 					$("#redirect-to-consultation-btn").one("click", function () {
 						dialog.modal("hide");
 						$rootScope.ringTone.pause();
@@ -65,9 +65,7 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
 						
 						if ($location.url() !== "/doctor/consultation") {
 							$location.path("/doctor/consultation");
-							
 						}
-							
 					});
 					
 					dialog.modal("show");
@@ -107,7 +105,6 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
                         	schedule.day = moment(schedule.startDateTime).format("DD MM YYYY");
                             schedule.startDateTime = TimeService.parseWithTimezone(schedule.startDateTime);
                             schedule.endDateTime = TimeService.parseWithTimezone(schedule.endDateTime);
-                            console.log(schedule.startDateTime);
                         });
                         
                         response.data = _.groupBy(response.data, function (schedule) {
@@ -133,7 +130,6 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
 
 
         $scope.addSchedule = function () {
-            moment.locale('pl');
             var start = new Date(moment($scope.date + " " + $scope.startTime, "D MMMM YYYY H:mm"));
             var end = new Date(moment($scope.date + " " + $scope.endTime, "D MMMM YYYY H:mm"));
 

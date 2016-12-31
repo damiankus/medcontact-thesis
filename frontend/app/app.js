@@ -59,8 +59,13 @@ var myApp = angular.module('myApp', ['ngRoute'])
     		parseWithTimezone: function (timeString) {
     			return moment.utc(timeString).format();
     		},
+    		parseTimeWithTimezone: function (timeString) {
+    			var offset = new Date().getTimezoneOffset();
+    			return moment.utc(timeString).subtract(offset, "minutes").format("HH:mm");
+    		},
     		now: function () {
-    			return moment.utc();
+    			var offset = new Date().getTimezoneOffset();
+    			return moment.utc().subtract(offset, "minutes");
     		}
     	};
     });

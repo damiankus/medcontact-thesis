@@ -17,7 +17,7 @@
             </tr>
             </thead>
             <tbody ng-repeat-end>
-            <tr ng-repeat="term in schedule.values">
+            <tr ng-repeat="term in schedule.values | orderBy:'startDateTime'">
                 <td>{{term.startDateTime | date:'HH:mm'}} - {{term.endDateTime | date:'HH:mm'}}</td>
                 <td>
                 	<span ng-show="term.reservationState === 'UNRESERVED'" class="term-status label label-default">wolny</span>
