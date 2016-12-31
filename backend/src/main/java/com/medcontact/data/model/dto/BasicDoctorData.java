@@ -2,9 +2,9 @@ package com.medcontact.data.model.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.medcontact.data.model.domain.Doctor;
-import com.medcontact.data.model.domain.Specialty;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +16,7 @@ public class BasicDoctorData extends BasicUserData {
     private String university;
     private String biography;
     private String title;
-    private List<Specialty> specialties;
+    private List<String> specialties;
 
     public BasicDoctorData() {
     	super();
@@ -28,12 +28,17 @@ public class BasicDoctorData extends BasicUserData {
     
     public BasicDoctorData(Doctor doctor) {
         this.id = doctor.getId();
+        this.email = doctor.getEmail();
+        this.username = doctor.getUsername();
         this.firstName = doctor.getFirstName();
         this.lastName = doctor.getLastName();
         this.university = doctor.getUniversity();
         this.biography = doctor.getBiography();
         this.title = doctor.getTitle();
-        this.specialties = doctor.getSpecialties();
+        this.specialties = doctor.getSpecialties()
+        		.stream()
+        		.map(s -> s.getName())
+        		.collect(Collectors.toList());
 
     }
 }

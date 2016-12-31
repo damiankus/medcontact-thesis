@@ -52,8 +52,6 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 					});
 				});
 				
-				console.log($scope.fileReservationMap);
-				
 				$scope.sharedFiles.forEach(function (item, index) {
 					$scope.fileReservationMap[item.fileEntryId][item.reservationId] = true;
 				});
@@ -70,7 +68,6 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 				$scope.files.forEach(function (item) {
 					item.uploadTime = new Date(item.uploadTime);
 				});
-				
 				$scope.getSharedFiles();
 				
 			}, function errorCallback(response) {

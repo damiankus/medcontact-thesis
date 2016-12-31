@@ -3,7 +3,7 @@
 
 myApp.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/personal-data', {
-        templateUrl: 'views/personal-data/personal-data.html',
+        templateUrl: 'views/patients/personal-data/personal-data.html',
         controller: 'PersonalDataCtrl'
     });
 }]);

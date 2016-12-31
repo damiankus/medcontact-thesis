@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.medcontact.data.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +22,11 @@ import com.medcontact.controller.services.DoctorService;
 import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Note;
 import com.medcontact.data.model.domain.Reservation;
+import com.medcontact.data.model.dto.BasicDoctorData;
+import com.medcontact.data.model.dto.BasicNoteData;
+import com.medcontact.data.model.dto.BasicReservationData;
+import com.medcontact.data.model.dto.ConnectionData;
+import com.medcontact.data.model.dto.ReservationDate;
 import com.medcontact.data.model.enums.ReservationState;
 import com.medcontact.exception.UnauthorizedUserException;
 
@@ -49,14 +53,14 @@ public class DoctorDataController {
         return doctorService.getConnectionData(doctorId);
     }
 
-    @GetMapping(value = "")
+    @GetMapping("")
     @ResponseBody
     public List<BasicDoctorData> getDoctors() {
 
         return doctorService.getDoctors();
     }
 
-    @PostMapping(value = "{id}/reservation")
+    @PostMapping("{id}/reservation")
     @ResponseStatus(value = HttpStatus.CREATED, reason = "Reservation added.")
     public void addNewReservation(
             @RequestBody ReservationDate reservationDate,
@@ -65,7 +69,7 @@ public class DoctorDataController {
         doctorService.addNewReservation(id, reservationDate);
     }
 
-    @GetMapping(value = "{id}/reservations/{type}")
+    @GetMapping("{id}/reservations/{type}")
     @ResponseBody
     public List<Reservation> getReservationBasedOnType(
     		@PathVariable("id") Long id,
@@ -75,7 +79,7 @@ public class DoctorDataController {
         return doctorService.getReservationBasedOnType(id, reservationState);
     }
     
-    @GetMapping(value = "{id}/reservations")
+    @GetMapping("{id}/reservations")
     @ResponseBody
     public List<Reservation> getReservationBasedOnType(@PathVariable("id") Long id) 
     		throws UnauthorizedUserException {
@@ -83,7 +87,7 @@ public class DoctorDataController {
         return doctorService.getCurrentReservations(id);
     }
     
-    @GetMapping(value = "{id}/sharedFiles/{sharedFileId}")
+    @GetMapping("{id}/sharedFiles/{sharedFileId}")
     public void getSharedFile(
             @PathVariable("id") Long doctorId,
             @PathVariable("sharedFileId") Long sharedFileId,
@@ -93,7 +97,7 @@ public class DoctorDataController {
         doctorService.getSharedFile(doctorId, sharedFileId, response);
     }
 
-    @GetMapping(value = "{id}/reservations/{reservationId}/sharedFiles")
+    @GetMapping("{id}/reservations/{reservationId}/sharedFiles")
     public List<FileEntry> getSharedFiles(
             @PathVariable("id") Long doctorId,
             @PathVariable("reservationId") Long reservationId) throws UnauthorizedUserException {
@@ -141,7 +145,7 @@ public class DoctorDataController {
     	doctorService.deleteNote(doctorId, noteId);
     }
 
-    @PutMapping(value = "{id}")
+    @PutMapping("{id}")
     @ResponseBody
     public void changePersonalData(
             @PathVariable("id") Long doctorId,
@@ -149,4 +153,17 @@ public class DoctorDataController {
 
         doctorService.changePersonalData(doctorId, doctorData);
     }
+    
+    @GetMapping("specialties")
+    public List<String> getAllSpecialties() {
+    	return doctorService.getAllSpecialties();
+    }
+    
+    @GetMapping("specialties/like/{specialtyNameFragment}")
+    public List<String> findSpecialtiesStartingWith(
+    		@PathVariable("specialtyNameFragment") String specialtyNameFragment) {
+    	
+    	return doctorService.findSpecialtiesStartingWith(specialtyNameFragment);
+    }
+    
 }	

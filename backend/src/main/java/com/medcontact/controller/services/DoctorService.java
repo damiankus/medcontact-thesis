@@ -13,9 +13,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.medcontact.data.model.domain.*;
-import com.medcontact.data.model.dto.*;
-import com.medcontact.exception.NotMatchedPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -23,13 +20,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.medcontact.controller.DoctorDataController;
+import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.domain.FileEntry;
+import com.medcontact.data.model.domain.Note;
+import com.medcontact.data.model.domain.Patient;
+import com.medcontact.data.model.domain.Reservation;
+import com.medcontact.data.model.domain.SharedFile;
+import com.medcontact.data.model.domain.Specialty;
+import com.medcontact.data.model.dto.BasicDoctorData;
+import com.medcontact.data.model.dto.BasicNoteData;
+import com.medcontact.data.model.dto.BasicReservationData;
+import com.medcontact.data.model.dto.ConnectionData;
+import com.medcontact.data.model.dto.ReservationDate;
 import com.medcontact.data.model.enums.ReservationState;
 import com.medcontact.data.repository.DoctorRepository;
 import com.medcontact.data.repository.NoteRepository;
 import com.medcontact.data.repository.PatientRepository;
 import com.medcontact.data.repository.ReservationRepository;
 import com.medcontact.data.repository.SharedFileRepository;
+import com.medcontact.data.repository.SpecialtyRepository;
 import com.medcontact.exception.NonExistentUserException;
+import com.medcontact.exception.NotMatchedPasswordException;
 import com.medcontact.exception.UnauthorizedUserException;
 import com.medcontact.security.config.EntitlementValidator;
 
@@ -62,6 +73,9 @@ public class DoctorService {
 
     @Autowired
     private SharedFileRepository sharedFileRepository;
+    
+    @Autowired
+    private SpecialtyRepository specialtyRepository;
 
     @Autowired
     private EntitlementValidator entitlementValidator;
@@ -339,31 +353,64 @@ public class DoctorService {
     }
 
     public void changePersonalData(Long doctorId, BasicDoctorData doctorData) throws UnauthorizedUserException {
-        Doctor doctor = doctorRepository.findOne(doctorId);
-        
-        System.out.println(doctorData);
-        
-        if (doctor == null) {
-        	throw new UnauthorizedUserException();
-        	
-        } else if(passwordEncoder.matches(
-    				doctorData.getOldPassword(), doctor.getPassword())
-        		&& doctorData.getNewPassword1() != null 
-        		&& doctorData.getNewPassword1().equals(doctorData.getNewPassword2())){
-        		
-        		doctor.setEmail(doctorData.getEmail());
-        		doctor.setFirstName(doctorData.getFirstName());
-        		doctor.setLastName(doctorData.getLastName());
-        		doctor.setBiography(doctorData.getBiography());
-        		doctor.setUniversity(doctorData.getUniversity());
-        		doctor.setSpecialties(doctorData.getSpecialties());
-        		doctor.setTitle(doctorData.getTitle());
-        		doctor.setPassword(passwordEncoder.encode(doctorData.getNewPassword1()));
-                
-                doctorRepository.save(doctor);
-                
-        } else{
-            throw new NotMatchedPasswordException();
+    	if (entitlementValidator.isEntitled(doctorId, Doctor.class)) {
+    		Doctor doctor = doctorRepository.findOne(doctorId);
+            
+    		/* If the password has been changed we need to check it's validity */
+    		
+    		if (doctorData.getNewPassword1() != null && doctorData.getNewPassword1().length() != 0) {
+    			if(passwordEncoder.matches(
+    					doctorData.getOldPassword(), doctor.getPassword())
+    					&& doctorData.getNewPassword1() != null 
+    					&& doctorData.getNewPassword1().equals(doctorData.getNewPassword2())) {
+    				
+    				doctor.setPassword(passwordEncoder.encode(doctorData.getNewPassword1()));
+    			
+    			} else{
+					throw new NotMatchedPasswordException();
+				}
+    		}
+    			
+    		doctor.setEmail(doctorData.getEmail());
+    		doctor.setFirstName(doctorData.getFirstName());
+    		doctor.setLastName(doctorData.getLastName());
+    		doctor.setBiography(doctorData.getBiography());
+    		doctor.setUniversity(doctorData.getUniversity());
+    		doctor.setTitle(doctorData.getTitle());
+    		
+    		List<Specialty> specialties = new ArrayList<>();
+    		
+    		for (String s : doctorData.getSpecialties()) {
+    			Optional<Specialty> optional = specialtyRepository.findByName(s);
+    			Specialty specialty;
+    			
+    			if (optional.isPresent()) {
+    				specialty = optional.get();
+    			} else {
+    				specialty = new Specialty(s);
+    			}
+    			
+    			specialty.getDoctorsWithSpecialty().add(doctor);
+    			specialties.add(specialty);
+    			specialtyRepository.save(specialty);
+    		}
+    		
+    		doctor.setSpecialties(specialties);
+            doctorRepository.save(doctor);
         }
+    }
+
+    public List<String> getAllSpecialties() {
+    	return specialtyRepository.findAll()
+    			.stream()
+    			.map(s -> s.getName())
+    			.collect(Collectors.toList());
+    }
+    
+    public List<String> findSpecialtiesStartingWith(String specialtyNameFragment) {
+    	return specialtyRepository.findByNameStartingWith(specialtyNameFragment)
+    			.stream()
+    			.map(s -> s.getName())
+    			.collect(Collectors.toList());
     }
 }

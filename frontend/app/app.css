@@ -4,6 +4,7 @@
 @import url('/assets/css/consultation.css');
 @import url('/assets/css/file-upload.css');
 @import url('/assets/css/signup.css');
+@import url('/assets/css/personal-data.css');
 
 .nav > .nav-item {
 	margin-right: 5px;
