@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.enums.ApplicationRole;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,6 +25,7 @@ public class BasicDoctorData extends BasicUserData {
     	this.university = "";
     	this.biography = "";
     	this.specialties = new ArrayList<>();
+    	this.role = ApplicationRole.DOCTOR;
     }
     
     public BasicDoctorData(Doctor doctor) {

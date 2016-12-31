@@ -21,12 +21,6 @@ myApp.controller('DoctorListCtrl', ['REST_API', "$rootScope", '$scope', '$http',
                         $scope.doctors = response.data;
                         
                         $scope.doctors.forEach(function (item, index) {
-                        	item.specialties = item.specialties.map(function (item) {
-                        		return item.name;
-                        	});
-                        });
-                        
-                        $scope.doctors.forEach(function (item, index) {
                         	item.specialties = item.specialties.sort();
                         	item.specialties = item.specialties.join(", ");
                         	item.fullName = item.firstName + " " + item.lastName;

@@ -63,7 +63,8 @@ myApp.controller('DoctorPersonalDataCtrl', ['REST_API', "$rootScope", '$scope', 
         };
         
         $scope.addSpecialty = function (specialty) {
-        	if ($scope.doctorInfo.specialties.indexOf(specialty) == -1) {
+        	if (specialty.length > 0
+        			&& $scope.doctorInfo.specialties.indexOf(specialty) == -1) {
         		$scope.doctorInfo.specialties.push(specialty);
         	}
         	$("#specialty-input").val("");
@@ -72,7 +73,9 @@ myApp.controller('DoctorPersonalDataCtrl', ['REST_API', "$rootScope", '$scope', 
         
         $scope.addSpecialtyFromTextField = function () {
         	var specialty = $("#specialty-input").val()
-        	if ($scope.doctorInfo.specialties.indexOf(specialty) == -1) {
+        	
+        	if (specialty.length > 0 
+        			&& $scope.doctorInfo.specialties.indexOf(specialty) == -1) {
         		$scope.doctorInfo.specialties.push(specialty);
         	}
         	$("#specialty-input").val("");
@@ -82,9 +85,15 @@ myApp.controller('DoctorPersonalDataCtrl', ['REST_API', "$rootScope", '$scope', 
         $scope.changePersonalData = function () {
             $http.put(REST_API + "doctors/" + $rootScope.userDetails.id, $scope.doctorInfo)
             .then(function successCallback(response) {
-            	UserService.setUser($scope.doctorInfo);
-                $rootScope.userDetails = $scope.doctorInfo;
-                $scope.badRequest = false;
+            	
+            	$rootScope.userDetails.firstName = $scope.doctorInfo.firstName;
+            	$rootScope.userDetails.lastName = $scope.doctorInfo.lastName;
+            	$rootScope.userDetails.email = $scope.doctorInfo.email;
+            	
+            	UserService.setUser($rootScope.userDetails);
+            	console.log($rootScope.userDetails);
+
+            	$scope.badRequest = false;
                 $scope.changeSuccess = true;
                 
             }, function errorCallback(response) {

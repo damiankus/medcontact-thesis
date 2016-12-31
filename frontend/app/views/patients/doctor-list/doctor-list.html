@@ -37,7 +37,7 @@
             <tr ng-repeat="doctor in doctors | filter:doctorKeyWord | orderBy:sortField:sortReversed">
                 <td>{{ $index + 1 }}</td>
                 <td>{{ doctor.fullName }}</td>
-                <td>{{ doctor.specialties }}</td>
+                <td class="auto-expand">{{ doctor.specialties }}</td>
                 <td>
        						<button type="button" class="btn btn-default" ng-click="showDoctorInfo(doctor)">
 										Szczegóły

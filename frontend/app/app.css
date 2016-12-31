@@ -40,3 +40,7 @@ th:hover {
 	display: none !important;
 }
 
+auto-expand {
+	overflow: auto;
+}
+

@@ -49,6 +49,10 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
     
 	$scope.sortField = "name";
 	$scope.sortReversed = true;
+	
+	if (!$rootScope.subscribed) {
+		subscribeForNotifications();
+	}
 
 	/* 
 	 * Connection logic
@@ -61,6 +65,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 	    	stompClient.debug = null;
 	    	
 	    	stompClient.connect({}, function (frame) {
+	    		$rootScope.subscribed = true;
 	    		$rootScope.subscription = stompClient.subscribe("/queue/doctors/" + $rootScope.userDetails.id + "/calling", function (message) {
 	    			$rootScope.prevPatient = $rootScope.callingPatient;
 					$rootScope.callingPatient = JSON.parse(message.body);

@@ -2,7 +2,7 @@
 <div class="container">
     <div class="jumbotron">
 
-        <form name="f" class="form-horizontal" autocomplete="off">
+        <form class="form-horizontal">
    	        <div ng-show="badRequest" class="alert alert-danger">
 		            <div class="row col-md-offset-1">Zmiana danych się nie powiodła</div>
 		        </div>
@@ -53,7 +53,7 @@
             <div class="form-group">
                 <label class="col-md-4 control-label">Specjalizacje: </label>
                 <div id="specialties-wrapper" class="col-md-8">
-               		<div id="specialty-labels-wrapper" class="form-control">
+               		<div id="specialty-labels-wrapper">
 										<span ng-repeat="specialty in doctorInfo.specialties"
 												ng-click="deleteSpecialty($index)"
 												class="specialty-label label label-md label-success">

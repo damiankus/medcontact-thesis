@@ -1,6 +1,7 @@
 .specialty-label {
 	font-size: 16px;
 	margin-right: 5px;
+	display:inline-block;
 }
 
 .specialty-label:hover {
@@ -14,8 +15,7 @@
 	padding-left: 0;
 	padding-right: 0;
 	margin-bottom: 5px;
-	overflow-wrap: break-word;
-	word-wrap: break-word;
+	overflow: auto;
 }
 
 #specialties-wrapper * {

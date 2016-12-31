@@ -41,6 +41,8 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
 	    	$rootScope.ringTone = new Audio("assets/sounds/ring.mp3");
 	    	
 	    	stompClient.connect({}, function (frame) {
+	    		$rootScope.subscribed = true;
+	    		
 	    		$rootScope.subscription = stompClient.subscribe("/queue/doctors/" + $rootScope.userDetails.id + "/calling", function (message) {
 	    			$rootScope.prevPatient = $rootScope.callingPatient;
 					$rootScope.callingPatient = JSON.parse(message.body);
@@ -64,11 +66,8 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
 						if ($location.url() !== "/doctor/consultation") {
 							$location.path("/doctor/consultation");
 							
-						} else {
-							getSharedFiles();
-							getNextReservation($rootScope.currentReservation.id);
-							getNotesForPatient($rootScope.callingPatient.id);
 						}
+							
 					});
 					
 					dialog.modal("show");
@@ -78,13 +77,33 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
 				id: $rootScope.userDetails.id
 			});
 	    }
+        
+        /* Current and previous reservation data controller */
+        
+        function getNextReservation(reservationId) {
+    		$http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/reservations/" + reservationId + "/next")
+    		    .then(function successCallback(response) {
+    		    	
+    		    	if (response.data.id > 0) {
+    		    		$rootScope.nextReservation = response.data;
+    		    		$rootScope.nextReservation.startDateTime = new Date($rootScope.nextReservation.startDateTime);
+    		    		$rootScope.nextReservation.endDateTime = new Date($rootScope.nextReservation.endDateTime);
+    		    	
+    		    	} else {
+    		    		$rootScope.nextReservation = null;
+    		    	}
+    		    	
+    		    }, function errorCallback(response) {
+    		    	alert("[ERROR]: Couldn't load current reservation data");
+    		    	$location.url("/login");
+    		    });
+        }
 
         function getSchedule() {
             $http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/reservations")
                 .then(function successCallback(response) {
                 	
                         response.data.forEach(function (schedule) {
-                        	console.log(schedule);
                             schedule.startDateTime = new Date(schedule.startDateTime);
                             schedule.endDateTime = new Date(schedule.endDateTime);
                             schedule.day = moment(schedule.startDateTime).format("DD MM YYYY");
