@@ -7,8 +7,8 @@ myApp.config(['$routeProvider', function ($routeProvider) {
     });
 }]);
 
-myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService',
-    function (REST_API, $rootScope, $scope, $http, $location, UserService) {
+myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService', 'TimeService',
+    function (REST_API, $rootScope, $scope, $http, $location, UserService, TimeService) {
 		$rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
 	
 		/* Warning: 
@@ -35,8 +35,8 @@ myApp.controller('ReservationCtrl', ['REST_API', '$rootScope', '$scope', '$http'
 	                $scope.reservations	 = response.data;
 	                
 	                $scope.reservations.forEach(function (reservation, index) {
-	                	reservation.startDateTime = new Date(reservation.startDateTime);
-	                	reservation.endDateTime = new Date(reservation.endDateTime);
+	                	reservation.startDateTime = new Date(TimeService.parseWithTimezone(reservation.startDateTime));
+	                	reservation.endDateTime = new Date(TimeService.parseWithTimezone(reservation.endDateTime));
 	                });
 	                
 	            }, function errorCallback(response) {

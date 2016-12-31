@@ -9,8 +9,8 @@ myApp.config(['$routeProvider', function ($routeProvider) {
     });
 }]);
 
-myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService',
-    function (REST_API, $rootScope, $scope, $http, $location, UserService) {
+myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http', '$location', 'UserService', 'TimeService',
+    function (REST_API, $rootScope, $scope, $http, $location, UserService, TimeService) {
 		
 		$rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
 		$scope.sortField = "uploadTime";
@@ -21,9 +21,13 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 			$http.get(REST_API + "patients/" + $rootScope.userDetails.id + "/reservations")
 			.then(function successCallback(response) {
 				$scope.reservations	 = response.data;
+				
 				$scope.reservations.forEach(function (reservation, index) {
-					reservation.startDateTime = new Date(reservation.startDateTime);
-					reservation.endDateTime = new Date(reservation.endDateTime);
+					reservation.startDateTime = TimeService.parseWithTimezone(reservation.startDateTime);
+					reservation.endDateTime = TimeService.parseWithTimezone(reservation.endDateTime);
+				});
+				$scope.reservations.sort(function (a, b) {
+					return (a.startDateTime < b.startDateTime) ? -1 : 1;
 				});
 				
 			}, function errorCallback(response) {
@@ -66,7 +70,7 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 			.then(function successCallback(response) {
 				$scope.files = response.data;
 				$scope.files.forEach(function (item) {
-					item.uploadTime = new Date(item.uploadTime);
+					item.uploadTime = TimeService.parseWithTimezone(item.uploadTime);
 				});
 				$scope.getSharedFiles();
 				

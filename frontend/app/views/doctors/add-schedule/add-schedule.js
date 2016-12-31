@@ -26,8 +26,8 @@ var isValidDate = function (date) {
     }
 };
 
-myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
-    function (REST_API, $rootScope, $scope, $http, $location, UserService) {
+myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService', 'TimeService',
+    function (REST_API, $rootScope, $scope, $http, $location, UserService, TimeService) {
         $rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
         subscribeForNotifications();
         getSchedule();
@@ -55,7 +55,7 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
 					$("#calling-patient-id").text($scope.callingPatient.id);
 					$("#calling-patient-name").text($scope.callingPatient.name);
 					
-					var startTime = formatTime(new Date($scope.callingPatient.reservation.startDateTime));
+					var startTime = TimeService.parseWithTimezone($scope.callingPatient.reservation.startDateTime);
 					
 					$("#calling-patient-start").text(startTime);
 					$("#redirect-to-consultation-btn").one("click", function () {
@@ -86,8 +86,8 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
     		    	
     		    	if (response.data.id > 0) {
     		    		$rootScope.nextReservation = response.data;
-    		    		$rootScope.nextReservation.startDateTime = new Date($rootScope.nextReservation.startDateTime);
-    		    		$rootScope.nextReservation.endDateTime = new Date($rootScope.nextReservation.endDateTime);
+    		    		$rootScope.nextReservation.startDateTime = TimeService.parseWithTimezone($rootScope.nextReservation.startDateTime);
+    		    		$rootScope.nextReservation.endDateTime = TimeService.parseWithTimezone($rootScope.nextReservation.endDateTime);
     		    	
     		    	} else {
     		    		$rootScope.nextReservation = null;
@@ -102,11 +102,12 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
         function getSchedule() {
             $http.get(REST_API + "doctors/" + $rootScope.userDetails.id + "/reservations")
                 .then(function successCallback(response) {
-                	
+                		
                         response.data.forEach(function (schedule) {
-                            schedule.startDateTime = new Date(schedule.startDateTime);
-                            schedule.endDateTime = new Date(schedule.endDateTime);
-                            schedule.day = moment(schedule.startDateTime).format("DD MM YYYY");
+                        	schedule.day = moment(schedule.startDateTime).format("DD MM YYYY");
+                            schedule.startDateTime = TimeService.parseWithTimezone(schedule.startDateTime);
+                            schedule.endDateTime = TimeService.parseWithTimezone(schedule.endDateTime);
+                            console.log(schedule.startDateTime);
                         });
                         
                         response.data = _.groupBy(response.data, function (schedule) {
@@ -183,10 +184,4 @@ myApp.controller('AddScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http'
                 $('#startTimePickerDiv').data("DateTimePicker").maxDate(e.date);
             });
         });
-        
-        function formatTime(dateTime) {
-        	var time = new Date(dateTime);
-    		return  "" + ((time.getHours() > 9) ? time.getHours() : "0" + time.getHours()) 
-    			+ ":" + ((time.getMinutes() > 9) ? time.getMinutes() : "0" + time.getMinutes());
-        }
     }]);

@@ -7,8 +7,8 @@ myApp.config(['$routeProvider', function ($routeProvider) {
     });
 }]);
 
-myApp.controller('AvailableScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService', '$routeParams',
-    function (REST_API, $rootScope, $scope, $http, $location, UserService, $routeParams) {
+myApp.controller('AvailableScheduleCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService', 'TimeService', '$routeParams',
+    function (REST_API, $rootScope, $scope, $http, $location, UserService, TimeService, $routeParams) {
         $rootScope.userDetails = UserService.getUserOrRedirect($location, "/login");
         getSchedule();
         $scope.emptySchedule = false;
@@ -18,8 +18,8 @@ myApp.controller('AvailableScheduleCtrl', ['REST_API', "$rootScope", '$scope', '
                 .then(function successCallback(response) {
 
                         response.data.forEach(function (schedule) {
-                            schedule.startDateTime = new Date(schedule.startDateTime);
-                            schedule.endDateTime = new Date(schedule.endDateTime);
+                            schedule.startDateTime = TimeService.parseWithTimezone(schedule.startDateTime);
+                            schedule.endDateTime = TimeService.parseWithTimezone(schedule.endDateTime);
                             schedule.day = moment(schedule.startDateTime).format("DD MM YYYY");
                         });
                         response.data = _.groupBy(response.data, function (schedule) {

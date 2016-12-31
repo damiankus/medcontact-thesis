@@ -53,4 +53,14 @@ var myApp = angular.module('myApp', ['ngRoute'])
         };
         
         return accessor;
+    })
+    .factory('TimeService', function () {
+    	return {
+    		parseWithTimezone: function (timeString) {
+    			return moment.utc(timeString).format();
+    		},
+    		now: function () {
+    			return moment.utc();
+    		}
+    	};
     });

@@ -7,8 +7,8 @@ myApp.config(['$routeProvider', function ($routeProvider) {
     });
 }]);
 
-myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService',
-  function (REST_API, $rootScope, $scope, $http, $location, UserService) {
+myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$location', 'UserService', 'TimeService',
+  function (REST_API, $rootScope, $scope, $http, $location, UserService, TimeService) {
 	$rootScope.userDetails = UserService.getUserOrRedirect($location, "/add-schedule");
 	$scope.isNoteModified = {};
 	initControlls();
@@ -78,7 +78,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 					$("#calling-patient-id").text($scope.callingPatient.id);
 					$("#calling-patient-name").text($scope.callingPatient.name);
 					
-					var startTime = formatTime(new Date($scope.callingPatient.reservation.startDateTime));
+					var startTime = TimeService.parseWithTimezone($scope.callingPatient.reservation.startDateTime);
 					
 					$("#calling-patient-start").text(startTime);
 					$("#redirect-to-consultation-btn").one("click", function () {
@@ -174,7 +174,7 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 			.then(function successCallback(response) {
 				$scope.files = response.data;
 				$scope.files.forEach(function (item) {
-					item.uploadTime = new Date(item.uploadTime);
+					item.uploadTime = TimeService.parseWithTimezone(item.uploadTime);
 				});
 				
 			}, function errorCallback(response) {
@@ -278,10 +278,9 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         	
         	var ctx = canvas.getContext("2d");
         	ctx.drawImage(remoteVideo, 0, 0);
-        	var now = new Date();
         	
         	var link = $("<a></a>")
-   	    		.attr("download", "screenshot_" + (formatDate(now) + "_" + formatTime(now)) + ".png")
+   	    		.attr("download", "screenshot_" + TimeService.now().format("DD-MM-YYYY[_]HH:mm") + ".png")
     			.attr("href", canvas.toDataURL("image/png"));
     	
         	link = link[0];
@@ -366,17 +365,6 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
         }
     }
     
-    function formatDate(dateTime) {
-    	var date = new Date(dateTime);
-    	return  "" + date.getDate() + "-" + date.getMonth() + "-" + date.getYear();
-    }
-    
-    function formatTime(dateTime) {
-    	var time = new Date(dateTime);
-		return  "" + ((time.getHours() > 9) ? time.getHours() : "0" + time.getHours()) 
-			+ ":" + ((time.getMinutes() > 9) ? time.getMinutes() : "0" + time.getMinutes());
-    }
-    
     /* Text chat controls logic */
     
     function addMessage(sender, content, bgClass) {
@@ -447,8 +435,8 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 		    	
 		    	if (response.data.id > 0) {
 		    		$rootScope.nextReservation = response.data;
-		    		$rootScope.nextReservation.startDateTime = new Date($rootScope.nextReservation.startDateTime);
-		    		$rootScope.nextReservation.endDateTime = new Date($rootScope.nextReservation.endDateTime);
+		    		$rootScope.nextReservation.startDateTime = TimeService.parseWithTimezone($rootScope.nextReservation.startDateTime);
+		    		$rootScope.nextReservation.endDateTime = TimeService.parseWithTimezone($rootScope.nextReservation.endDateTime);
 		    	
 		    	} else {
 		    		$rootScope.nextReservation = null;
