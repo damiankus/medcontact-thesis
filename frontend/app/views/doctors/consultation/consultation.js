@@ -77,10 +77,8 @@ myApp.controller('ConsultationDoctorCtrl', ['REST_API', "$rootScope", '$scope', 
 					var dialog = $("#modal-calling");
 					$("#calling-patient-id").text($scope.callingPatient.id);
 					$("#calling-patient-name").text($scope.callingPatient.name);
-					$scope.callingPatient.reservation.startDateTime = TimeService.parseTimeWithTimezone($scope.callingPatient.reservation.startDateTime);
-					$scope.callingPatient.reservation.endDateTime = TimeService.parseTimeWithTimezone($scope.callingPatient.reservation.endDateTime);
 					
-					$("#calling-patient-start").text($scope.callingPatient.reservation.startDateTime);
+					$("#calling-patient-start").text(TimeService.parseTimeWithTimezone($scope.callingPatient.reservation.startDateTime));
 					var startTime = TimeService.parseTimeWithTimezone($scope.callingPatient.reservation.startDateTime);
 					$("#calling-patient-start").text(startTime);
 					$("#redirect-to-consultation-btn").one("click", function () {

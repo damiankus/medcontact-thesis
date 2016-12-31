@@ -265,6 +265,7 @@ public class DoctorService {
     			.map(r -> new BasicReservationData(r))
     			.collect(Collectors.toList());
     	
+    	nextReservations.forEach(r -> System.out.println(r.getStartDateTime()));
     	return (nextReservations.size() > 0) ? nextReservations.get(0) : new BasicReservationData();
     }
     
