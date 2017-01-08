@@ -1,0 +1,14 @@
+.classpath  
+.git  
+.mvn  
+mvnw  
+mvnw.cmd  
+.project  
+.settings  
+.springBeans
+target
+.idea/
+patients/
+
+
+

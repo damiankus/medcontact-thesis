@@ -114,7 +114,8 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
     	$scope.connected = false;
     	$scope.webrtc.leaveRoom();
         stopTransmission();
-        console.log("Disconnected from: [" + $scope.connectionDetails.room + "]");
+        console.log("Disconnected from: [" + $scope.connectionDetails.room + "]");        	
+
     }
     
     function notifyDoctor() {
@@ -181,11 +182,15 @@ myApp.controller('ConsultationPatientCtrl', ['REST_API', "$rootScope", '$scope',
         });
   
         $("#call-btn").click(function () {
-            notifyDoctor();
-            
-            if (!$scope.connected) {
-            	connect();
-            }
+        	console.error("local");
+        	console.log($scope.webrtc.webrtc.peers[0].pc.pc.peerconnection.localDescription.sdp);
+         	console.error("remote");
+        	console.log($scope.webrtc.webrtc.peers[0].pc.pc.peerconnection.remoteDescription.sdp);
+//        	notifyDoctor();
+//            
+//            if (!$scope.connected) {
+//            	connect();
+//            }
         });
         
         $("#disconnect-btn").click(function () {

@@ -1,0 +1,29 @@
+.specialty-label {
+	font-size: 16px;
+	margin-right: 5px;
+	display:inline-block;
+}
+
+.specialty-label:hover {
+	cursor: pointer;
+	background-color: #d9534f;
+}
+
+#specialty-labels-wrapper {
+	background: none;
+	border: none;
+	padding-left: 0;
+	padding-right: 0;
+	margin-bottom: 5px;
+	overflow: auto;
+}
+
+#specialties-wrapper * {
+	margin-bottom: 5px;
+}
+
+#biography-textarea {
+	overflow: auto;
+	white-space: pre-line;
+	overflow-wrap: break-word;
+}

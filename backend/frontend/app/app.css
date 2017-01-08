@@ -1,0 +1,46 @@
+/* app css stylesheet */
+
+@import url('/assets/css/add-schedule.css');
+@import url('/assets/css/consultation.css');
+@import url('/assets/css/file-upload.css');
+@import url('/assets/css/signup.css');
+@import url('/assets/css/personal-data.css');
+
+.nav > .nav-item {
+	margin-right: 5px;
+}
+
+.navbar-default .navbar-nav > li > .btn-success {
+	color: white;
+}
+
+.center {
+	float: none;
+	margin: auto;
+}
+
+th:hover {
+	cursor: pointer;
+}
+
+.btn-toolbar button {
+	margin-right: 5px;
+}
+
+.search-form {
+	margin-top: 2% !important;
+	margin-bottom: 2% !important;
+}
+
+.term-status {
+	font-size: 16px;
+}
+
+[ng-cloak] .ng-cloak {
+	display: none !important;
+}
+
+auto-expand {
+	overflow: auto;
+}
+

@@ -13,7 +13,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -27,8 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.medcontact.data.model.domain.Doctor;
 import com.medcontact.data.model.domain.FileEntry;
 import com.medcontact.data.model.domain.Patient;
@@ -39,7 +36,6 @@ import com.medcontact.data.model.dto.BasicSharedFileData;
 import com.medcontact.data.model.dto.BasicUserData;
 import com.medcontact.data.model.dto.ConnectionData;
 import com.medcontact.data.model.dto.SharedFileDetails;
-import com.medcontact.data.model.dto.UserFilename;
 import com.medcontact.data.model.enums.ReservationState;
 import com.medcontact.data.repository.FileRepository;
 import com.medcontact.data.repository.PatientRepository;
@@ -59,11 +55,6 @@ import lombok.Setter;
 @Service
 public class PatientService {
     private Logger logger = Logger.getLogger(this.getClass().getName());
-
-    private Cache<UserFilename, FileEntry> cachedFileEntries = CacheBuilder.newBuilder()
-            .expireAfterWrite(2, TimeUnit.MINUTES)
-            .concurrencyLevel(4)
-            .build();
 
     @Getter
     @Setter
@@ -215,19 +206,8 @@ public class PatientService {
                 List<FileEntry> foundEntries = fileRepository.findByFilenameAndOwnerId(
                         file.getOriginalFilename(), patientId);
 
-				/* We use file entries cache because it's possible that
-                 * file upload is divided into 2 or more subsequent method calls.
-				 * Because of that the file entry repository might not be able to
-				 * save the file entry quickly enough so that it can be
-				 * found during the second call. */
-
-                UserFilename soughtFileEntry = new UserFilename(patientId, file.getOriginalFilename());
-                FileEntry cachedFileEntry = cachedFileEntries.getIfPresent(soughtFileEntry);
-
                 FileEntry fileEntry = (foundEntries.size() > 0)
                         ? foundEntries.get(0)
-                        : (cachedFileEntry != null)
-                        ? cachedFileEntry
                         : new FileEntry();
 
                 fileEntry.setName(file.getOriginalFilename());
@@ -250,8 +230,6 @@ public class PatientService {
                     fileEntry.setUrl(fileUrl + fileEntry.getId());
                     fileRepository.save(fileEntry);
                 }
-
-                cachedFileEntries.put(soughtFileEntry, fileEntry);
 
                 File fileToWrite = Paths.get(filePath).toAbsolutePath().toFile();
                 fileToWrite.getParentFile().mkdirs();
@@ -424,21 +402,26 @@ public class PatientService {
         if (patient == null) {
         	throw new UnauthorizedUserException();
         	
-        } else if(passwordEncoder.matches(
-        			patientData.getOldPassword(), patient.getPassword())
-        		&& patientData.getNewPassword1() != null 
-        		&& patientData.getNewPassword1().equals(patientData.getNewPassword2())){
+        } else {
+        	patient.setEmail(patientData.getUsername());
+        	patient.setFirstName(patientData.getFirstName());
+        	patient.setLastName(patientData.getLastName());
+        			
+        	if (patientData.getNewPassword1().length() > 0) {
+        		if (passwordEncoder.matches(
+        				patientData.getOldPassword(), patient.getPassword())
+            		&& patientData.getNewPassword1() != null 
+            		&& patientData.getNewPassword1().equals(patientData.getNewPassword2())) {
+        			
+        			patient.setPassword(passwordEncoder.encode(patientData.getNewPassword1()));
         		
-    		patient.setEmail(patientData.getUsername());
-    		patient.setFirstName(patientData.getFirstName());
-    		patient.setLastName(patientData.getLastName());
-    		patient.setPassword(passwordEncoder.encode(patientData.getNewPassword1()));
-            
+        		} else {
+        			throw new NotMatchedPasswordException();
+        		}
+        	}
+        	
     		patientRepository.save(patient);
-    		
-        } else{
-            throw new NotMatchedPasswordException();
-        }
+        } 
     }
 
 }

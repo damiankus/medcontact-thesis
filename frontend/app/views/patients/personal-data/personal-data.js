@@ -39,7 +39,6 @@ myApp.controller('PersonalDataCtrl', ['REST_API', "$rootScope", '$scope', '$http
                         role: $rootScope.userDetails.role
                     };
                     
-                    console.log($rootScope.userDetails);
                     UserService.setUser(personalData);
                     $rootScope.userDetails = UserService.getUser();
                     console.log($rootScope.userDetails);

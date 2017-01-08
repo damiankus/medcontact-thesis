@@ -1,0 +1,109 @@
+@CHARSET "UTF-8";
+
+#chat-panel {
+	height: 100%;
+}
+
+.modal-body {
+	padding: 5%;
+}
+
+.message {
+	border-radius: 5px;
+	padding: 2% 1% 0 1%;
+	margin-top: 1%;
+}
+
+#chat-messages {
+	height: 240px;
+	overflow: auto;
+}
+
+.msg-content {
+	margin-top: 1%;
+	padding: 1%;
+	overflow-wrap: break-word;
+	font-size: 18px;
+}
+
+.msg-label {
+	border: solid white 1px;
+	border-radius: 5px;
+	padding: 1%;
+	margin-top: 1%;
+	font-size: 14px;
+}
+
+#localVideo {
+	border-radius: 5px;
+	width: 100%;
+	height: auto;
+	transform: scaleX(1) !important;
+}
+
+#remoteVideos video {
+	border-radius: 5px;
+	width: 100%;
+	height: auto;
+}
+
+#volume-level-range {
+	display: inline-block;
+  vertical-align: middle;
+	width: auto;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.tab {
+	margin: 1%;
+}
+
+.tab-panel {
+	padding: 2% 3% 2% 3%;
+	font-size: 16px;
+}
+
+.tab-panel-row {
+	margin-top: 2%;
+}
+
+.tab-panel-label {
+	font-size: 16px;
+	font-weight: normal !important;
+}
+
+#tab-doctor-info {
+	overflow: auto;
+}
+
+#files-table-wrapper {
+	overflow: auto;
+}
+
+#notes-wrapper {
+	overflow: auto;
+}
+
+.reservation-data-label {
+	margin-bottom: 2%;
+	font-size: 16px;
+}
+
+.reservation-data {
+	width: 49%;
+	padding: 2%;
+	border-radius: 5px;
+}
+
+.note {
+	white-space: pre-line;
+	overflow-wrap: break-word;
+	text-align: left;
+	padding: 2% 1% 2% 1%;
+	margin-bottom: 1%;
+	font-size: 16px;
+	border-radius: 5px;
+}

@@ -1,0 +1,80 @@
+<div class="container">
+    <div class="jumbotron">
+        <div class="form-group text-center">
+            <h2>{{userDetails.firstName + " " + userDetails.lastName}}</h2>
+            <h3>Terminy konsultacji</h2>
+        </div>
+        
+        <div ng-show="emptySchedule" class="col-md-offset-1 col-md-10 alert alert-warning">
+            Lekarz nie posiada wolnych terminów
+        </div>
+
+        <table class="table">
+            <thead ng-repeat-start="schedule in schedules">
+            <tr>
+                <th>{{schedule.key | date:'EEEE: dd MMMM yyyy'}}</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody ng-repeat-end>
+            <tr ng-repeat="term in schedule.values | orderBy:'startDateTime'">
+                <td>{{term.startDateTime | date:'HH:mm'}} - {{term.endDateTime | date:'HH:mm'}}</td>
+                <td>
+                	<span ng-show="term.reservationState === 'UNRESERVED'" class="term-status label label-default">wolny</span>
+                	<span ng-show="term.reservationState === 'RESERVED'" class="term-status label label-success">zajęty</span>
+                </td>
+								<!--<td><input name="submit-btn" class="btn btn-sm btn-warning" type="submit" value="Usuń termin"
+                           ng-click="bookTerm(value.id)"/></td>-->
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="jumbotron">
+        <form id="scheduleForm" name="scheduleForm" class="form-horizontal">  
+            <div class="form-group">
+								<div class="text-center">
+	                <h2>Dodawanie nowego terminu</h2>
+								</div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">Data: </label>
+                <div class='col-md-6 input-group date' id="datePickerDiv">
+                    <input id='datePicker' type='text' class="form-control" required/>
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar">
+                    </span>
+                </span>
+                </div>
+
+                <label class="col-md-4 control-label">Początek terminu: </label>
+                <div class='col-md-6 input-group date' id='startTimePickerDiv'>
+                    <input id="startTimePicker"  type='text' class="form-control" required/>
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar">
+                    </span>
+                </span>
+                </div>
+
+                <label class="col-md-4 control-label">Koniec terminu: </label>
+                <div class='col-md-6 input-group date' id='endTimePickerDiv'>
+                    <input id="endTimePicker" ng-model="endTime" type='text' class="form-control" required/>
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar">
+                    </span>
+                </span>
+                </div>
+			           	<button id="shedule-submit-btn" ng-click="scheduleForm.$valid && addSchedule()" 
+			           			class="col-md-8 col-md-offset-2 btn btn-lg btn-success">
+			           		Dodaj termin
+			         		</button>
+            </div>
+						
+
+        </form>
+
+    </div>
+</div>
+
+</body>

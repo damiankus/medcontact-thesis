@@ -1,0 +1,117 @@
+<body>
+<div class="container">
+    <div class="jumbotron">
+
+        <form class="form-horizontal">
+   	        <div ng-show="badRequest" class="alert alert-danger">
+		            <div class="row col-md-offset-1">Zmiana danych się nie powiodła</div>
+		        </div>
+		        <div ng-show="changeSuccess" class="alert alert-success">
+		            <div class="row col-md-offset-1">Dane zostały zaktualizowane</div>
+		        </div>
+		        
+            <div class="form-group">
+                <span class="col-md-4"></span>
+                <h2 class="col-md-8">Ustawienia konta</h2>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">Imię: </label>
+                <div class="col-md-8">
+                    <input name="firstname" type="text" class="form-control" required="required" ng-model="doctorInfo.firstName"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">Nazwisko: </label>
+                <div class="col-md-8">
+                    <input name="surname" type="text" class="form-control" required="required" ng-model="doctorInfo.lastName"/>
+                </div>
+            </div>
+            
+						<div class="form-group">
+                <label class="col-md-4 control-label">Adres e-mail: </label>
+                <div class="col-md-8">
+                    <input name="email" type="email" class="form-control" required="required" ng-model="doctorInfo.email"/>
+                </div>
+            </div>
+            
+           	<div class="form-group">
+                <label class="col-md-4 control-label">Tytuł naukowy: </label>
+                <div class="col-md-8">
+                    <input name="surname" type="text" class="form-control" required="required" ng-model="doctorInfo.title"/>
+                </div>
+            </div>
+
+						<div class="form-group">
+                <label class="col-md-4 control-label">Ukończona uczelnia: </label>
+                <div class="col-md-8">
+                    <input name="surname" type="text" class="form-control" required="required" ng-model="doctorInfo.university"/>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="col-md-4 control-label">Specjalizacje: </label>
+                <div id="specialties-wrapper" class="col-md-8">
+               		<div id="specialty-labels-wrapper">
+										<span ng-repeat="specialty in doctorInfo.specialties"
+												ng-click="deleteSpecialty($index)"
+												class="specialty-label label label-md label-success">
+											{{ specialty }}
+										</span>
+               		</div>
+                   
+                  <input id="specialty-input" type="text" class="form-control" autocomplete="off"/>
+									<div id="specialties-dropdown" class="col-md-12 dropdown">
+										<ul id="suggested-specialties-menu" class="dropdown-menu" role="menu">
+											<li tabindex="1" class="dropdown-item" ng-repeat="specialty in suggestedSpecialties">
+												<div ng-click="addSpecialty(specialty)">
+													<span> {{ specialty }}</span>
+												</div>
+											</li>
+										</ul>
+		              </div>
+                  <button ng-click="addSpecialtyFromTextField()" class="form-control btn btn-md btn-success col-md-12"> Dodaj</button>
+
+            	</div>    
+            </div>        
+            
+            <div class="form-group">
+                <label class="col-md-4 control-label">Biografia: </label>
+                <div class="col-md-8">
+										<textarea id="biography-textarea" ng-model="doctorInfo.biography" rows="5" class="form-control pre-scrollable col-md-12"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="col-md-4"></span>
+                <h4 class="col-md-8">Zmiana hasła</h4>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label">Stare hasło: </label>
+                <div class="col-md-8">
+                    <input name="oldpassword" type="password" class="form-control" ng-model="doctorInfo.oldPassword" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label">Nowe hasło: </label>
+                <div class="col-md-8">
+                    <input name="newpassword1" type="password" class="form-control" ng-model="doctorInfo.newPassword1" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label">Powtórz hasło: </label>
+                <div class="col-md-8">
+                    <input name="newpassword2" type="password" class="form-control" ng-model="doctorInfo.newPassword2" />
+                </div>
+            </div>
+
+            <div class="pull-right">
+                <input ng-click="changePersonalData()" name="submit-btn" class="btn btn-lg btn-success" type="submit" value="Zapisz zmiany" />
+            </div>
+
+        </form>
+    </div>
+</div>
+
+</body>

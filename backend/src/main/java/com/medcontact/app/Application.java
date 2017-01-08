@@ -1,20 +1,26 @@
 package com.medcontact.app;
 
-import com.medcontact.data.model.builders.DoctorBuilder;
-import com.medcontact.data.model.domain.*;
-import com.medcontact.data.repository.AdministratorRepository;
-import com.medcontact.data.repository.DoctorRepository;
-import com.medcontact.data.repository.PatientRepository;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import com.medcontact.data.model.builders.DoctorBuilder;
+import com.medcontact.data.model.domain.Admin;
+import com.medcontact.data.model.domain.Doctor;
+import com.medcontact.data.model.domain.Note;
+import com.medcontact.data.model.domain.Patient;
+import com.medcontact.data.model.domain.Specialty;
+import com.medcontact.data.repository.AdministratorRepository;
+import com.medcontact.data.repository.DoctorRepository;
+import com.medcontact.data.repository.PatientRepository;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {
@@ -37,7 +43,13 @@ public class Application implements CommandLineRunner {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-
+    
+    @Value("${admin.email}")
+    private String adminEmail;
+    
+    @Value("${admin.password}")
+    private String adminPassword;
+    
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
@@ -46,9 +58,9 @@ public class Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Admin admin = (Admin) Admin.getBuilder()
                 .setFirstName("Admin")
-                .setLastName("Adminowski")
-                .setEmail("a1@test.com")
-                .setPassword(passwordEncoder.encode("haslo"))
+                .setLastName("Admin")
+                .setEmail(adminEmail)
+                .setPassword(passwordEncoder.encode(adminPassword))
                 .build();
 
         adminRepository.save(admin);

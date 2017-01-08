@@ -117,7 +117,6 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 				/* Show the filename in the text area */
 				
 				if (fileInput[0].files[0] !== null) {
-					console.log("# of files: " + fileInput[0].files.length);
 					var fileNames = "";
 					var maxLength = 0;
 					var fileCount = fileInput[0].files.length;
@@ -232,7 +231,6 @@ myApp.controller('FileUploadCtrl', ['REST_API', '$rootScope', '$scope', '$http',
 			$("#dropdown-" + fileId).addClass("open");
 			
 			$scope.reservations.forEach(function (reservation, index) {
-				console.log("fileId: "+ fileId + ", reservation: " + reservation.id + " -> " + $scope.fileReservationMap[fileId][reservation.id]);
 				if ($scope.fileReservationMap[fileId][reservation.id] == true) {
 					$("#dropdown-" + fileId + " #reservation-" + reservation.id).addClass("dropdown-item-selected");
 				}

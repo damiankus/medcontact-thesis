@@ -43,6 +43,7 @@ myApp.controller('LoginCtrl', ['REST_API', "$rootScope", '$scope', '$http', '$lo
                         $scope.loginError = false;
                         $scope.loggedIn = true;
                         $scope.resetPassword = false;
+                        
                         switch ($rootScope.userDetails.role){
                             case 'DOCTOR':
                                 $location.url('/add-schedule');

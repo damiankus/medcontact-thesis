@@ -1,0 +1,20 @@
+{
+  "name": "medcontact-thesis-frontend",
+  "description": "medcontact thesis",
+  "version": "0.0.0",
+  "homepage": "https://github.com/damiankus/medcontact-thesis",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "angular": "~1.5.0",
+    "angular-route": "~1.5.0",
+    "html5-boilerplate": "^5.3.0",
+    "bootstrap": "~3.3.7",
+    "eonasdan-bootstrap-datetimepicker": "latest",
+    "sockjs-client": "^1.1.1",
+    "stomp-websocket": "^2.3.3",
+    "angular-i18n": "latest",
+    "underscore": "latest",
+    "simpleWebRTC": "git://github.com/andyet/SimpleWebRTC.git#2f23aabbefc241d19018dddb006a02174653b0eb"
+  }
+}
